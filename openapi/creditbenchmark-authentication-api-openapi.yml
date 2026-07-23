@@ -1,0 +1,171 @@
+openapi: 3.1.0
+info:
+  title: Credit Benchmark Analytics Authentication API
+  description: 'Authentication, matching, and analytics.
+
+    '
+  version: 1.0.0
+  contact:
+    name: Credit Benchmark API Support
+    email: api-support@creditbenchmark.com
+    url: https://creditbenchmark.com/support
+  license:
+    name: Proprietary
+    url: https://creditbenchmark.com/terms
+servers:
+- url: https://api.creditbenchmark.com
+  description: Production server
+security:
+- BearerAuth: []
+tags:
+- name: Authentication
+  description: JWT token generation and authentication
+paths:
+  /gartan/api/token:
+    post:
+      tags:
+      - Authentication
+      summary: Create JWT Token
+      description: 'Create a JWT bearer token.
+
+        '
+      operationId: getToken
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+              - Username
+              - Password
+              - grant_type
+              properties:
+                Username:
+                  type: string
+                  description: Your Credit Benchmark username
+                  example: your_username
+                Password:
+                  type: string
+                  format: password
+                  description: Your Credit Benchmark password
+                  example: your_password
+                grant_type:
+                  type: string
+                  enum:
+                  - password
+                  description: Grant type for authentication
+                  example: password
+            encoding:
+              Username:
+                style: form
+              Password:
+                style: form
+              grant_type:
+                style: form
+      responses:
+        '200':
+          description: JWT token generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    description: JWT access token valid for 24 hours
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  token_type:
+                    type: string
+                    description: Token type (always "Bearer")
+                    example: Bearer
+                  expires_in:
+                    type: integer
+                    description: Token expiration time in seconds (86400 = 24 hours)
+                    example: 86400
+              example:
+                access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                token_type: Bearer
+                expires_in: 86400
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+components:
+  schemas:
+    ValidationErrorDetail:
+      type: object
+      description: Single field validation error
+      properties:
+        field:
+          type: string
+          description: Location of the validation error (e.g. body.Parameters.portfolio)
+          example: body.Parameters.portfolio
+        message:
+          type: string
+          description: Human-readable error message
+          example: field required
+        type:
+          type: string
+          description: Machine-readable error type
+          example: value_error.missing
+    Error:
+      type: object
+      description: Standard error envelope used by the API
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+              description: Machine-readable error code
+              example: BAD_REQUEST
+            message:
+              type: string
+              description: Human-readable error message
+              example: Invalid request parameters
+            details:
+              description: Optional structured details about the error
+              oneOf:
+              - type: array
+                items:
+                  $ref: '#/components/schemas/ValidationErrorDetail'
+              - type: object
+              - type: string
+  responses:
+    BadRequest:
+      description: Bad request - invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: BAD_REQUEST
+              message: Invalid request parameters
+              details:
+                invalid_columns:
+                - BadColumn
+                allowed_columns: Please check documentation for valid column names
+    Unauthorized:
+      description: Unauthorized - invalid or missing JWT token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: UNAUTHORIZED
+              message: Invalid or missing JWT token
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT bearer token.

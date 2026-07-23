@@ -1,0 +1,297 @@
+openapi: 3.1.0
+info:
+  title: Credit Benchmark Analytics Entity Matching API
+  description: 'Authentication, matching, and analytics.
+
+    '
+  version: 1.0.0
+  contact:
+    name: Credit Benchmark API Support
+    email: api-support@creditbenchmark.com
+    url: https://creditbenchmark.com/support
+  license:
+    name: Proprietary
+    url: https://creditbenchmark.com/terms
+servers:
+- url: https://api.creditbenchmark.com
+  description: Production server
+security:
+- BearerAuth: []
+tags:
+- name: Entity Matching
+  description: Entity name matching and identification
+paths:
+  /matching/match:
+    post:
+      tags:
+      - Entity Matching
+      summary: Entity Name Matching
+      description: 'Return ranked entity matches.
+
+        '
+      operationId: matchEntities
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatchBody'
+            example:
+              queries:
+              - text: JPMorgan Chase & Co.
+                industry: Financials
+                country_name: United States
+              - text: Apple Inc.
+                lei: 5493000X0X4X4X4X4X4X
+      responses:
+        '200':
+          description: Entity matching completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchExternalResponse'
+              example:
+                results:
+                - entity: JPMorgan Chase
+                  candidates:
+                  - rank: 1
+                    CBId: CB0000022706
+                    CBEntityName: JPMORGAN CHASE & CO
+                    CBCountryOfRiskISO: US
+                    isConsensus1M: true
+                    confidence: 0.82
+                  - rank: 2
+                    CBId: CB0000118034
+                    CBEntityName: JJPMORGAN CHASE BANK NA
+                    CBCountryOfRiskISO: US
+                    isConsensus1M: true
+                    confidence: 0.09
+                - entity: Apple Inc.
+                  candidates:
+                  - rank: 1
+                    CBId: CB0000000456
+                    CBEntityName: APPLE INC
+                    CBCountryOfRiskISO: US
+                    isConsensus1M: true
+                    confidence: 0.97
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  schemas:
+    MatchExternalResponse:
+      type: object
+      description: Response containing entity matching results
+      required:
+      - results
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExternalMatchRow'
+          description: Table-style results keyed by input entity
+          default: []
+    ExternalMatchRow:
+      type: object
+      description: Matching results for a single entity query
+      required:
+      - entity
+      - candidates
+      properties:
+        entity:
+          type: string
+          description: Original query text
+          example: JPMorgan Chase & Co.
+        candidates:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExternalCandidate'
+          description: Ordered list of candidate matches, sorted by rank
+          default: []
+    Error:
+      type: object
+      description: Standard error envelope used by the API
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+              description: Machine-readable error code
+              example: BAD_REQUEST
+            message:
+              type: string
+              description: Human-readable error message
+              example: Invalid request parameters
+            details:
+              description: Optional structured details about the error
+              oneOf:
+              - type: array
+                items:
+                  $ref: '#/components/schemas/ValidationErrorDetail'
+              - type: object
+              - type: string
+    Query:
+      type: object
+      description: A single entity name query for matching
+      required:
+      - text
+      properties:
+        text:
+          type: string
+          description: The company name to match
+          example: JPMorgan Chase & Co.
+        industry:
+          type: string
+          description: Optional industry filter to improve matching accuracy
+          example: Financials
+        lei:
+          type: string
+          description: Optional Legal Entity Identifier (LEI) for exact matching
+          example: 5493000X0X4X4X4X4X4X
+        country_name:
+          type: string
+          description: Optional country name or code to filter matches
+          example: United States
+    ExternalCandidate:
+      type: object
+      description: A ranked candidate match for an entity query
+      required:
+      - rank
+      - CBId
+      - CBEntityName
+      - confidence
+      properties:
+        rank:
+          type: integer
+          description: 1-based rank of the candidate (1 = best match)
+          minimum: 1
+          example: 1
+        CBId:
+          type: string
+          description: Credit Benchmark entity identifier
+          example: CB0000000121
+        CBEntityName:
+          type: string
+          description: Credit Benchmark entity name
+          example: JPMorgan Chase & Co.
+        CBCountryOfRiskISO:
+          type: string
+          description: ISO 3166-1 alpha-2 country code
+          example: US
+        isConsensus1M:
+          type: boolean
+          description: Whether the entity has a 1-month consensus rating
+          example: true
+        confidence:
+          type: number
+          format: float
+          description: Confidence score for the match (0.0 to 1.0)
+          minimum: 0
+          maximum: 1
+          example: 0.98
+    MatchBody:
+      type: object
+      description: Request body for entity name matching
+      required:
+      - queries
+      properties:
+        queries:
+          type: array
+          items:
+            $ref: '#/components/schemas/Query'
+          description: List of company names to match
+          minItems: 1
+    ValidationErrorDetail:
+      type: object
+      description: Single field validation error
+      properties:
+        field:
+          type: string
+          description: Location of the validation error (e.g. body.Parameters.portfolio)
+          example: body.Parameters.portfolio
+        message:
+          type: string
+          description: Human-readable error message
+          example: field required
+        type:
+          type: string
+          description: Machine-readable error type
+          example: value_error.missing
+  responses:
+    ValidationError:
+      description: Validation error - request parameters are invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: VALIDATION_ERROR
+              message: Request validation failed
+              details:
+              - field: body.Parameters.portfolio
+                message: field required
+                type: value_error.missing
+    Unauthorized:
+      description: Unauthorized - invalid or missing JWT token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: UNAUTHORIZED
+              message: Invalid or missing JWT token
+    BadRequest:
+      description: Bad request - invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: BAD_REQUEST
+              message: Invalid request parameters
+              details:
+                invalid_columns:
+                - BadColumn
+                allowed_columns: Please check documentation for valid column names
+    Forbidden:
+      description: Forbidden - insufficient permissions or access denied
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: PERMISSION_DENIED
+              message: Insufficient permissions for this resource
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: INTERNAL_SERVER_ERROR
+              message: An unexpected error occurred.
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT bearer token.

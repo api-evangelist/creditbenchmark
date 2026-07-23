@@ -1,0 +1,376 @@
+openapi: 3.1.0
+info:
+  title: Credit Benchmark Analytics Entity Data API
+  description: 'Authentication, matching, and analytics.
+
+    '
+  version: 1.0.0
+  contact:
+    name: Credit Benchmark API Support
+    email: api-support@creditbenchmark.com
+    url: https://creditbenchmark.com/support
+  license:
+    name: Proprietary
+    url: https://creditbenchmark.com/terms
+servers:
+- url: https://api.creditbenchmark.com
+  description: Production server
+security:
+- BearerAuth: []
+tags:
+- name: Entity Data
+  description: Entity-specific data and rating information
+paths:
+  /api/analytics/entity-rating-change:
+    post:
+      tags:
+      - Entity Data
+      summary: Entity Rating Change
+      description: 'Return entity rating changes.
+
+        '
+      operationId: entityRatingChange
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestEnvelope_EntityRatingChangeRequest'
+            example:
+              Parameters:
+                portfolio:
+                  name: Example Portfolio
+                  entities:
+                    CBId:
+                    - CB000000123
+                    - CB000000456
+                    CustomField1:
+                    - Value1
+                    - Value2
+                    - Value3
+                EffectiveDateId: 20241201
+                rating_change_months: 6
+                use_oci: false
+                use_client_scale: false
+                descriptor_columns:
+                - Sector
+      responses:
+        '200':
+          description: Entity rating changes retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityRatingChangeResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  schemas:
+    RatingChangeType:
+      type: string
+      enum:
+      - upgrades
+      - downgrades
+      title: RatingChangeType
+    EntityRatingChangeRequest:
+      properties:
+        portfolio:
+          $ref: '#/components/schemas/Portfolio'
+        EffectiveDateId:
+          type: integer
+          title: Effectivedateid
+        rating_change_months:
+          type: integer
+          title: Rating Change Months
+          default: 6
+        use_oci:
+          type: boolean
+          title: Use Oci
+          default: false
+        use_client_scale:
+          type: boolean
+          title: Use Client Scale
+          default: false
+        descriptor_columns:
+          items:
+            type: string
+          type: array
+          title: Descriptor Columns
+        filters:
+          $ref: '#/components/schemas/RatingChangeFilters'
+      type: object
+      required:
+      - portfolio
+      title: EntityRatingChangeRequest
+    RequestEnvelope_EntityRatingChangeRequest:
+      properties:
+        Parameters:
+          $ref: '#/components/schemas/EntityRatingChangeRequest'
+      type: object
+      required:
+      - Parameters
+      title: RequestEnvelope_EntityRatingChangeRequest
+    Error:
+      type: object
+      description: Standard error envelope used by the API
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+              description: Machine-readable error code
+              example: BAD_REQUEST
+            message:
+              type: string
+              description: Human-readable error message
+              example: Invalid request parameters
+            details:
+              description: Optional structured details about the error
+              oneOf:
+              - type: array
+                items:
+                  $ref: '#/components/schemas/ValidationErrorDetail'
+              - type: object
+              - type: string
+    Portfolio:
+      properties:
+        name:
+          type: string
+          title: Name
+          example: Example Portfolio
+        entities:
+          $ref: '#/components/schemas/FlexibleCBPortfolio'
+          example:
+            CBId:
+            - CB000000123
+            - CB000000456
+      type: object
+      required:
+      - name
+      - entities
+      title: Portfolio
+    RatingChangeFilters:
+      properties:
+        rating_change_type:
+          $ref: '#/components/schemas/RatingChangeType'
+        sort_by:
+          type: string
+          title: Sort By
+          default: rating_change
+        sort_descending:
+          type: boolean
+          title: Sort Descending
+          default: true
+        n:
+          type: integer
+          title: N
+      type: object
+      title: RatingChangeFilters
+    EntityRatingChangeResponse:
+      type: object
+      description: Response containing entity rating change data
+      required:
+      - CBId
+      - CBEntityName
+      - CCR
+      - CCR6M
+      - CCR100PDMid
+      - CCR100PDMid6M
+      - rating_change
+      - pd_change
+      properties:
+        CBId:
+          type: array
+          items:
+            type: string
+          description: Credit Benchmark entity identifiers
+          example:
+          - CB0000002619
+          - CB0000009484
+          - CB0000009810
+          - CB0000010249
+          - CB0000010457
+        CBEntityName:
+          type: array
+          items:
+            type: string
+          description: Entity names
+          example:
+          - BMO CAPITAL MARKETS CORP
+          - HILLTOP SECURITIES INC
+          - VIRTU AMERICAS LLC
+          - OPPENHEIMER & CO INC, BROKER
+          - TD AMERITRADE CLEARING INC
+        CCR:
+          type: array
+          items:
+            type: string
+          description: Current aggregate credit ratings
+          example:
+          - a-
+          - bb+
+          - bb-
+          - bb
+          - a-
+        CCR6M:
+          type: array
+          items:
+            type: string
+          description: Credit ratings 6 months ago (or rating_change_months ago)
+          example:
+          - a
+          - bb+
+          - bb-
+          - bb+
+          - a-
+        CCR100PDMid:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Current probability of default (mid)
+          example:
+          - 0.0009
+          - 0.0051
+          - 0.012
+          - 0.0086
+          - 0.0011
+        CCR100PDMid6M:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Probability of default 6 months ago (mid)
+          example:
+          - 0.0008
+          - 0.0051
+          - 0.012
+          - 0.0073
+          - 0.0011
+        rating_change:
+          type: array
+          items:
+            type: integer
+          description: Rating change in notches (negative = downgrade, positive = upgrade)
+          example:
+          - -1
+          - 0
+          - 0
+          - -1
+          - 0
+        pd_change:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Change in probability of default
+          example:
+          - 0.0001
+          - 0
+          - 0
+          - 0.0013
+          - 0
+    FlexibleCBPortfolio:
+      properties:
+        CBId:
+          items:
+            type: string
+          type: array
+          title: Cbid
+      additionalProperties: true
+      type: object
+      title: FlexibleCBPortfolio
+    ValidationErrorDetail:
+      type: object
+      description: Single field validation error
+      properties:
+        field:
+          type: string
+          description: Location of the validation error (e.g. body.Parameters.portfolio)
+          example: body.Parameters.portfolio
+        message:
+          type: string
+          description: Human-readable error message
+          example: field required
+        type:
+          type: string
+          description: Machine-readable error type
+          example: value_error.missing
+  responses:
+    ValidationError:
+      description: Validation error - request parameters are invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: VALIDATION_ERROR
+              message: Request validation failed
+              details:
+              - field: body.Parameters.portfolio
+                message: field required
+                type: value_error.missing
+    Unauthorized:
+      description: Unauthorized - invalid or missing JWT token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: UNAUTHORIZED
+              message: Invalid or missing JWT token
+    BadRequest:
+      description: Bad request - invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: BAD_REQUEST
+              message: Invalid request parameters
+              details:
+                invalid_columns:
+                - BadColumn
+                allowed_columns: Please check documentation for valid column names
+    Forbidden:
+      description: Forbidden - insufficient permissions or access denied
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: PERMISSION_DENIED
+              message: Insufficient permissions for this resource
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: INTERNAL_SERVER_ERROR
+              message: An unexpected error occurred.
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT bearer token.

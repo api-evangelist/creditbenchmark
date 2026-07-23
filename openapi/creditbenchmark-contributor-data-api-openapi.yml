@@ -1,0 +1,1119 @@
+openapi: 3.1.0
+info:
+  title: Credit Benchmark Analytics Contributor Data API
+  description: 'Authentication, matching, and analytics.
+
+    '
+  version: 1.0.0
+  contact:
+    name: Credit Benchmark API Support
+    email: api-support@creditbenchmark.com
+    url: https://creditbenchmark.com/support
+  license:
+    name: Proprietary
+    url: https://creditbenchmark.com/terms
+servers:
+- url: https://api.creditbenchmark.com
+  description: Production server
+security:
+- BearerAuth: []
+tags:
+- name: Contributor Data
+  description: Contributor-specific analytics using client/bank internal PD data. Requires ent_CLIENT-DATA entitlement.
+paths:
+  /api/analytics/contributor/custom-aggregate:
+    post:
+      tags:
+      - Contributor Data
+      summary: Client Data Custom Aggregate
+      description: 'Return client aggregate trend metrics.
+
+        '
+      operationId: clientDataCustomAggregate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestEnvelope_ClientDataAggregateRequest'
+            example:
+              Parameters:
+                portfolio:
+                  name: Example Portfolio
+                  entities:
+                    CBId:
+                    - CB000000123
+                    - CB000000456
+                EffectiveDateId: 20241201
+                facet_column: Sector
+                effectivedateid_min_lag_months: 24
+                use_client_scale: false
+      responses:
+        '200':
+          description: Client data aggregate calculation successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientDataAggregateResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+          description: Forbidden - requires ent_CLIENT-DATA entitlement
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/analytics/contributor/rating-distribution:
+    post:
+      tags:
+      - Contributor Data
+      summary: Client Data Rating Distribution
+      description: 'Return client rating distribution data.
+
+        '
+      operationId: clientDataRatingDistribution
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestEnvelope_ClientDataDistributionRequest'
+            example:
+              Parameters:
+                portfolio:
+                  name: Example Portfolio
+                  entities:
+                    CBId:
+                    - CB000000123
+                    - CB000000456
+                EffectiveDateId: 20241201
+                effectivedateid_min: 20240101
+                effectivedateid_min_lag_months: 0
+                use_client_scale: false
+                use_cb7_scale: false
+                facet_column: Sector
+      responses:
+        '200':
+          description: Client data rating distribution retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RatingDistributionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+          description: Forbidden - requires ent_CLIENT-DATA entitlement
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/analytics/contributor/portfolio-summary:
+    post:
+      tags:
+      - Contributor Data
+      summary: Client Data Portfolio Summary
+      description: 'Return grouped client portfolio metrics.
+
+        '
+      operationId: clientDataPortfolioSummary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestEnvelope_ClientDataSummaryRequest'
+            example:
+              Parameters:
+                portfolio:
+                  name: Example Portfolio
+                  entities:
+                    CBId:
+                    - CB000000123
+                    - CB000000456
+                facet_column: Sector
+                EffectiveDateId: 20241201
+                rating_change_months: 24
+                use_client_scale: false
+                use_oci: false
+      responses:
+        '200':
+          description: Client data portfolio summary retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientDataSummaryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+          description: Forbidden - requires ent_CLIENT-DATA entitlement
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/analytics/contributor/entity-rating-change:
+    post:
+      tags:
+      - Contributor Data
+      summary: Client Data Entity Rating Change
+      description: 'Return client entity rating changes.
+
+        '
+      operationId: clientDataEntityRatingChange
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestEnvelope_ClientDataEntityRatingChangeRequest'
+            example:
+              Parameters:
+                portfolio:
+                  name: Example Portfolio
+                  entities:
+                    CBId:
+                    - CB000000123
+                    - CB000000456
+                EffectiveDateId: 20241201
+                rating_change_months: 6
+                use_oci: false
+                use_client_scale: false
+                descriptor_columns:
+                - Sector
+      responses:
+        '200':
+          description: Client data entity rating changes retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientDataEntityRatingChangeResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+          description: Forbidden - requires ent_CLIENT-DATA entitlement
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  schemas:
+    RatingChangeType:
+      type: string
+      enum:
+      - upgrades
+      - downgrades
+      title: RatingChangeType
+    RequestEnvelope_ClientDataDistributionRequest:
+      properties:
+        Parameters:
+          $ref: '#/components/schemas/ClientDataDistributionRequest'
+      type: object
+      required:
+      - Parameters
+      title: RequestEnvelope_ClientDataDistributionRequest
+    RequestEnvelope_ClientDataAggregateRequest:
+      properties:
+        Parameters:
+          $ref: '#/components/schemas/ClientDataAggregateRequest'
+      type: object
+      required:
+      - Parameters
+      title: RequestEnvelope_ClientDataAggregateRequest
+    RatingDistributionResponse:
+      type: object
+      description: Response containing rating distribution with percentage of entities in each rating band
+      required:
+      - EffectiveDateId
+      - aaa
+      - aa+
+      - aa
+      - aa-
+      - a+
+      - a
+      - a-
+      - bbb+
+      - bbb
+      - bbb-
+      - bb+
+      - bb
+      - bb-
+      - b+
+      - b
+      - b-
+      - ccc+
+      - ccc
+      - ccc-
+      - cc
+      - c
+      properties:
+        EffectiveDateId:
+          type: array
+          items:
+            type: integer
+          description: Effective date identifiers
+          example:
+          - 20251031
+        aaa:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated AAA
+          example:
+          - 0
+        aa+:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated AA+
+          example:
+          - 0
+        aa:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated AA
+          example:
+          - 0
+        aa-:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated AA-
+          example:
+          - 0
+        a+:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated A+
+          example:
+          - 0
+        a:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated A
+          example:
+          - 0
+        a-:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated A-
+          example:
+          - 0
+        bbb+:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated BBB+
+          example:
+          - 0
+        bbb:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated BBB
+          example:
+          - 0.25
+        bbb-:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated BBB-
+          example:
+          - 0.25
+        bb+:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated BB+
+          example:
+          - 0.25
+        bb:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated BB
+          example:
+          - 0
+        bb-:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated BB-
+          example:
+          - 0.25
+        b+:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated B+
+          example:
+          - 0
+        b:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated B
+          example:
+          - 0
+        b-:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated B-
+          example:
+          - 0
+        ccc+:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated CCC+
+          example:
+          - 0
+        ccc:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated CCC
+          example:
+          - 0
+        ccc-:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated CCC-
+          example:
+          - 0
+        cc:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated CC
+          example:
+          - 0
+        c:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated C
+          example:
+          - 0
+    ClientDataEntityRatingChangeResponse:
+      type: object
+      description: Response containing entity rating changes for both CCR and client ratings
+      required:
+      - CBId
+      - CBEntityName
+      - CCR
+      - CCR6M
+      - CCR100PDMid
+      - CCR100PDMid6M
+      - ccr_rating_change
+      - ClientRating
+      - ClientRating6M
+      - ClientPD
+      - ClientPD6M
+      - client_rating_change
+      properties:
+        CBId:
+          type: array
+          items:
+            type: string
+          description: Credit Benchmark entity identifiers
+          example:
+          - CB0000002619
+          - CB0000009484
+          - CB0000009810
+          - CB0000010249
+          - CB0000011079
+        CBEntityName:
+          type: array
+          items:
+            type: string
+          description: Entity names
+          example:
+          - BMO CAPITAL MARKETS CORP
+          - HILLTOP SECURITIES INC
+          - VIRTU AMERICAS LLC
+          - OPPENHEIMER & CO INC, BROKER
+          - JANNEY MONTGOMERY SCOTT LLC
+        CCR:
+          type: array
+          items:
+            type: string
+          description: Current consensus credit rating
+          example:
+          - a-
+          - bb+
+          - bb-
+          - bb
+          - bb
+        CCR6M:
+          type: array
+          items:
+            type: string
+          description: Consensus credit rating 6 months ago
+          example:
+          - a
+          - bb+
+          - bb+
+          - bb+
+          - bb+
+        CCR100PDMid:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Current consensus probability of default (mid)
+          example:
+          - 0.0009
+          - 0.0051
+          - 0.012
+          - 0.0086
+          - 0.0079
+        CCR100PDMid6M:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Consensus probability of default 6 months ago (mid)
+          example:
+          - 0.0008
+          - 0.0051
+          - 0.0063
+          - 0.0073
+          - 0.0073
+        ccr_rating_change:
+          type: array
+          items:
+            type: integer
+          description: Consensus rating change in notches
+          example:
+          - -1
+          - 0
+          - -2
+          - -1
+          - -1
+        ClientRating:
+          type: array
+          items:
+            type: string
+          description: Current client internal rating (empty string if not available)
+          example:
+          - ''
+          - ''
+          - bb-
+          - ''
+          - bbb-
+        ClientRating6M:
+          type: array
+          items:
+            type: string
+          description: Client internal rating 6 months ago (empty string if not available)
+          example:
+          - ''
+          - ''
+          - bb+
+          - ''
+          - bbb-
+        ClientPD:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Current client probability of default (0.0 if not available)
+          example:
+          - 0
+          - 0
+          - 0.0165
+          - 0
+          - 0.0037
+        ClientPD6M:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Client probability of default 6 months ago (0.0 if not available)
+          example:
+          - 0
+          - 0
+          - 0.0063
+          - 0
+          - 0.0037
+        client_rating_change:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Client rating change in notches (0.0 if not available)
+          example:
+          - 0
+          - 0
+          - -2
+          - 0
+          - 0
+    ValidationErrorDetail:
+      type: object
+      description: Single field validation error
+      properties:
+        field:
+          type: string
+          description: Location of the validation error (e.g. body.Parameters.portfolio)
+          example: body.Parameters.portfolio
+        message:
+          type: string
+          description: Human-readable error message
+          example: field required
+        type:
+          type: string
+          description: Machine-readable error type
+          example: value_error.missing
+    RequestEnvelope_ClientDataEntityRatingChangeRequest:
+      properties:
+        Parameters:
+          $ref: '#/components/schemas/ClientDataEntityRatingChangeRequest'
+      type: object
+      required:
+      - Parameters
+      title: RequestEnvelope_ClientDataEntityRatingChangeRequest
+    ClientDataDistributionRequest:
+      properties:
+        portfolio:
+          $ref: '#/components/schemas/Portfolio'
+        EffectiveDateId:
+          type: integer
+          title: Effectivedateid
+        effectivedateid_min:
+          type: integer
+          title: Effectivedateid Min
+        effectivedateid_min_lag_months:
+          type: integer
+          title: Effectivedateid Min Lag Months
+          default: 0
+        use_client_scale:
+          type: boolean
+          title: Use Client Scale
+          default: false
+        use_cb7_scale:
+          type: boolean
+          title: Use Cb7 Scale
+          default: false
+        facet_column:
+          type: string
+          title: Facet Column
+          description: Column to group by (e.g., Sector, Region, Industry)
+      type: object
+      required:
+      - portfolio
+      title: ClientDataDistributionRequest
+    RatingChangeFilters:
+      properties:
+        rating_change_type:
+          $ref: '#/components/schemas/RatingChangeType'
+        sort_by:
+          type: string
+          title: Sort By
+          default: rating_change
+        sort_descending:
+          type: boolean
+          title: Sort Descending
+          default: true
+        n:
+          type: integer
+          title: N
+      type: object
+      title: RatingChangeFilters
+    ClientDataAggregateRequest:
+      properties:
+        portfolio:
+          $ref: '#/components/schemas/Portfolio'
+        EffectiveDateId:
+          type: integer
+          title: Effectivedateid
+        effectivedateid_min_lag_months:
+          type: integer
+          title: Effectivedateid Min Lag Months
+          default: 24
+        use_client_scale:
+          type: boolean
+          title: Use Client Scale
+          default: false
+        facet_column:
+          type: string
+          title: Facet Column
+          description: Optional column to group by (e.g., Sector, Industry)
+      type: object
+      required:
+      - portfolio
+      title: ClientDataAggregateRequest
+    FlexibleCBPortfolio:
+      properties:
+        CBId:
+          items:
+            type: string
+          type: array
+          title: Cbid
+      additionalProperties: true
+      type: object
+      title: FlexibleCBPortfolio
+    Portfolio:
+      properties:
+        name:
+          type: string
+          title: Name
+          example: Example Portfolio
+        entities:
+          $ref: '#/components/schemas/FlexibleCBPortfolio'
+          example:
+            CBId:
+            - CB000000123
+            - CB000000456
+      type: object
+      required:
+      - name
+      - entities
+      title: Portfolio
+    Error:
+      type: object
+      description: Standard error envelope used by the API
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+              description: Machine-readable error code
+              example: BAD_REQUEST
+            message:
+              type: string
+              description: Human-readable error message
+              example: Invalid request parameters
+            details:
+              description: Optional structured details about the error
+              oneOf:
+              - type: array
+                items:
+                  $ref: '#/components/schemas/ValidationErrorDetail'
+              - type: object
+              - type: string
+    ClientDataEntityRatingChangeRequest:
+      properties:
+        portfolio:
+          $ref: '#/components/schemas/Portfolio'
+        EffectiveDateId:
+          type: integer
+          title: Effectivedateid
+        rating_change_months:
+          type: integer
+          title: Rating Change Months
+          default: 6
+        use_oci:
+          type: boolean
+          title: Use Oci
+          default: false
+        use_client_scale:
+          type: boolean
+          title: Use Client Scale
+          default: false
+        descriptor_columns:
+          items:
+            type: string
+          type: array
+          title: Descriptor Columns
+        filters:
+          $ref: '#/components/schemas/RatingChangeFilters'
+      type: object
+      required:
+      - portfolio
+      title: ClientDataEntityRatingChangeRequest
+    ClientDataSummaryResponse:
+      type: object
+      description: Response containing client data portfolio summary comparing client vs benchmark ratings
+      required:
+      - CBSector
+      - entity_count
+      - benchmark_entity_count
+      - ClientRating
+      - ExMeRating
+      - notch_difference
+      - ClientPD
+      - ExMePD
+      - notch_diff_aggressive
+      - notch_diff_consistent
+      - notch_diff_conservative
+      properties:
+        CBSector:
+          type: array
+          items:
+            type: string
+          description: Values of the grouping column (matches facet_column parameter)
+          example:
+          - Financial Services
+        entity_count:
+          type: array
+          items:
+            type: integer
+          description: Total number of entities in each group
+          example:
+          - 10
+        benchmark_entity_count:
+          type: array
+          items:
+            type: integer
+          description: Number of entities with benchmark ratings
+          example:
+          - 4
+        ClientRating:
+          type: array
+          items:
+            type: string
+          description: Client's internal aggregate rating
+          example:
+          - bbb-
+        ExMeRating:
+          type: array
+          items:
+            type: string
+          description: Benchmark rating (excluding client)
+          example:
+          - bb+
+        notch_difference:
+          type: array
+          items:
+            type: integer
+          description: Notch difference between client and benchmark (positive = client more conservative)
+          example:
+          - 1
+        ClientPD:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Client's aggregate probability of default
+          example:
+          - 0.0047
+        ExMePD:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Benchmark aggregate probability of default (excluding client)
+          example:
+          - 0.0049
+        notch_diff_aggressive:
+          type: array
+          items:
+            type: integer
+          description: Notch difference using aggressive methodology
+          example:
+          - 1
+        notch_diff_consistent:
+          type: array
+          items:
+            type: integer
+          description: Notch difference using consistent methodology
+          example:
+          - 3
+        notch_diff_conservative:
+          type: array
+          items:
+            type: integer
+          description: Notch difference using conservative methodology
+          example:
+          - 0
+    ClientDataSummaryRequest:
+      properties:
+        portfolio:
+          $ref: '#/components/schemas/Portfolio'
+        facet_column:
+          type: string
+          title: Facet Column
+          description: Column to group by (e.g., ClientType, Sector, Industry)
+        EffectiveDateId:
+          type: integer
+          title: Effectivedateid
+        rating_change_months:
+          type: integer
+          title: Rating Change Months
+          description: Number of months to look back for rating changes (e.g., 24 for 2-year changes)
+          default: 24
+        use_client_scale:
+          type: boolean
+          title: Use Client Scale
+          default: false
+        use_oci:
+          type: boolean
+          title: Use Oci
+          default: false
+      type: object
+      required:
+      - portfolio
+      - facet_column
+      title: ClientDataSummaryRequest
+    RequestEnvelope_ClientDataSummaryRequest:
+      properties:
+        Parameters:
+          $ref: '#/components/schemas/ClientDataSummaryRequest'
+      type: object
+      required:
+      - Parameters
+      title: RequestEnvelope_ClientDataSummaryRequest
+    ClientDataAggregateResponse:
+      type: object
+      description: Response containing client data aggregate trend lines
+      required:
+      - EffectiveDateId
+      - EntityCount
+      - ClientPD_log
+      - ClientPD
+      - ClientPD_index
+      - ClientRating
+      - ClientRatingNotch
+      - ExMePD_log
+      - ExMePD
+      - ExMePD_index
+      - ExMeRating
+      - ExMeRatingNotch
+      properties:
+        EffectiveDateId:
+          type: array
+          items:
+            type: integer
+          description: Effective date identifiers
+          example:
+          - 20230131
+          - 20230228
+          - 20230331
+          - 20230428
+          - 20230531
+        EntityCount:
+          type: array
+          items:
+            type: integer
+          description: Number of entities in client aggregate
+          example:
+          - 6
+          - 6
+          - 6
+          - 6
+          - 6
+        ClientPD_log:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Log-transformed client PD values
+          example:
+          - -5.6766
+          - -5.6766
+          - -5.6766
+          - -5.6766
+          - -5.6766
+        ClientPD:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Client's aggregate probability of default
+          example:
+          - 0.0034
+          - 0.0034
+          - 0.0034
+          - 0.0034
+          - 0.0034
+        ClientPD_index:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Client PD index value (relative to first date)
+          example:
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+        ClientRating:
+          type: array
+          items:
+            type: string
+          description: Client's aggregate rating
+          example:
+          - '3.2'
+          - '3.2'
+          - '3.2'
+          - '3.2'
+          - '3.2'
+        ClientRatingNotch:
+          type: array
+          items:
+            type: integer
+          description: Client's aggregate rating notch
+          example:
+          - 7
+          - 7
+          - 7
+          - 7
+          - 7
+        ExMePD_log:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Log-transformed benchmark PD values (excluding client)
+          example:
+          - -5.2292
+          - -5.2292
+          - -5.2292
+          - -5.2292
+          - -5.2292
+        ExMePD:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Benchmark aggregate probability of default (excluding client)
+          example:
+          - 0.0054
+          - 0.0054
+          - 0.0054
+          - 0.0054
+          - 0.0054
+        ExMePD_index:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Benchmark PD index value (relative to first date)
+          example:
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+        ExMeRating:
+          type: array
+          items:
+            type: string
+          description: Benchmark aggregate rating (excluding client)
+          example:
+          - '3.3'
+          - '3.3'
+          - '3.3'
+          - '3.3'
+          - '3.3'
+        ExMeRatingNotch:
+          type: array
+          items:
+            type: integer
+          description: Benchmark aggregate rating notch (excluding client)
+          example:
+          - 8
+          - 8
+          - 8
+          - 8
+          - 8
+  responses:
+    BadRequest:
+      description: Bad request - invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: BAD_REQUEST
+              message: Invalid request parameters
+              details:
+                invalid_columns:
+                - BadColumn
+                allowed_columns: Please check documentation for valid column names
+    Unauthorized:
+      description: Unauthorized - invalid or missing JWT token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: UNAUTHORIZED
+              message: Invalid or missing JWT token
+    ValidationError:
+      description: Validation error - request parameters are invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: VALIDATION_ERROR
+              message: Request validation failed
+              details:
+              - field: body.Parameters.portfolio
+                message: field required
+                type: value_error.missing
+    Forbidden:
+      description: Forbidden - insufficient permissions or access denied
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: PERMISSION_DENIED
+              message: Insufficient permissions for this resource
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: INTERNAL_SERVER_ERROR
+              message: An unexpected error occurred.
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT bearer token.

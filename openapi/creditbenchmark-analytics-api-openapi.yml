@@ -1,0 +1,618 @@
+openapi: 3.1.0
+info:
+  title: Credit Benchmark Analytics API
+  description: 'Authentication, matching, and analytics.
+
+    '
+  version: 1.0.0
+  contact:
+    name: Credit Benchmark API Support
+    email: api-support@creditbenchmark.com
+    url: https://creditbenchmark.com/support
+  license:
+    name: Proprietary
+    url: https://creditbenchmark.com/terms
+servers:
+- url: https://api.creditbenchmark.com
+  description: Production server
+security:
+- BearerAuth: []
+tags:
+- name: Analytics
+  description: Portfolio analytics and risk calculations
+paths:
+  /api/analytics/custom-aggregate:
+    post:
+      tags:
+      - Analytics
+      summary: Custom Aggregate
+      description: 'Return aggregate trend metrics.
+
+        '
+      operationId: customAggregate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestEnvelope_CustomAggregateRequest'
+            example:
+              Parameters:
+                portfolio:
+                  name: Example Portfolio
+                  entities:
+                    CBId:
+                    - CB000000123
+                    - CB000000456
+                    CustomField1:
+                    - Value1
+                    - Value2
+                    - Value3
+                EffectiveDateId: 20241201
+                facet_column: Sector
+                effectivedateid_min_lag_months: 24
+                use_client_scale: false
+      responses:
+        '200':
+          description: Custom aggregate calculation successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomAggregateResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/analytics/rating-distribution:
+    post:
+      tags:
+      - Analytics
+      summary: Rating Distribution
+      description: 'Return rating distribution data.
+
+        '
+      operationId: ratingDistribution
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestEnvelope_RatingDistributionRequest'
+            example:
+              Parameters:
+                portfolio:
+                  name: Example Portfolio
+                  entities:
+                    CBId:
+                    - CB000000123
+                    - CB000000456
+                EffectiveDateId: 20241201
+                effectivedateid_min: 20240101
+                effectivedateid_min_lag_months: 0
+                use_client_scale: false
+                use_cb7_scale: false
+                facet_column: Sector
+      responses:
+        '200':
+          description: Rating distribution retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RatingDistributionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  schemas:
+    Portfolio:
+      properties:
+        name:
+          type: string
+          title: Name
+          example: Example Portfolio
+        entities:
+          $ref: '#/components/schemas/FlexibleCBPortfolio'
+          example:
+            CBId:
+            - CB000000123
+            - CB000000456
+      type: object
+      required:
+      - name
+      - entities
+      title: Portfolio
+    Error:
+      type: object
+      description: Standard error envelope used by the API
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+              description: Machine-readable error code
+              example: BAD_REQUEST
+            message:
+              type: string
+              description: Human-readable error message
+              example: Invalid request parameters
+            details:
+              description: Optional structured details about the error
+              oneOf:
+              - type: array
+                items:
+                  $ref: '#/components/schemas/ValidationErrorDetail'
+              - type: object
+              - type: string
+    CustomAggregateResponse:
+      type: object
+      description: Response containing facet values and aggregated metrics over time
+      required:
+      - CBSector
+      - EffectiveDateId
+      - EntityCount
+      - CCRPD100Mid_log
+      - CCRPD100Mid
+      - CCRPD100Mid_index
+      - CCR
+      properties:
+        CBSector:
+          type: array
+          items:
+            type: string
+          description: Values of the grouping column (matches facet_column parameter, e.g., CBSector)
+          example:
+          - Financial Services
+          - Financial Services
+          - Financial Services
+          - Financial Services
+          - Financial Services
+        EffectiveDateId:
+          type: array
+          items:
+            type: integer
+          description: Effective date identifiers
+          example:
+          - 20230131
+          - 20230228
+          - 20230331
+          - 20230428
+          - 20230531
+        EntityCount:
+          type: array
+          items:
+            type: integer
+          description: Number of entities in each group
+          example:
+          - 10
+          - 10
+          - 10
+          - 10
+          - 10
+        CCRPD100Mid_log:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Log-transformed PD values
+          example:
+          - -5.6594
+          - -5.6594
+          - -5.672
+          - -5.6071
+          - -5.5814
+        CCRPD100Mid:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Aggregate probability of default (mid)
+          example:
+          - 0.0035
+          - 0.0035
+          - 0.0034
+          - 0.0037
+          - 0.0038
+        CCRPD100Mid_index:
+          type: array
+          items:
+            type: number
+            format: float
+          description: PD index value (relative to first date)
+          example:
+          - 0
+          - 0
+          - -0.0125
+          - 0.0537
+          - 0.0812
+        CCR:
+          type: array
+          items:
+            type: string
+          description: Aggregate credit ratings
+          example:
+          - bbb-
+          - bbb-
+          - bbb-
+          - bbb-
+          - bbb-
+    RatingDistributionRequest:
+      properties:
+        portfolio:
+          $ref: '#/components/schemas/Portfolio'
+        EffectiveDateId:
+          type: integer
+          title: Effectivedateid
+        effectivedateid_min:
+          type: integer
+          title: Effectivedateid Min
+        effectivedateid_min_lag_months:
+          type: integer
+          title: Effectivedateid Min Lag Months
+          default: 0
+        use_client_scale:
+          type: boolean
+          title: Use Client Scale
+          default: false
+        use_cb7_scale:
+          type: boolean
+          title: Use Cb7 Scale
+          default: false
+        facet_column:
+          type: string
+          title: Facet Column
+          description: Column to group by (e.g., Sector, Region, Industry)
+      type: object
+      required:
+      - portfolio
+      title: RatingDistributionRequest
+    RatingDistributionResponse:
+      type: object
+      description: Response containing rating distribution with percentage of entities in each rating band
+      required:
+      - EffectiveDateId
+      - aaa
+      - aa+
+      - aa
+      - aa-
+      - a+
+      - a
+      - a-
+      - bbb+
+      - bbb
+      - bbb-
+      - bb+
+      - bb
+      - bb-
+      - b+
+      - b
+      - b-
+      - ccc+
+      - ccc
+      - ccc-
+      - cc
+      - c
+      properties:
+        EffectiveDateId:
+          type: array
+          items:
+            type: integer
+          description: Effective date identifiers
+          example:
+          - 20251031
+        aaa:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated AAA
+          example:
+          - 0
+        aa+:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated AA+
+          example:
+          - 0
+        aa:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated AA
+          example:
+          - 0
+        aa-:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated AA-
+          example:
+          - 0
+        a+:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated A+
+          example:
+          - 0
+        a:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated A
+          example:
+          - 0
+        a-:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated A-
+          example:
+          - 0
+        bbb+:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated BBB+
+          example:
+          - 0
+        bbb:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated BBB
+          example:
+          - 0.25
+        bbb-:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated BBB-
+          example:
+          - 0.25
+        bb+:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated BB+
+          example:
+          - 0.25
+        bb:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated BB
+          example:
+          - 0
+        bb-:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated BB-
+          example:
+          - 0.25
+        b+:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated B+
+          example:
+          - 0
+        b:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated B
+          example:
+          - 0
+        b-:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated B-
+          example:
+          - 0
+        ccc+:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated CCC+
+          example:
+          - 0
+        ccc:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated CCC
+          example:
+          - 0
+        ccc-:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated CCC-
+          example:
+          - 0
+        cc:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated CC
+          example:
+          - 0
+        c:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Percentage of entities rated C
+          example:
+          - 0
+    RequestEnvelope_RatingDistributionRequest:
+      properties:
+        Parameters:
+          $ref: '#/components/schemas/RatingDistributionRequest'
+      type: object
+      required:
+      - Parameters
+      title: RequestEnvelope_RatingDistributionRequest
+    FlexibleCBPortfolio:
+      properties:
+        CBId:
+          items:
+            type: string
+          type: array
+          title: Cbid
+      additionalProperties: true
+      type: object
+      title: FlexibleCBPortfolio
+    CustomAggregateRequest:
+      properties:
+        portfolio:
+          $ref: '#/components/schemas/Portfolio'
+        EffectiveDateId:
+          type: integer
+          title: Effectivedateid
+        effectivedateid_min_lag_months:
+          type: integer
+          title: Effectivedateid Min Lag Months
+          default: 24
+        use_client_scale:
+          type: boolean
+          title: Use Client Scale
+          default: false
+        facet_column:
+          type: string
+          title: Facet Column
+          description: Optional column to group by (e.g., Sector, Industry)
+      type: object
+      required:
+      - portfolio
+      title: CustomAggregateRequest
+    RequestEnvelope_CustomAggregateRequest:
+      properties:
+        Parameters:
+          $ref: '#/components/schemas/CustomAggregateRequest'
+      type: object
+      required:
+      - Parameters
+      title: RequestEnvelope_CustomAggregateRequest
+    ValidationErrorDetail:
+      type: object
+      description: Single field validation error
+      properties:
+        field:
+          type: string
+          description: Location of the validation error (e.g. body.Parameters.portfolio)
+          example: body.Parameters.portfolio
+        message:
+          type: string
+          description: Human-readable error message
+          example: field required
+        type:
+          type: string
+          description: Machine-readable error type
+          example: value_error.missing
+  responses:
+    ValidationError:
+      description: Validation error - request parameters are invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: VALIDATION_ERROR
+              message: Request validation failed
+              details:
+              - field: body.Parameters.portfolio
+                message: field required
+                type: value_error.missing
+    Unauthorized:
+      description: Unauthorized - invalid or missing JWT token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: UNAUTHORIZED
+              message: Invalid or missing JWT token
+    BadRequest:
+      description: Bad request - invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: BAD_REQUEST
+              message: Invalid request parameters
+              details:
+                invalid_columns:
+                - BadColumn
+                allowed_columns: Please check documentation for valid column names
+    Forbidden:
+      description: Forbidden - insufficient permissions or access denied
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: PERMISSION_DENIED
+              message: Insufficient permissions for this resource
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: INTERNAL_SERVER_ERROR
+              message: An unexpected error occurred.
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT bearer token.

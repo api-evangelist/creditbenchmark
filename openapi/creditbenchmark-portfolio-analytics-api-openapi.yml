@@ -1,0 +1,472 @@
+openapi: 3.1.0
+info:
+  title: Credit Benchmark Analytics Portfolio Analytics API
+  description: 'Authentication, matching, and analytics.
+
+    '
+  version: 1.0.0
+  contact:
+    name: Credit Benchmark API Support
+    email: api-support@creditbenchmark.com
+    url: https://creditbenchmark.com/support
+  license:
+    name: Proprietary
+    url: https://creditbenchmark.com/terms
+servers:
+- url: https://api.creditbenchmark.com
+  description: Production server
+security:
+- BearerAuth: []
+tags:
+- name: Portfolio Analytics
+  description: Portfolio-level analytics and summaries
+paths:
+  /api/analytics/portfolio-data:
+    post:
+      tags:
+      - Portfolio Analytics
+      summary: Portfolio Data
+      description: 'Return portfolio time-series data.
+
+        '
+      operationId: portfolioData
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestEnvelope_PortfolioDataRequest'
+            example:
+              Parameters:
+                portfolio:
+                  name: Example Portfolio
+                  entities:
+                    CBId:
+                    - CB000000123
+                    - CB000000456
+                    CustomField1:
+                    - Value1
+                    - Value2
+                    - Value3
+                    CustomField2:
+                    - 100
+                    - 200
+                    - 300
+                EffectiveDateId: 20241201
+                effectivedateid_min: 20240101
+                effectivedateid_min_lag_months: 0
+                columns:
+                - CBEntityId
+                - CBId
+                - CBEntityName
+                - EffectiveDateId
+                - CCR
+                - CCR21Notch
+                - CCR100PDMid
+                - CustomField1
+                - CustomField2
+      responses:
+        '200':
+          description: Portfolio data retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortfolioDataResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/analytics/portfolio-summary:
+    post:
+      tags:
+      - Portfolio Analytics
+      summary: Portfolio Summary
+      description: 'Return grouped portfolio metrics.
+
+        '
+      operationId: portfolioSummary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestEnvelope_PortfolioSummaryRequest'
+            example:
+              Parameters:
+                portfolio:
+                  name: Example Portfolio
+                  entities:
+                    CBId:
+                    - CB000000123
+                    - CB000000456
+                facet_column: Sector
+                EffectiveDateId: 20241201
+                rating_change_months: 24
+                use_client_scale: false
+                use_oci: false
+      responses:
+        '200':
+          description: Portfolio summary retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortfolioSummaryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  schemas:
+    RequestEnvelope_PortfolioSummaryRequest:
+      properties:
+        Parameters:
+          $ref: '#/components/schemas/PortfolioSummaryRequest'
+      type: object
+      required:
+      - Parameters
+      title: RequestEnvelope_PortfolioSummaryRequest
+    PortfolioDataResponse:
+      type: object
+      description: Response containing detailed portfolio data with requested columns
+      required:
+      - CBId
+      - EffectiveDateId
+      - CBEntityName
+      - CCR
+      - CCR100PDMid
+      properties:
+        CBId:
+          type: array
+          items:
+            type: string
+          description: Credit Benchmark entity identifiers
+          example:
+          - CB0000002619
+          - CB0000009484
+          - CB0000009810
+          - CB0000010249
+          - CB0000010457
+        EffectiveDateId:
+          type: array
+          items:
+            type: integer
+          description: Effective date identifiers
+          example:
+          - 20250131
+          - 20250131
+          - 20250131
+          - 20250131
+          - 20250131
+        CBEntityName:
+          type: array
+          items:
+            type: string
+          description: Entity names
+          example:
+          - BMO CAPITAL MARKETS CORP
+          - HILLTOP SECURITIES INC
+          - VIRTU AMERICAS LLC
+          - OPPENHEIMER & CO INC, BROKER
+          - TD AMERITRADE CLEARING INC
+        CCR:
+          type: array
+          items:
+            type: string
+          description: Aggregate credit ratings
+          example:
+          - a-
+          - bb+
+          - bb-
+          - bb
+          - a-
+        CCR100PDMid:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Probability of default (mid)
+          example:
+          - 0.0009
+          - 0.0051
+          - 0.012
+          - 0.0086
+          - 0.0011
+    PortfolioSummaryResponse:
+      type: object
+      description: Response containing portfolio summary statistics by facet
+      required:
+      - CBSector
+      - entity_count
+      - benchmark_entity_count
+      - CCR
+      - CCRPD100Mid
+      - upgrades
+      - downgrades
+      - rating_change
+      properties:
+        CBSector:
+          type: array
+          items:
+            type: string
+          description: Values of the grouping column (matches facet_column parameter)
+          example:
+          - Financial Services
+        entity_count:
+          type: array
+          items:
+            type: integer
+          description: Total number of entities in each group
+          example:
+          - 10
+        benchmark_entity_count:
+          type: array
+          items:
+            type: integer
+          description: Number of entities with credit ratings (benchmark coverage)
+          example:
+          - 10
+        CCR:
+          type: array
+          items:
+            type: string
+          description: Aggregate credit ratings
+          example:
+          - bbb-
+        CCRPD100Mid:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Aggregate probability of default (mid)
+          example:
+          - 0.0036
+        upgrades:
+          type: array
+          items:
+            type: integer
+          description: Number of upgrades in period
+          example:
+          - 1
+        downgrades:
+          type: array
+          items:
+            type: integer
+          description: Number of downgrades in period
+          example:
+          - 2
+        rating_change:
+          type: array
+          items:
+            type: integer
+          description: Net rating change (upgrades - downgrades)
+          example:
+          - -1
+    Portfolio:
+      properties:
+        name:
+          type: string
+          title: Name
+          example: Example Portfolio
+        entities:
+          $ref: '#/components/schemas/FlexibleCBPortfolio'
+          example:
+            CBId:
+            - CB000000123
+            - CB000000456
+      type: object
+      required:
+      - name
+      - entities
+      title: Portfolio
+    Error:
+      type: object
+      description: Standard error envelope used by the API
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+              description: Machine-readable error code
+              example: BAD_REQUEST
+            message:
+              type: string
+              description: Human-readable error message
+              example: Invalid request parameters
+            details:
+              description: Optional structured details about the error
+              oneOf:
+              - type: array
+                items:
+                  $ref: '#/components/schemas/ValidationErrorDetail'
+              - type: object
+              - type: string
+    PortfolioSummaryRequest:
+      properties:
+        portfolio:
+          $ref: '#/components/schemas/Portfolio'
+        facet_column:
+          type: string
+          title: Facet Column
+          description: Column to group by (e.g., ClientType, Sector, Industry)
+        EffectiveDateId:
+          type: integer
+          title: Effectivedateid
+        rating_change_months:
+          type: integer
+          title: Rating Change Months
+          description: Number of months to look back for rating changes (e.g., 24 for 2-year changes)
+          default: 24
+        use_client_scale:
+          type: boolean
+          title: Use Client Scale
+          default: false
+        use_oci:
+          type: boolean
+          title: Use Oci
+          default: false
+      type: object
+      required:
+      - portfolio
+      - facet_column
+      title: PortfolioSummaryRequest
+    RequestEnvelope_PortfolioDataRequest:
+      properties:
+        Parameters:
+          $ref: '#/components/schemas/PortfolioDataRequest'
+      type: object
+      required:
+      - Parameters
+      title: RequestEnvelope_PortfolioDataRequest
+    FlexibleCBPortfolio:
+      properties:
+        CBId:
+          items:
+            type: string
+          type: array
+          title: Cbid
+      additionalProperties: true
+      type: object
+      title: FlexibleCBPortfolio
+    PortfolioDataRequest:
+      properties:
+        portfolio:
+          $ref: '#/components/schemas/Portfolio'
+        EffectiveDateId:
+          type: integer
+          title: Effectivedateid
+        effectivedateid_min:
+          type: integer
+          title: Effectivedateid Min
+        effectivedateid_min_lag_months:
+          type: integer
+          title: Effectivedateid Min Lag Months
+          default: 0
+        columns:
+          items:
+            type: string
+          type: array
+          title: Columns
+          description: 'List of columns to retrieve. Available columns: CBCountryOfDomicile, CBCountryOfRisk, CBCountryOfRiskISO, CBEntityId, CBEntityName, CBEntitySize, CBEntitySubType, CBEntityType, CBGroupSize, CBId, CBIndustry, CBRegion, CBRegionGroup, CBSector, CBSubSector, CBSubdivision, CBSubdivisionISO, CBSubdivisionRegion, CBSuperSector, CCR, CCR100Notch, CCR100PDMid, CCR100PDMidLog, CCR21Notch, CCR21PDMid, CCRAgreementIndicator, CCRContributorCount, CCRMax, CCRMaxNotch, CCRMin, CCRMinNotch, CCRNotchDifferenceCBScale, CCRNotchDifferenceClientScale, CCROpinionChangeIndicator, CCROpinionChangeIndicatorNumeric, CCROutlierIndicator, CCRRSD, CCRRatingChange12M, CCRRatingChange1M, CCRRatingChange3M, CCRRatingChange6M, CCRRatingChange9M, CCRSkew, CCRSource, CRARated, CUSIP, ClientId, ClientLogTTCPDChange, ClientLogTTCPDChangePublish, ClientOpinionChangeIndicatorNumeric, ClientRatingCBScale, ClientRatingCBScale21Notch, ClientRatingClientScale, ClientRatingClientScaleName, ClientRatingClientScaleNormalisedNotch, ClientRatingClientScaleNotch, ClientScaleNormalisedRating, ClientTTCPD, ClientTTCPDLog, EffectiveDate, EffectiveDateId, EntityStructure, ExClientOpinionChangeIndicatorNumeric, ExClientPDAvg, ExClientPDAvgLog, ExClientRatingCBScale, ExClientRatingClientScale, ExClientRatingClientScaleNotch, FitchLTIDRating, IGHY, ISIN, ImmediateParentEntityId, IsHistoricalQuorate, IsHistoricalQuorateCCR, IsPublicCompany, LEI, LatestWatchlist, Ownership, ParticipationId, RealExClientPDAvg, RealExClientPDAvgLog, SME, SMEFlag, SPFCLTNotch, SPFCLTRating, TTCPDAverage, Ticker, UltimateParentCBCountryOfRisk, UltimateParentCBEntityName, UltimateParentEntityId, isQuorate. Some columns require specific entitlements (S&P, Fitch, client data).'
+      type: object
+      required:
+      - portfolio
+      title: PortfolioDataRequest
+    ValidationErrorDetail:
+      type: object
+      description: Single field validation error
+      properties:
+        field:
+          type: string
+          description: Location of the validation error (e.g. body.Parameters.portfolio)
+          example: body.Parameters.portfolio
+        message:
+          type: string
+          description: Human-readable error message
+          example: field required
+        type:
+          type: string
+          description: Machine-readable error type
+          example: value_error.missing
+  responses:
+    ValidationError:
+      description: Validation error - request parameters are invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: VALIDATION_ERROR
+              message: Request validation failed
+              details:
+              - field: body.Parameters.portfolio
+                message: field required
+                type: value_error.missing
+    Unauthorized:
+      description: Unauthorized - invalid or missing JWT token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: UNAUTHORIZED
+              message: Invalid or missing JWT token
+    BadRequest:
+      description: Bad request - invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: BAD_REQUEST
+              message: Invalid request parameters
+              details:
+                invalid_columns:
+                - BadColumn
+                allowed_columns: Please check documentation for valid column names
+    Forbidden:
+      description: Forbidden - insufficient permissions or access denied
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: PERMISSION_DENIED
+              message: Insufficient permissions for this resource
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: INTERNAL_SERVER_ERROR
+              message: An unexpected error occurred.
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT bearer token.
