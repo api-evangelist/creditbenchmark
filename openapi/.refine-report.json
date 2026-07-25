@@ -1,0 +1,24 @@
+{
+  "provider": "creditbenchmark",
+  "sources": [
+    "creditbenchmark-analytics-api-openapi.yml",
+    "creditbenchmark-authentication-api-openapi.yml",
+    "creditbenchmark-contributor-data-api-openapi.yml",
+    "creditbenchmark-entity-data-api-openapi.yml",
+    "creditbenchmark-entity-matching-api-openapi.yml",
+    "creditbenchmark-portfolio-analytics-api-openapi.yml"
+  ],
+  "outputs": [
+    "creditbenchmark-analytics-api-openapi.yml",
+    "creditbenchmark-authentication-api-openapi.yml",
+    "creditbenchmark-contributor-data-api-openapi.yml",
+    "creditbenchmark-entity-data-api-openapi.yml",
+    "creditbenchmark-entity-matching-api-openapi.yml",
+    "creditbenchmark-portfolio-analytics-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [],
+  "skipped": []
+}

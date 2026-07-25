@@ -1,0 +1,12 @@
+generated: '2026-07-18'
+method: generated
+source: openapi/creditbenchmark-openapi-original.yml
+skills:
+  - file: creditbenchmark-resolve-and-analyze.md
+    name: Resolve entities and pull consensus credit analytics
+    api: openapi/creditbenchmark-openapi-original.yml
+    operations: [getToken, matchEntities, ratingDistribution, portfolioSummary]
+  - file: creditbenchmark-rating-moves.md
+    name: Track consensus rating moves across a universe
+    api: openapi/creditbenchmark-openapi-original.yml
+    operations: [getToken, entityRatingChange, customAggregate]

@@ -1,0 +1,48 @@
+generated: '2026-07-18'
+method: derived
+status: candidate
+source: openapi/creditbenchmark-openapi-original.yml
+note: >-
+  No official hosted/remote MCP server was found for Credit Benchmark. This is a candidate tool
+  list derived one-to-one from the published OpenAPI operations, for a future MCP wrapper.
+server:
+  name: creditbenchmark
+  transport: http
+  url: null
+auth:
+  type: http-bearer
+  token_endpoint: POST /gartan/api/token
+tools:
+  - name: get_token
+    description: Create a JWT bearer token from username/password credentials.
+    source_operation: openapi/creditbenchmark-openapi-original.yml#getToken
+  - name: custom_aggregate
+    description: Run a custom aggregate analytics calculation over a scoped entity universe.
+    source_operation: openapi/creditbenchmark-openapi-original.yml#customAggregate
+  - name: entity_rating_change
+    description: Entity-level consensus rating changes over a lookback window.
+    source_operation: openapi/creditbenchmark-openapi-original.yml#entityRatingChange
+  - name: portfolio_data
+    description: Raw entity-level portfolio data for a scoped universe across a time range.
+    source_operation: openapi/creditbenchmark-openapi-original.yml#portfolioData
+  - name: portfolio_summary
+    description: Portfolio-level consensus credit summary.
+    source_operation: openapi/creditbenchmark-openapi-original.yml#portfolioSummary
+  - name: rating_distribution
+    description: Share of entities in each rating bucket over time for a scoped universe.
+    source_operation: openapi/creditbenchmark-openapi-original.yml#ratingDistribution
+  - name: client_data_custom_aggregate
+    description: Contributor-data custom aggregate (your submitted data).
+    source_operation: openapi/creditbenchmark-openapi-original.yml#clientDataCustomAggregate
+  - name: client_data_rating_distribution
+    description: Contributor-data rating distribution.
+    source_operation: openapi/creditbenchmark-openapi-original.yml#clientDataRatingDistribution
+  - name: client_data_portfolio_summary
+    description: Contributor-data portfolio summary.
+    source_operation: openapi/creditbenchmark-openapi-original.yml#clientDataPortfolioSummary
+  - name: client_data_entity_rating_change
+    description: Contributor-data entity rating change.
+    source_operation: openapi/creditbenchmark-openapi-original.yml#clientDataEntityRatingChange
+  - name: match_entities
+    description: Resolve free-text entity names to Credit Benchmark CBIDs with confidence scores.
+    source_operation: openapi/creditbenchmark-openapi-original.yml#matchEntities

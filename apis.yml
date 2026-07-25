@@ -1,26 +1,186 @@
 aid: creditbenchmark
-name: creditbenchmark
-description: creditbenchmark is a company surfaced as a portfolio company of balderton-capital and added
-  to the API Evangelist network as a stub for enrichment. This profile is a lead awaiting the enrichment
-  pipeline.
+accessModel:
+  pricing: unknown
+  onboarding: self-serve
+  trial: false
+  try_now: false
+  public: false
+  label: Self-serve signup
+  confidence: medium
+  source:
+  - authentication
+  generated: '2026-07-22'
+  method: derived
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/creditbenchmark.png
+name: Credit Benchmark
+description: >-
+  Credit Benchmark is a financial data company that aggregates internal credit risk assessments
+  contributed by more than 40 leading global financial institutions into anonymized, consensus
+  Credit Consensus Ratings and analytics covering roughly 120,000 public and private entities —
+  over 90% of which are unrated by the traditional credit rating agencies. Its REST API delivers
+  consensus ratings, rating distributions, aggregate credit trends, entity rating changes, and
+  portfolio analytics, along with entity-name-to-CBID resolution (matching) and contributor-data
+  analytics. Delivery is also available via a web app, an Excel Add-In, and file/SFTP feeds.
+  Access is enterprise/sales-gated; the JWT-authenticated API base is https://api.creditbenchmark.com.
 url: https://raw.githubusercontent.com/api-evangelist/creditbenchmark/refs/heads/main/apis.yml
 x-type: company
 x-source: vc-portfolio
 x-backed-by:
 - balderton-capital
-x-tier: stub
-x-tier-reason: portfolio-lead
+x-tier: profiled
+x-tier-reason: has-openapi
 specificationVersion: '0.20'
 created: '2026-07-17'
-modified: '2026-07-17'
+modified: '2026-07-18'
 tags:
 - Company
-apis: []
+- Credit Risk
+- Financial Data
+- Credit Ratings
+- Analytics
+- Risk Management
+- Entity Resolution
+- Consensus Data
+apis:
+- aid: creditbenchmark:creditbenchmark-analytics-api
+  name: Credit Benchmark Analytics API
+  description: Portfolio analytics and risk calculations
+  humanURL: https://docs.creditbenchmark.com/api-reference/intro
+  baseURL: https://api.creditbenchmark.com
+  tags:
+  - Analytics
+  properties:
+  - type: OpenAPI
+    url: openapi/creditbenchmark-analytics-api-openapi.yml
+  - type: Documentation
+    url: https://docs.creditbenchmark.com/
+  - type: APIReference
+    url: https://docs.creditbenchmark.com/api-reference/intro
+- aid: creditbenchmark:creditbenchmark-authentication-api
+  name: Credit Benchmark Authentication API
+  description: JWT token generation and authentication
+  humanURL: https://docs.creditbenchmark.com/api-reference/intro
+  baseURL: https://api.creditbenchmark.com
+  tags:
+  - Authentication
+  properties:
+  - type: OpenAPI
+    url: openapi/creditbenchmark-authentication-api-openapi.yml
+  - type: Documentation
+    url: https://docs.creditbenchmark.com/
+  - type: APIReference
+    url: https://docs.creditbenchmark.com/api-reference/intro
+- aid: creditbenchmark:creditbenchmark-contributor-data-api
+  name: Credit Benchmark Contributor Data API
+  description: >-
+    Contributor-specific analytics using client/bank internal PD data. Requires ent_CLIENT-DATA entitlement.
+  humanURL: https://docs.creditbenchmark.com/api-reference/intro
+  baseURL: https://api.creditbenchmark.com
+  tags:
+  - Contributor Data
+  properties:
+  - type: OpenAPI
+    url: openapi/creditbenchmark-contributor-data-api-openapi.yml
+  - type: Documentation
+    url: https://docs.creditbenchmark.com/
+  - type: APIReference
+    url: https://docs.creditbenchmark.com/api-reference/intro
+- aid: creditbenchmark:creditbenchmark-entity-data-api
+  name: Credit Benchmark Entity Data API
+  description: Entity-specific data and rating information
+  humanURL: https://docs.creditbenchmark.com/api-reference/intro
+  baseURL: https://api.creditbenchmark.com
+  tags:
+  - Entity Data
+  properties:
+  - type: OpenAPI
+    url: openapi/creditbenchmark-entity-data-api-openapi.yml
+  - type: Documentation
+    url: https://docs.creditbenchmark.com/
+  - type: APIReference
+    url: https://docs.creditbenchmark.com/api-reference/intro
+- aid: creditbenchmark:creditbenchmark-entity-matching-api
+  name: Credit Benchmark Entity Matching API
+  description: Entity name matching and identification
+  humanURL: https://docs.creditbenchmark.com/api-reference/intro
+  baseURL: https://api.creditbenchmark.com
+  tags:
+  - Entity Matching
+  properties:
+  - type: OpenAPI
+    url: openapi/creditbenchmark-entity-matching-api-openapi.yml
+  - type: Documentation
+    url: https://docs.creditbenchmark.com/
+  - type: APIReference
+    url: https://docs.creditbenchmark.com/api-reference/intro
+- aid: creditbenchmark:creditbenchmark-portfolio-analytics-api
+  name: Credit Benchmark Portfolio Analytics API
+  description: Portfolio-level analytics and summaries
+  humanURL: https://docs.creditbenchmark.com/api-reference/intro
+  baseURL: https://api.creditbenchmark.com
+  tags:
+  - Portfolio Analytics
+  properties:
+  - type: OpenAPI
+    url: openapi/creditbenchmark-portfolio-analytics-api-openapi.yml
+  - type: Documentation
+    url: https://docs.creditbenchmark.com/
+  - type: APIReference
+    url: https://docs.creditbenchmark.com/api-reference/intro
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: DeveloperPortal
+  url: https://docs.creditbenchmark.com/
+- type: Documentation
+  url: https://docs.creditbenchmark.com/
+- type: APIReference
+  url: https://docs.creditbenchmark.com/api-reference/intro
+- type: GettingStarted
+  url: https://docs.creditbenchmark.com/delivery-channels/getting-access
+- type: Support
+  url: https://www.creditbenchmark.com/contact/
+- type: Blog
+  url: https://www.creditbenchmark.com/insights/
+- type: Login
+  url: https://analytics.creditbenchmark.com/cri/
+- type: TermsOfService
+  url: https://www.creditbenchmark.com/terms/
+- type: PrivacyPolicy
+  url: https://www.creditbenchmark.com/privacy-policy/
+- type: TrustCenter
+  url: security/creditbenchmark-trust-center.yml
+- type: Authentication
+  url: authentication/creditbenchmark-authentication.yml
+- type: Conventions
+  url: conventions/creditbenchmark-conventions.yml
+- type: ErrorCatalog
+  url: errors/creditbenchmark-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/creditbenchmark-lifecycle.yml
+- type: Conformance
+  url: conformance/creditbenchmark-conformance.yml
+- type: DataModel
+  url: data-model/creditbenchmark-data-model.yml
+- type: Overlay
+  url: overlays/creditbenchmark-openapi-overlay.yaml
+- type: MCPServer
+  url: mcp/creditbenchmark-mcp.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: LLMsTxt
+  url: llms/creditbenchmark-llms.txt
+- type: AgenticAccess
+  url: agentic-access/creditbenchmark-agentic-access.yml
+- type: DomainSecurity
+  url: security/creditbenchmark-domain-security.yml
 - type: Website
   url: http://www.creditbenchmark.com/
+x-enrichment:
+  date: '2026-07-19'
+  status: backfilled
+  pass: local-v1
+  note: backfilled from .gitignore signal + verified work evidence

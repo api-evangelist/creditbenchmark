@@ -1,0 +1,72 @@
+# Credit Benchmark Docs
+
+> Credit Benchmark documentation hub: Consensus Credit methodology, API reference, data dictionary, and product guides.
+
+## Docs
+
+- [Choosing a Data or Analytics Route](https://docs.creditbenchmark.com/api-reference/analytics-endpoints.md): How to pick the right Credit Benchmark API route for raw entity data, computed analytics, metadata discovery, portfolio trends, rating moves, or rating distributions.
+- [API Payload Examples](https://docs.creditbenchmark.com/api-reference/analytics-payload-examples.md): Copy-paste request bodies for common Credit Benchmark Analytics API queries, including filter join syntax and multi-dimension payload examples.
+- [Scope and Empty Results](https://docs.creditbenchmark.com/api-reference/analytics-scope-and-empty-results.md): How scope and result_filter narrow Credit Benchmark Analytics API queries, and why a successful request can still return an empty result set.
+- [Aggregate Trend](https://docs.creditbenchmark.com/api-reference/analytics/aggregate-trend.md): Time series of aggregate credit metrics for a scoped entity universe. Use to track how consensus credit quality moves over time.
+- [Credit Breakdown](https://docs.creditbenchmark.com/api-reference/analytics/credit-breakdown.md): Credit quality snapshot broken down by a facet column — sector, country, industry, or any facetable field.
+- [Entity Rating Change](https://docs.creditbenchmark.com/api-reference/analytics/entity-rating-change.md): Entity-level rating changes over a lookback window. Use to identify upgrades and downgrades across a portfolio.
+- [Rating Distribution](https://docs.creditbenchmark.com/api-reference/analytics/rating-distribution.md): Share of entities in each rating bucket over time for a scoped universe.
+- [Create JWT Token](https://docs.creditbenchmark.com/api-reference/create-jwt-token.md): Create a JWT bearer token.
+- [Get Data](https://docs.creditbenchmark.com/api-reference/data/get-data.md): Raw entity-level data for a scoped universe across a time range. The primary endpoint for extracting point-in-time or time series data.
+- [Entity Resolution](https://docs.creditbenchmark.com/api-reference/entity-name-resolution.md): Resolves entity names to Credit Benchmark identifiers. Returns ranked candidates with confidence scores.
+- [API Reference](https://docs.creditbenchmark.com/api-reference/intro.md): Authenticate, resolve entities, query data, run analytics, and discover metadata via the Credit Benchmark REST API.
+- [Name Matching & CBID Mapping](https://docs.creditbenchmark.com/api-reference/matching/overview.md): Credit Benchmark resolves free-text company names to CBIDs using a three-stage pipeline: candidate retrieval, feature engineering, and ML-based match scoring.
+- [Accuracy & Coverage](https://docs.creditbenchmark.com/api-reference/matching/performance.md): Performance benchmarks for Credit Benchmark entity resolution: precision, recall, and coverage metrics measured on a held-out evaluation set.
+- [Available Data Columns](https://docs.creditbenchmark.com/api-reference/metadata/available-data-columns.md): Returns a flat catalog of public input columns with metadata such as type, scopeable, facetable, and entitlement. This endpoint describes request-side input columns only; it does not describe route response fields or result_filter fields.
+- [Available Dates](https://docs.creditbenchmark.com/api-reference/metadata/available-dates.md): Returns latest and previous available effective dates for analytics requests.
+- [Geography Schema](https://docs.creditbenchmark.com/api-reference/metadata/geography-schema.md): Returns the CB geography hierarchy as region group, region, and country of risk levels.
+- [Industry Schema](https://docs.creditbenchmark.com/api-reference/metadata/industry-schema.md): Returns the CB industry hierarchy as L1 through L6 rows for scope filters, facets, and hierarchy-aware analytics.
+- [Rating Scales](https://docs.creditbenchmark.com/api-reference/metadata/rating-scales.md): Returns CB rating scale metadata, including CB21 and CB7 ordering and band mappings.
+- [Metrics and Rating Scales](https://docs.creditbenchmark.com/api-reference/metrics-and-rating-scales.md): How the metric and rating_scale parameters control which credit risk values and response field names the Credit Benchmark Analytics API returns.
+- [Data Dictionary](https://docs.creditbenchmark.com/data/data-dictionary.md): Complete field reference for Credit Benchmark consensus data: field names, data types, schemas, access levels, and entitlement requirements.
+- [Industry Schema Definitions](https://docs.creditbenchmark.com/data/industry-schema-definitions.md): Reference for Credit Benchmark industry and geographic classification hierarchies, from broad sectors down to specific subsectors and subdivisions.
+- [API Access](https://docs.creditbenchmark.com/delivery-channels/api.md): Programmatic access to Credit Benchmark data through the API.
+- [CB Web App Login](https://docs.creditbenchmark.com/delivery-channels/cb-web-app-login.md): Sign-in and password reset guidance for the Credit Benchmark Web App.
+- [CB Web App Overview](https://docs.creditbenchmark.com/delivery-channels/cb-web-app-overview.md): Navigation overview for the Credit Benchmark Web App.
+- [Installation Guide](https://docs.creditbenchmark.com/delivery-channels/excel-add-in/installation-guide.md): Installation guidance for the Credit Benchmark Excel Add-In.
+- [Excel Add-In Guide](https://docs.creditbenchmark.com/delivery-channels/excel-add-in/user-guide.md): Credit Benchmark Excel Add-In access for consensus credit risk data.
+- [Matching as a Service](https://docs.creditbenchmark.com/delivery-channels/feed-file/managed-entity-resolution.md): File-based managed matching for entity lists and Credit Benchmark identifiers.
+- [SFTP and CB Secure File Transfer](https://docs.creditbenchmark.com/delivery-channels/feed-file/sftp.md): Connection requirements for Credit Benchmark SFTP and CB Secure file transfer.
+- [Getting Access](https://docs.creditbenchmark.com/delivery-channels/getting-access.md): Access paths for current subscribers, prospective customers, and SSO-managed firms.
+- [Delivery Channels](https://docs.creditbenchmark.com/delivery-channels/intro.md): Access patterns for Credit Benchmark applications, APIs, and file-based delivery.
+- [Single Sign-On (SSO)](https://docs.creditbenchmark.com/delivery-channels/sso.md): SSO configuration for the Credit Benchmark Web App and Excel Add-in.
+- [Aggregates](https://docs.creditbenchmark.com/delivery-channels/webapp-pages/aggregates.md): Aggregate credit trend analysis across sectors, industries, and countries.
+- [Client Analytics](https://docs.creditbenchmark.com/delivery-channels/webapp-pages/client-analytics.md): Client Analytics comparisons between submitted data and consensus ratings.
+- [Entity](https://docs.creditbenchmark.com/delivery-channels/webapp-pages/entity.md): Single-name consensus ratings and entity-level credit risk analysis.
+- [Home Page](https://docs.creditbenchmark.com/delivery-channels/webapp-pages/home-page.md): Overview of the Credit Benchmark Web App Home Page: portfolio movers, universe-wide credit trends, and consensus rating highlights.
+- [Inbox](https://docs.creditbenchmark.com/delivery-channels/webapp-pages/inbox.md): Inbox access for data files, reports, and shared downloads.
+- [My Portfolios](https://docs.creditbenchmark.com/delivery-channels/webapp-pages/my-portfolios.md): Portfolio creation, management, and monitoring in the Credit Benchmark Web App.
+- [Screener](https://docs.creditbenchmark.com/delivery-channels/webapp-pages/screener.md): Universe screening, saved filters, and portfolio creation from search results.
+- [AWS Data Exchange](https://docs.creditbenchmark.com/integrations/aws.md): AWS access for Credit Benchmark data delivery via AWS Data Exchange.
+- [Databricks Data Delivery](https://docs.creditbenchmark.com/integrations/databricks.md): Databricks access for Credit Benchmark data delivery via the Databricks Marketplace.
+- [Snowflake Data Delivery](https://docs.creditbenchmark.com/integrations/snowflake.md): Snowflake access for Credit Benchmark data delivery.
+- [CCR Distribution Fields](https://docs.creditbenchmark.com/methodology/consensus-calculations/distribution-calculations.md): Credit Benchmark calculates distribution metrics including standard deviation, skewness, and dispersion on contributed PD estimates for each entity.
+- [Opinion Change Indicator](https://docs.creditbenchmark.com/methodology/consensus-calculations/opinion-change-indicator.md): The Opinion Change Indicator distinguishes genuine bank opinion changes from consensus rating moves caused by shifts in the contributing bank population.
+- [Rating Comparisons (Notch Differences)](https://docs.creditbenchmark.com/methodology/consensus-calculations/rating-comparisons.md): Credit Benchmark uses notch differences to compare PD estimates for peer benchmarking, portfolio analysis, and cross-entity risk reporting.
+- [Consensus Credit Rating](https://docs.creditbenchmark.com/methodology/consensus-credit-rating.md): The Consensus Credit Rating (CCR) is derived from contributed bank PD estimates and mapped to the Credit Benchmark 21-category rating scale.
+- [Consensus Probability of Default (PD)](https://docs.creditbenchmark.com/methodology/consensus-pd.md): The raw Consensus PD is mapped to the CCR100 scale for finer-grained credit analysis, providing 101 buckets versus the standard 21 letter grades.
+- [Contributor count and CCR Source classification](https://docs.creditbenchmark.com/methodology/contributor-count.md): How Credit Benchmark publishes contributor counts, applies publication thresholds, and distinguishes Consensus from Implied credit ratings using CCRSource.
+- [Bank Data Onboarding](https://docs.creditbenchmark.com/methodology/data-processing/bank-onboarding.md): Credit Benchmark reviews sample PD files, validates contributor models, and onboards new contributing banks through a structured process before go-live.
+- [Data Submission](https://docs.creditbenchmark.com/methodology/data-processing/data-submission.md): Over 40 contributing banks submit entity-level Probability of Default estimates to Credit Benchmark on a monthly or weekly data cadence.
+- [Data Validation](https://docs.creditbenchmark.com/methodology/data-processing/data-validation.md): Credit Benchmark validates contributed PD data through layered controls including outlier detection, cross-bank checks, and trend analysis before consensus.
+- [Industry Classification](https://docs.creditbenchmark.com/methodology/data-processing/industry-classification.md): Credit Benchmark maps NAICS, SIC, NACE, and other classification standards to a unified CB industry schema for consistent analytics across all entities.
+- [Credit Methodology](https://docs.creditbenchmark.com/methodology/intro.md): Credit Benchmark collects, processes, and publishes consensus credit ratings from PD estimates submitted by the world's leading financial institutions.
+- [Aggregate Calculation Methodology](https://docs.creditbenchmark.com/methodology/pd-aggregates/methodology.md): Portfolio PD aggregates are calculated using a back-calculation approach anchored to the most recent month and validated by the Opinion Change Indicator.
+- [PD Aggregates Overview](https://docs.creditbenchmark.com/methodology/pd-aggregates/overview.md): Credit Benchmark builds portfolio-level credit risk indices from contributed PD data, covering CB Aggregates, custom aggregates, and client aggregates.
+- [Alignment with Rating Agencies](https://docs.creditbenchmark.com/methodology/rating-agency-alignment.md): How Credit Benchmark Consensus Credit Ratings compare with S&P and Fitch, including rating distributions and upgrade and downgrade patterns.
+- [Credit Benchmark Rating Scale](https://docs.creditbenchmark.com/methodology/rating-scales.md): Credit Benchmark maps Probability of Default values to Consensus Credit Ratings through its standardized 21-category scale, from aaa through d.
+- [Bloomberg](https://docs.creditbenchmark.com/partnerships/bbg.md): Access Credit Benchmark data via the Bloomberg Terminal and Bloomberg Enterprise Data License.
+- [Preqin](https://docs.creditbenchmark.com/partnerships/preqin.md): Access Credit Benchmark Credit Consensus Ratings inside Preqin Pro.
+- [Release Notes](https://docs.creditbenchmark.com/product-updates/index.md): Release notes for Credit Benchmark: API launches, new endpoints, data and schema changes, documentation updates, and other platform announcements.
+
+## OpenAPI Specs
+
+- [consensus-data](https://docs.creditbenchmark.com/openapi/consensus-data.yaml)
+- [matching](https://docs.creditbenchmark.com/openapi/matching.yaml)
+- [authentication](https://docs.creditbenchmark.com/openapi/authentication.yaml)
+- [openapi](https://docs.creditbenchmark.com/openapi.yaml)

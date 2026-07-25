@@ -1,0 +1,26 @@
+generated: '2026-07-18'
+method: derived
+source: openapi/creditbenchmark-openapi-original.yml
+standards:
+  - id: openapi-3.1
+    conforms: true
+    evidence: openapi field is 3.1.0
+  - id: oauth2
+    conforms: false
+    evidence: Auth is http bearer JWT via a password-grant token endpoint, not an OAuth2 scheme.
+  - id: oidc
+    conforms: false
+  - id: jwt-rfc7519
+    conforms: true
+    evidence: securityScheme BearerAuth bearerFormat JWT; token endpoint issues JWT access_token.
+  - id: rfc9457-problem-details
+    conforms: false
+    evidence: 'Errors use a custom { error: { code, message, details } } envelope, not application/problem+json.'
+  - id: json-api
+    conforms: false
+  - id: pagination
+    conforms: false
+    evidence: No cursor/offset pagination documented.
+  - id: idempotency
+    conforms: false
+    evidence: No Idempotency-Key support documented or in spec.

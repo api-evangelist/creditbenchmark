@@ -1,0 +1,47 @@
+generated: '2026-07-18'
+method: derived
+source: openapi/creditbenchmark-openapi-original.yml
+docs: https://docs.creditbenchmark.com/api-reference/intro
+summary: >-
+  Cross-cutting request/response semantics for the Credit Benchmark REST API, derived from the
+  published OpenAPI 3.1 spec and docs. Enterprise analytics API: JWT bearer auth, POST-based
+  analytics routes taking a RequestEnvelope body, a custom error envelope, and a response
+  metadata block carrying a request_id for tracing.
+authentication:
+  style: http-bearer
+  scheme: bearer
+  bearer_format: JWT
+  token_endpoint: POST /gartan/api/token
+  grant: password (Username/Password, grant_type=password)
+  token_lifetime_seconds: 86400
+  header: 'Authorization: Bearer <token>'
+  cross_link: authentication/creditbenchmark-authentication.yml
+idempotency:
+  supported: false
+  notes: No Idempotency-Key header/parameter is documented or present in the spec.
+pagination:
+  supported: false
+  notes: >-
+    Analytics routes return scoped aggregate/time-series result sets shaped by the request
+    envelope (scope, result_filter); no cursor/offset pagination is documented.
+request_tracing:
+  request_id_field: metadata.request_id
+  source_schema: ResponseMetadata
+  notes: Responses include a ResponseMetadata block with request_id, api_version, generated_at.
+versioning:
+  scheme: spec-version
+  current: 1.0.0
+  api_version_field: metadata.api_version
+  cross_link: lifecycle/creditbenchmark-lifecycle.yml
+error_envelope:
+  shape: '{ "error": { "code", "message", "details" } }'
+  format: custom-envelope
+  cross_link: errors/creditbenchmark-problem-types.yml
+rate_limiting:
+  documented: false
+  notes: No rate-limit headers or policy are documented for the enterprise API.
+request_body:
+  style: RequestEnvelope wrapper
+  notes: >-
+    Analytics/data routes wrap their typed request in a RequestEnvelope_* schema; token route uses
+    application/x-www-form-urlencoded.

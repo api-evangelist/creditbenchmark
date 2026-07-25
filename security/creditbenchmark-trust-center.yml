@@ -1,0 +1,19 @@
+generated: '2026-07-18'
+method: searched
+probe: false
+url: https://compliance.creditbenchmark.com/
+title: Credit Benchmark Limited Trust Center
+certifications: []
+notes: >-
+  Credit Benchmark publishes a dedicated Trust Center at compliance.creditbenchmark.com
+  ("Credit Benchmark Limited Trust Center"), linked from the site as "Security and Compliance".
+  The portal is a JavaScript-rendered trust-center app (documents gated behind the portal UI), so
+  specific named certifications could not be extracted verbatim and are intentionally left empty
+  rather than asserted. No Compliance pointer is emitted because no certification was verified.
+evidence:
+  - source: https://compliance.creditbenchmark.com/
+    kind: trust-center portal
+    signal: page title "Credit Benchmark Limited Trust Center"
+  - source: https://www.creditbenchmark.com/
+    kind: site nav
+    signal: '"Security and Compliance" links to compliance.creditbenchmark.com'

@@ -1,0 +1,52 @@
+generated: '2026-07-18'
+method: derived
+source: openapi/creditbenchmark-openapi-original.yml
+note: >-
+  Credit Benchmark's API is an analytics/query surface rather than a CRUD resource API, so the
+  data model is a set of core domain concepts and the request/response envelopes that carry them,
+  derived from components.schemas. Relationships are conceptual (query -> scoped universe -> results).
+entities:
+  - name: Entity
+    key: CBID
+    description: A public or private company keyed by a Credit Benchmark Identifier (CBID).
+    resolved_via: matchEntities (name -> CBID with confidence)
+  - name: Portfolio
+    schema: Portfolio / FlexibleCBPortfolio
+    description: A named set of CBIDs (or a flexible portfolio definition) analytics are scoped to.
+  - name: RatingScale
+    schema: CRARatingDisplayOption
+    description: CB rating scales (CB21 21-band and CB7 7-band) and band mappings.
+  - name: RequestEnvelope
+    schema: RequestEnvelope_Base and typed subclasses
+    description: Wrapper carrying scope, result_filter, metric, rating_scale, and the typed request.
+  - name: ResponseMetadata
+    schema: ResponseMetadata
+    fields: [request_id, api_version, generated_at]
+  - name: MatchResult
+    schema: MatchExternalResponse / ExternalMatchRow / ExternalCandidate
+    description: Ranked entity-resolution candidates with match scores.
+relationships:
+  - from: RequestEnvelope
+    to: Portfolio
+    type: has_one
+    via: portfolio / scope
+  - from: RequestEnvelope
+    to: RatingScale
+    type: has_one
+    via: rating_scale
+  - from: Portfolio
+    to: Entity
+    type: has_many
+    via: CBID list
+  - from: MatchResult
+    to: Entity
+    type: has_many
+    via: CBID candidates
+  - from: '*Response'
+    to: ResponseMetadata
+    type: has_one
+    via: metadata
+request_families:
+  analytics: [CustomAggregateRequest, RatingDistributionRequest, EntityRatingChangeRequest, PortfolioDataRequest, PortfolioSummaryRequest]
+  contributor: [ClientDataAggregateRequest, ClientDataDistributionRequest, ClientDataSummaryRequest, ClientDataEntityRatingChangeRequest]
+  matching: [MatchBody, Query]

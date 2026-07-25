@@ -1,0 +1,20 @@
+generated: '2026-07-18'
+method: searched
+source: openapi/creditbenchmark-openapi-original.yml
+docs: https://docs.creditbenchmark.com/api-reference/intro
+versioning:
+  scheme: spec-version
+  current: '1.0.0'
+  api_version_field: metadata.api_version
+  notes: OpenAPI info.version is 1.0.0; responses echo api_version in ResponseMetadata.
+deprecation:
+  policy_url: null
+  sunset_header: false
+  notes: No public deprecation policy or RFC 8594 Sunset/Deprecation header support documented.
+sla:
+  url: null
+  uptime_target: null
+  notes: Enterprise agreement; no public SLA page located.
+status_page: null
+status_page_notes: No public status page located (docs.creditbenchmark.com/changelog is 404).
+deprecated_operations: []

@@ -1,0 +1,22 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for Credit Benchmark API
+  version: 1.0.0
+extends: openapi/creditbenchmark-openapi-original.yml
+actions:
+  - target: $.info
+    update:
+      x-apievangelist-enriched: '2026-07-18'
+      x-apievangelist-auth: http-bearer-jwt
+      x-apievangelist-error-format: custom-envelope
+      x-apievangelist-idempotency: false
+      x-apievangelist-pagination: false
+      x-apievangelist-categories:
+        - credit-risk
+        - financial-data
+        - analytics
+  - target: $.info
+    update:
+      x-apievangelist-notes: >-
+        Enterprise analytics API. Access is sales-gated (sales@creditbenchmark.com); no
+        self-service signup. JWT tokens via POST /gartan/api/token are valid 24h.
