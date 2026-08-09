@@ -1,0 +1,22 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for Credit Benchmark Consensus Data API
+  version: 1.0.0
+extends: openapi/credit-benchmark-consensus-data-openapi.yml
+actions:
+- target: $.info
+  update:
+    x-apievangelist-enriched: '2026-07-18'
+    x-apievangelist-provider: credit-benchmark
+    x-apievangelist-artifacts:
+    - authentication/credit-benchmark-authentication.yml
+    - conventions/credit-benchmark-conventions.yml
+    - errors/credit-benchmark-problem-types.yml
+    - data-model/credit-benchmark-data-model.yml
+    - lifecycle/credit-benchmark-lifecycle.yml
+- target: $.info
+  update:
+    x-apievangelist-notes: >-
+      Consensus credit-risk data API. JWT bearer auth via POST /api/security/token,
+      URI-path versioning (v2), entitlement-gated data, HTTP 429 rate-limit signalling,
+      and a proprietary {error, detail} error envelope (not RFC 9457).

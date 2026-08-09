@@ -1,0 +1,411 @@
+openapi: 3.1.0
+info:
+  title: Credit Benchmark analytics data API
+  description: 'Authentication, entity resolution, data, analytics, and metadata endpoints.
+
+    '
+  version: 1.0.0
+  contact:
+    name: Credit Benchmark API Support
+    email: api-support@creditbenchmark.com
+    url: https://creditbenchmark.com/support
+  license:
+    name: Proprietary
+    url: https://creditbenchmark.com/terms
+servers:
+- url: https://gateway.creditbenchmark.com
+  description: Production gateway
+security:
+- BearerAuth: []
+tags:
+- name: data
+  description: Raw data extraction endpoints.
+  x-group: Data
+paths:
+  /analytics/v2/data/getdata:
+    post:
+      tags:
+      - data
+      summary: Get Data
+      description: Raw entity-level data for a scoped universe across a time range. The primary endpoint for extracting point-in-time or time series data.
+      operationId: getData
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetDataRequest'
+            example:
+              effective_date: 20250930
+              lookback_period: 24
+              lookback_unit: months
+              columns:
+              - CB_ID
+              - CB_Legal_Name
+              - CB_Effective_Date_ID
+              - CB_CCR
+              - CB_CCR_21_Notch
+              - CB_CCR_100_PDMid
+              scope:
+                portfolio:
+                  CB_ID:
+                  - CB0000022706
+                  - CB0000022177
+      responses:
+        '200':
+          description: Data retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetDataResponse'
+              example:
+                CB_ID:
+                - CB0000022706
+                - CB0000022177
+                CB_Effective_Date_ID:
+                - 20250831
+                - 20250831
+                CB_Legal_Name:
+                - JPMORGAN CHASE & CO
+                - GOLDMAN SACHS GROUP INC
+                CB_CCR:
+                - a-
+                - bbb+
+                CB_CCR_21_Notch:
+                - 7
+                - 9
+                CB_CCR_100_PDMid:
+                - 0.00119
+                - 0.00237
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/FrameworkValidationError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  responses:
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: Client-backed analytics inputs require contributor entitlement.
+    TooManyRequests:
+      description: Too many requests
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RateLimitError'
+          example:
+            error: Rate limit exceeded
+            detail: 60 per 1 minute
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+          example:
+            detail: Unauthorized request
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: 'Invalid request parameters: scope requires at least ''portfolio'' or ''filters''.'
+    InternalServerError:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: An error occurred while processing your request. Please try again later.
+    FrameworkValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FastApiValidationErrorResponse'
+          example:
+            detail:
+            - loc:
+              - body
+              - effective_date
+              msg: Input should be a valid integer
+              type: int_parsing
+  schemas:
+    ColumnArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/ScalarValue'
+    ScalarValue:
+      anyOf:
+      - type: string
+      - type: integer
+      - type: number
+      - type: boolean
+      - type: 'null'
+    GetDataRequest:
+      type: object
+      required:
+      - scope
+      properties:
+        effective_date:
+          type: integer
+          description: As-of date in YYYYMMDD format. If omitted, the latest available date is used.
+        lookback_period:
+          type: integer
+          minimum: 0
+          default: 24
+          description: Number of `lookback_unit` intervals before `effective_date`.
+        lookback_unit:
+          type: string
+          enum:
+          - months
+          - quarters
+          - years
+          default: months
+        scope:
+          $ref: '#/components/schemas/Scope'
+        columns:
+          type: array
+          items:
+            type: string
+          description: Requested output columns. Some columns require S&P, Fitch, or client-data entitlements. Use `/v2/metadata/columns` to discover the public column catalog.
+          default:
+          - CB_ID
+          - CB_Legal_Name
+          - CB_Effective_Date_ID
+          - CB_CCR
+          - CB_CCR_21_Notch
+          - CB_CCR_100_PDMid
+        result_filter:
+          $ref: '#/components/schemas/ResultFilter'
+    ResultFilterSort:
+      type: object
+      additionalProperties: false
+      required:
+      - field
+      properties:
+        field:
+          type: string
+          description: Supported result field name to sort by for this route. Valid values come from returned analytic fields or documented route aliases, not arbitrary source columns.
+        direction:
+          type: string
+          enum:
+          - asc
+          - desc
+          default: desc
+          description: Sort direction.
+    FilterValue:
+      anyOf:
+      - $ref: '#/components/schemas/ScalarValue'
+      - $ref: '#/components/schemas/ColumnArray'
+    FastApiValidationErrorResponse:
+      type: object
+      required:
+      - detail
+      properties:
+        detail:
+          type: array
+          items:
+            $ref: '#/components/schemas/FastApiValidationErrorDetail'
+    Scope:
+      type: object
+      additionalProperties: false
+      description: Defines the input universe. Use `portfolio`, `filters`, or both.
+      properties:
+        portfolio:
+          $ref: '#/components/schemas/ScopePortfolio'
+        filters:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScopeFilter'
+          description: Universe filters. Use them alone to build the universe from public columns, or with `portfolio` to subset the supplied portfolio. Only built-in scopeable columns are allowed in `filters[].key`; custom `scope.portfolio` columns are not valid scope filters.
+        filters_join:
+          type: array
+          items:
+            type: string
+          description: Optional logic used to join `filters`. Only `&`, `|`, and `~` are supported. Length must be `len(filters)+1`.
+    FastApiValidationErrorDetail:
+      type: object
+      properties:
+        loc:
+          type: array
+          items:
+            oneOf:
+            - type: string
+            - type: integer
+        msg:
+          type: string
+        type:
+          type: string
+    SimpleError:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: string
+    NumberArray:
+      type: array
+      items:
+        type: number
+    UnauthorizedError:
+      type: object
+      required:
+      - detail
+      properties:
+        detail:
+          type: string
+    ScopePortfolio:
+      type: object
+      description: Explicit entity universe. `CB_ID` is required. Any extra keys are treated as custom portfolio columns.
+      required:
+      - CB_ID
+      properties:
+        CB_ID:
+          type: array
+          items:
+            type: string
+          description: List of Credit Benchmark entity identifiers.
+      additionalProperties: true
+    IntegerArray:
+      type: array
+      items:
+        type: integer
+    ResultFilter:
+      type: object
+      additionalProperties: false
+      description: Filtering, sorting, and limiting applied after an analytic has computed its results. `filters[].key` and `sort.field` must reference supported result fields for the selected route. Some routes also accept documented alias names that map to returned fields.
+      properties:
+        limit:
+          type: integer
+          minimum: 1
+          description: Return only the first N rows after `filters` and `sort` are applied.
+        filters:
+          type: array
+          description: Filters applied to computed result rows. These do not change the analytic itself.
+          items:
+            $ref: '#/components/schemas/ResultFilterCondition'
+        filters_join:
+          type: array
+          items:
+            type: string
+          description: Optional logic used to join `filters`. Length must be `len(filters)+1`. If omitted, conditions are AND-joined.
+        sort:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResultFilterSort'
+          description: Priority-ordered sort rules.
+    ResultFilterCondition:
+      type: object
+      additionalProperties: false
+      required:
+      - key
+      - operator
+      properties:
+        key:
+          type: string
+          description: Supported result field name to filter after the analytic has been computed. Valid values come from returned analytic fields or documented route aliases, not arbitrary source columns.
+        operator:
+          type: string
+          enum:
+          - ==
+          - '!='
+          - '>'
+          - <
+          - '>='
+          - <=
+          - in
+          - not in
+          - contains
+          - starts with
+          - ends with
+          - does not contain
+          - does not start with
+          - does not end with
+          - is null
+          - is not null
+          description: Comparison operator.
+        values:
+          allOf:
+          - $ref: '#/components/schemas/FilterValue'
+          description: Single value or list of values for the filter. Not used for `is null` or `is not null`.
+    GetDataResponse:
+      type: object
+      description: Get data results.
+      properties:
+        CB_ID:
+          $ref: '#/components/schemas/StringArray'
+        CB_Effective_Date_ID:
+          $ref: '#/components/schemas/IntegerArray'
+        CB_Legal_Name:
+          $ref: '#/components/schemas/StringArray'
+        CB_CCR:
+          $ref: '#/components/schemas/ColumnArray'
+        CB_CCR_21_Notch:
+          $ref: '#/components/schemas/NumberArray'
+        CB_CCR_100_PDMid:
+          $ref: '#/components/schemas/NumberArray'
+      additionalProperties:
+        $ref: '#/components/schemas/ColumnArray'
+    ScopeFilter:
+      type: object
+      additionalProperties: false
+      required:
+      - key
+      - operator
+      properties:
+        key:
+          type: string
+          description: Public input column used to build or filter the universe. Only supported scopeable columns are allowed; see `/v2/metadata/columns`.
+        operator:
+          type: string
+          enum:
+          - ==
+          - '!='
+          - '>'
+          - <
+          - '>='
+          - <=
+          - in
+          - not in
+          - is null
+          - is not null
+          description: Comparison operator.
+        values:
+          $ref: '#/components/schemas/FilterValue'
+          description: Single value or list of values for the filter. Use an empty string for `is null` or `is not null`.
+    StringArray:
+      type: array
+      items:
+        type: string
+    RateLimitError:
+      type: object
+      required:
+      - error
+      - detail
+      properties:
+        error:
+          type: string
+        detail:
+          type: string
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT bearer token.

@@ -1,0 +1,420 @@
+openapi: 3.1.0
+info:
+  title: Credit Benchmark analytics metadata API
+  description: 'Authentication, entity resolution, data, analytics, and metadata endpoints.
+
+    '
+  version: 1.0.0
+  contact:
+    name: Credit Benchmark API Support
+    email: api-support@creditbenchmark.com
+    url: https://creditbenchmark.com/support
+  license:
+    name: Proprietary
+    url: https://creditbenchmark.com/terms
+servers:
+- url: https://gateway.creditbenchmark.com
+  description: Production gateway
+security:
+- BearerAuth: []
+tags:
+- name: metadata
+  description: Metadata discovery endpoints.
+  x-group: Metadata
+paths:
+  /analytics/v2/metadata/columns:
+    get:
+      tags:
+      - metadata
+      summary: Available Data Columns
+      description: Returns a flat catalog of public input columns with metadata such as type, scopeable, facetable, and entitlement. This endpoint describes request-side input columns only; it does not describe route response fields or result_filter fields.
+      operationId: metadata_columns_v2_metadata_columns_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataColumnsResponse'
+              example:
+                CB_ID:
+                  type: String
+                  scopeable: false
+                  facetable: false
+                  entitlement: null
+                CB_Country:
+                  type: String
+                  scopeable: true
+                  facetable: true
+                  entitlement: null
+                CB_CCR_100_PDMid:
+                  type: Float64
+                  scopeable: true
+                  facetable: false
+                  entitlement: null
+                SP_ForeignCurrencyLongTerm:
+                  type: String
+                  scopeable: true
+                  facetable: true
+                  entitlement: SP
+                Client_Rating_Client_Scale:
+                  type: String
+                  scopeable: true
+                  facetable: true
+                  entitlement: CLIENT_DATA
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /analytics/v2/metadata/rating-scales:
+    get:
+      tags:
+      - metadata
+      summary: Rating Scales
+      description: Returns CB rating scale metadata, including CB21 and CB7 ordering and band mappings.
+      operationId: metadata_rating_scales_v2_metadata_rating_scales_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RatingScalesMetadataResponse'
+              example:
+                default_scale: CB21
+                supported_scales:
+                - CB21
+                - CB7
+                - CLIENT
+                scales:
+                  CB21:
+                    ratings:
+                    - CB_CCR_21_Notch: 1
+                      CB_CCR: aaa
+                      CB_PD_Lower_Bound: 0.0
+                      CB_PD_Mid_Point: 7.9057e-05
+                      CB_PD_Upper_Bound: 0.000125
+                      CB_IG_HY: IG
+                    - CB_CCR_21_Notch: 2
+                      CB_CCR: aa+
+                      CB_PD_Lower_Bound: 0.000125001
+                      CB_PD_Mid_Point: 0.000167705
+                      CB_PD_Upper_Bound: 0.000225
+                      CB_IG_HY: IG
+                  CB7:
+                    ratings:
+                    - CB_Rating_Group_Notch: 1
+                      CB_Rating_Group: aaa
+                    - CB_Rating_Group_Notch: 2
+                      CB_Rating_Group: aa
+                  CLIENT:
+                    description: Client-specific scales are selected per entitled client request.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /analytics/v2/metadata/industry-schema:
+    get:
+      tags:
+      - metadata
+      summary: Industry Schema
+      description: Returns the CB industry hierarchy as L1 through L6 rows for scope filters, facets, and hierarchy-aware analytics.
+      operationId: metadata_industry_schema_v2_metadata_industry_schema_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndustrySchemaMetadataResponse'
+              example:
+                industry:
+                  levels:
+                    CB_Industry: L1
+                    CB_Super_Sector: L2
+                    CB_Sector: L3
+                    CB_Sub_Sector: L4
+                  tree:
+                    Financials:
+                      Banks:
+                        Banks:
+                        - Banks
+                      Financial Services:
+                        Financial Services:
+                        - Asset Managers
+                        - Consumer Finance
+                entity_types:
+                  levels:
+                    CB_Entity_Type: L1
+                    CB_Entity_Sub_Type: L2
+                  tree:
+                    Corporates:
+                    - Corporates
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /analytics/v2/metadata/geography-schema:
+    get:
+      tags:
+      - metadata
+      summary: Geography Schema
+      description: Returns the CB geography hierarchy as region group, region, and country of risk levels.
+      operationId: metadata_geography_schema_v2_metadata_geography_schema_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeographySchemaMetadataResponse'
+              example:
+                levels:
+                  CB_Region_Group: L1
+                  CB_Region: L2
+                  CB_Country: L3
+                tree:
+                  Developed Markets:
+                    North America:
+                      Canada: CA
+                      United States: US
+                    Europe:
+                      France: FR
+                      United Kingdom: GB
+                code: CB_Country_ISO
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /analytics/v2/metadata/available-dates:
+    get:
+      tags:
+      - metadata
+      summary: Available Dates
+      description: Returns latest and previous available effective dates for analytics requests.
+      operationId: metadata_available_dates_v2_metadata_available_dates_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailableDatesMetadataResponse'
+              example:
+                latest_effective_date: 20260529
+                latest_finalised_effective_date: 20260529
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  responses:
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: Client-backed analytics inputs require contributor entitlement.
+    TooManyRequests:
+      description: Too many requests
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RateLimitError'
+          example:
+            error: Rate limit exceeded
+            detail: 60 per 1 minute
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+          example:
+            detail: Unauthorized request
+    InternalServerError:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: An error occurred while processing your request. Please try again later.
+  schemas:
+    AvailableDatesMetadataResponse:
+      type: object
+      description: Latest available effective dates for analytics requests.
+      required:
+      - latest_effective_date
+      - latest_finalised_effective_date
+      properties:
+        latest_effective_date:
+          type: integer
+          description: Latest available effective date in YYYYMMDD format.
+          example: 20260529
+        latest_finalised_effective_date:
+          type: integer
+          description: Latest finalised effective date in YYYYMMDD format.
+          example: 20260529
+    GeographySchemaMetadataResponse:
+      type: object
+      description: Geography hierarchy metadata.
+      required:
+      - levels
+      - tree
+      - code
+      properties:
+        levels:
+          type: object
+          additionalProperties:
+            type: string
+          description: Geography field names mapped to hierarchy levels.
+          example:
+            CB_Region_Group: L1
+            CB_Region: L2
+            CB_Country: L3
+        tree:
+          type: object
+          additionalProperties: true
+          description: Nested region group, region, and country tree.
+        code:
+          type: string
+          description: Field containing the country code.
+          example: CB_Country_ISO
+    DataColumnMetadata:
+      type: object
+      additionalProperties: false
+      required:
+      - type
+      - scopeable
+      - facetable
+      - entitlement
+      properties:
+        type:
+          type: string
+          description: Column type.
+        scopeable:
+          type: boolean
+          description: Whether the column can be used in `scope.filters`.
+        facetable:
+          type: boolean
+          description: Whether the column can be used as a facet column.
+        entitlement:
+          type:
+          - string
+          - 'null'
+          enum:
+          - SP
+          - FITCH
+          - CLIENT_DATA
+          - null
+          description: Required entitlement, if any.
+    HierarchyMetadata:
+      type: object
+      description: Hierarchy metadata with level labels and a nested tree.
+      required:
+      - levels
+      - tree
+      properties:
+        levels:
+          type: object
+          additionalProperties:
+            type: string
+          description: Field names mapped to hierarchy levels.
+        tree:
+          type: object
+          additionalProperties: true
+          description: Nested hierarchy tree.
+    DataColumnsResponse:
+      type: object
+      description: Public input column catalog.
+      additionalProperties:
+        $ref: '#/components/schemas/DataColumnMetadata'
+    RateLimitError:
+      type: object
+      required:
+      - error
+      - detail
+      properties:
+        error:
+          type: string
+        detail:
+          type: string
+    IndustrySchemaMetadataResponse:
+      type: object
+      description: Industry and entity-type hierarchy metadata.
+      required:
+      - industry
+      - entity_types
+      properties:
+        industry:
+          $ref: '#/components/schemas/HierarchyMetadata'
+        entity_types:
+          $ref: '#/components/schemas/HierarchyMetadata'
+    SimpleError:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: string
+    RatingScalesMetadataResponse:
+      type: object
+      description: CB rating scale metadata.
+      required:
+      - default_scale
+      - supported_scales
+      - scales
+      properties:
+        default_scale:
+          type: string
+          example: CB21
+        supported_scales:
+          type: array
+          items:
+            type: string
+          example:
+          - CB21
+          - CB7
+          - CLIENT
+        scales:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties: true
+          description: Scale definitions keyed by scale name. `CB21` and `CB7` include ordered rating rows; `CLIENT` describes client-specific scale behavior.
+    UnauthorizedError:
+      type: object
+      required:
+      - detail
+      properties:
+        detail:
+          type: string
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT bearer token.

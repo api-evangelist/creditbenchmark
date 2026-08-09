@@ -1,0 +1,254 @@
+openapi: 3.1.0
+info:
+  title: Credit Benchmark analytics entity-resolution API
+  description: 'Authentication, entity resolution, data, analytics, and metadata endpoints.
+
+    '
+  version: 1.0.0
+  contact:
+    name: Credit Benchmark API Support
+    email: api-support@creditbenchmark.com
+    url: https://creditbenchmark.com/support
+  license:
+    name: Proprietary
+    url: https://creditbenchmark.com/terms
+servers:
+- url: https://gateway.creditbenchmark.com
+  description: Production gateway
+security:
+- BearerAuth: []
+tags:
+- name: entity-resolution
+  description: Entity name resolution endpoints.
+  x-group: Entity Resolution
+paths:
+  /matching/text/match_external:
+    post:
+      tags:
+      - entity-resolution
+      summary: Entity Resolution
+      description: Resolves entity names to Credit Benchmark identifiers. Returns ranked candidates with confidence scores.
+      operationId: matchExternalEntities
+      x-mint:
+        href: /api-reference/entity-name-resolution
+        metadata:
+          title: Entity Resolution
+          sidebarTitle: Entity Resolution
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalMatchBody'
+            example:
+              entities:
+              - entity_name: JPMorgan Chase & Co.
+                industry: Financials
+                country: United States
+              - entity_name: Apple Inc.
+                lei: 5493000X0X4X4X4X4X4X
+              limit: 3
+      responses:
+        '200':
+          description: Entity name resolution results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchExternalResponse'
+              example:
+                results:
+                - entity: JPMorgan Chase & Co.
+                  candidates:
+                  - rank: 1
+                    CBId: CB0000022706
+                    CBEntityName: JPMORGAN CHASE & CO
+                    CBCountryOfRiskISO: US
+                    isConsensus1M: true
+                    confidence: 0.82
+                  - rank: 2
+                    CBId: CB0000118034
+                    CBEntityName: JPMORGAN CHASE BANK NA
+                    CBCountryOfRiskISO: US
+                    isConsensus1M: true
+                    confidence: 0.09
+                - entity: Apple Inc.
+                  candidates:
+                  - rank: 1
+                    CBId: CB0000000456
+                    CBEntityName: APPLE INC
+                    CBCountryOfRiskISO: US
+                    isConsensus1M: true
+                    confidence: 0.97
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/FrameworkValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  responses:
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: Client-backed analytics inputs require contributor entitlement.
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+          example:
+            detail: Unauthorized request
+    FrameworkValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FastApiValidationErrorResponse'
+          example:
+            detail:
+            - loc:
+              - body
+              - effective_date
+              msg: Input should be a valid integer
+              type: int_parsing
+    InternalServerError:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: An error occurred while processing your request. Please try again later.
+  schemas:
+    MatchExternalResponse:
+      type: object
+      required:
+      - results
+      properties:
+        results:
+          type: array
+          description: Table-style results keyed by input entity.
+          items:
+            $ref: '#/components/schemas/ExternalMatchRow'
+    FastApiValidationErrorResponse:
+      type: object
+      required:
+      - detail
+      properties:
+        detail:
+          type: array
+          items:
+            $ref: '#/components/schemas/FastApiValidationErrorDetail'
+    ExternalCandidate:
+      type: object
+      required:
+      - rank
+      - CBId
+      - CBEntityName
+      - confidence
+      properties:
+        rank:
+          type: integer
+          description: 1-based rank of the candidate.
+        CBId:
+          type: string
+          description: Credit Benchmark entity identifier.
+        CBEntityName:
+          type: string
+          description: Credit Benchmark entity name.
+        CBCountryOfRiskISO:
+          type: string
+          description: ISO 3166-1 alpha-2 country code when available.
+        isConsensus1M:
+          type: boolean
+          description: 1-month consensus availability flag when available.
+        confidence:
+          type: number
+          description: Matching confidence score.
+    FastApiValidationErrorDetail:
+      type: object
+      properties:
+        loc:
+          type: array
+          items:
+            oneOf:
+            - type: string
+            - type: integer
+        msg:
+          type: string
+        type:
+          type: string
+    ExternalMatchRow:
+      type: object
+      required:
+      - entity
+      - candidates
+      properties:
+        entity:
+          type: string
+          description: Original input `entity_name`.
+        candidates:
+          type: array
+          description: Ordered candidates limited by the requested `limit`.
+          items:
+            $ref: '#/components/schemas/ExternalCandidate'
+    ExternalMatchBody:
+      type: object
+      additionalProperties: false
+      properties:
+        entities:
+          type: array
+          description: 'Entities to match using the external route contract. Empty arrays are allowed and return `results: []`.'
+          items:
+            $ref: '#/components/schemas/ExternalMatchEntity'
+          default: []
+        limit:
+          type: integer
+          default: 3
+          description: Maximum candidates to return per entity row. Valid integer values are 1 through 10. Omitted or out-of-range integers are normalized to 3; malformed non-integer values fail validation.
+    SimpleError:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: string
+    UnauthorizedError:
+      type: object
+      required:
+      - detail
+      properties:
+        detail:
+          type: string
+    ExternalMatchEntity:
+      type: object
+      additionalProperties: false
+      required:
+      - entity_name
+      properties:
+        entity_name:
+          type: string
+          minLength: 1
+          description: The company or entity name to match. Whitespace is trimmed and blank values are rejected.
+        country:
+          type: string
+          description: Optional country name or ISO 3166-1 alpha-2 country code. Blank values are treated as omitted.
+        industry:
+          type: string
+          description: Optional industry hint. Blank values are treated as omitted.
+        lei:
+          type: string
+          description: Optional LEI hint. Blank values are treated as omitted.
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT bearer token.

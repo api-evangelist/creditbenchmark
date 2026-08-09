@@ -1,0 +1,1558 @@
+openapi: 3.1.0
+info:
+  title: Credit Benchmark API
+  description: "Authentication, entity resolution, data, analytics, and metadata endpoints.\n"
+  version: 1.0.0
+  contact:
+    name: Credit Benchmark API Support
+    email: api-support@creditbenchmark.com
+    url: https://creditbenchmark.com/support
+  license:
+    name: Proprietary
+    url: https://creditbenchmark.com/terms
+servers:
+- url: https://gateway.creditbenchmark.com
+  description: Production gateway
+security:
+- BearerAuth: []
+tags:
+- name: authentication
+  description: Token generation endpoints.
+  x-group: Authentication
+- name: entity-resolution
+  description: Entity name resolution endpoints.
+  x-group: Entity Resolution
+- name: data
+  description: Raw data extraction endpoints.
+  x-group: Data
+- name: analytics
+  description: Analytics endpoints.
+  x-group: Analytics
+- name: metadata
+  description: Metadata discovery endpoints.
+  x-group: Metadata
+paths:
+  /api/security/token:
+    post:
+      tags:
+      - authentication
+      summary: Create JWT Token
+      description: Create a JWT bearer token.
+      operationId: getToken
+      security: []
+      x-mint:
+        href: /api-reference/create-jwt-token
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+              - Username
+              - Password
+              additionalProperties: false
+              properties:
+                Username:
+                  type: string
+                  description: Your Credit Benchmark username.
+                  example: your_username
+                Password:
+                  type: string
+                  format: password
+                  description: Your Credit Benchmark password.
+                  example: your_password
+            example:
+              Username: your_username
+              Password: your_password
+      responses:
+        '200':
+          description: Access token generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+              example:
+                accessToken: eyJraWQiOiJ4WldoaUZMd05OZ1VZVEtoVjVtam8tOFlvbTZ5Y0pyRXpGWlpqN3ltQ1E4IiwiYWxnIjoiUlMyNTYifQ...
+                expiresIn: 7200
+                tokenType: Bearer
+        '400':
+          $ref: '#/components/responses/AuthBadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /matching/text/match_external:
+    post:
+      tags:
+      - entity-resolution
+      summary: Entity Resolution
+      description: Resolves entity names to Credit Benchmark identifiers. Returns ranked candidates with confidence scores.
+      operationId: matchExternalEntities
+      x-mint:
+        href: /api-reference/entity-name-resolution
+        metadata:
+          title: Entity Resolution
+          sidebarTitle: Entity Resolution
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalMatchBody'
+            example:
+              entities:
+              - entity_name: JPMorgan Chase & Co.
+                industry: Financials
+                country: United States
+              - entity_name: Apple Inc.
+                lei: 5493000X0X4X4X4X4X4X
+              limit: 3
+      responses:
+        '200':
+          description: Entity name resolution results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchExternalResponse'
+              example:
+                results:
+                - entity: JPMorgan Chase & Co.
+                  candidates:
+                  - rank: 1
+                    CBId: CB0000022706
+                    CBEntityName: JPMORGAN CHASE & CO
+                    CBCountryOfRiskISO: US
+                    isConsensus1M: true
+                    confidence: 0.82
+                  - rank: 2
+                    CBId: CB0000118034
+                    CBEntityName: JPMORGAN CHASE BANK NA
+                    CBCountryOfRiskISO: US
+                    isConsensus1M: true
+                    confidence: 0.09
+                - entity: Apple Inc.
+                  candidates:
+                  - rank: 1
+                    CBId: CB0000000456
+                    CBEntityName: APPLE INC
+                    CBCountryOfRiskISO: US
+                    isConsensus1M: true
+                    confidence: 0.97
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/FrameworkValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /analytics/v2/data/getdata:
+    post:
+      tags:
+      - data
+      summary: Get Data
+      description: Raw entity-level data for a scoped universe across a time range. The primary endpoint for extracting point-in-time or time series data.
+      operationId: getData
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetDataRequest'
+            example:
+              effective_date: 20250930
+              lookback_period: 24
+              lookback_unit: months
+              columns:
+              - CB_ID
+              - CB_Legal_Name
+              - CB_Effective_Date_ID
+              - CB_CCR
+              - CB_CCR_21_Notch
+              - CB_CCR_100_PDMid
+              scope:
+                portfolio:
+                  CB_ID:
+                  - CB0000022706
+                  - CB0000022177
+      responses:
+        '200':
+          description: Data retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetDataResponse'
+              example:
+                CB_ID:
+                - CB0000022706
+                - CB0000022177
+                CB_Effective_Date_ID:
+                - 20250831
+                - 20250831
+                CB_Legal_Name:
+                - JPMORGAN CHASE & CO
+                - GOLDMAN SACHS GROUP INC
+                CB_CCR:
+                - a-
+                - bbb+
+                CB_CCR_21_Notch:
+                - 7
+                - 9
+                CB_CCR_100_PDMid:
+                - 0.00119
+                - 0.00237
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/FrameworkValidationError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /analytics/v2/data/aggregatetrend:
+    post:
+      tags:
+      - analytics
+      summary: Aggregate Trend
+      description: Time series of aggregate credit metrics for a scoped entity universe. Use to track how consensus credit quality moves over time.
+      operationId: aggregateTrend
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AggregateTrendRequest'
+            example:
+              metric: CCR
+              rating_scale: CB21
+              effective_date: 20250930
+              lookback_period: 24
+              lookback_unit: months
+              scope:
+                portfolio:
+                  CB_ID:
+                  - CB0000022706
+                  - CB0000022177
+      responses:
+        '200':
+          description: Aggregate trend retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AggregateTrendResponse'
+              example:
+                CB_Effective_Date_ID:
+                - 20240731
+                - 20240831
+                AGG_EntityCount:
+                - 2
+                - 2
+                AGG_CCRPD_log:
+                - -5.82
+                - -5.79
+                AGG_CCRPD:
+                - 0.00297
+                - 0.00306
+                AGG_CCRPD_index:
+                - 0.0
+                - 0.03
+                AGG_CCR:
+                - bbb-
+                - bbb-
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/FrameworkValidationError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /analytics/v2/data/entityratingchange:
+    post:
+      tags:
+      - analytics
+      summary: Entity Rating Change
+      description: Entity-level rating changes over a lookback window. Use to identify upgrades and downgrades across a portfolio.
+      operationId: entityRatingChange
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntityRatingChangeRequest'
+            example:
+              metric: CCR
+              rating_scale: CB21
+              effective_date: 20250930
+              lookback_period: 6
+              lookback_unit: months
+              scope:
+                portfolio:
+                  CB_ID:
+                  - CB0000022706
+                  - CB0000022177
+              result_filter:
+                sort:
+                - field: CB_CCR_Change
+                  direction: asc
+                limit: 25
+      responses:
+        '200':
+          description: Entity rating changes retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityRatingChangeResponse'
+              example:
+                CB_ID:
+                - CB0000075935
+                - CB0000035484
+                CB_Legal_Name:
+                - VANGUARD MARKETING CORP
+                - NATIONAL BANK FINANCIAL INC
+                CB_CCR:
+                - bbb-
+                - a-
+                CB_CCR_6M:
+                - bbb
+                - a-
+                CB_CCR_PD:
+                - 0.00322
+                - 0.00119
+                CB_CCR_PD_6M:
+                - 0.00212
+                - 0.00119
+                CB_CCR_Change:
+                - -1
+                - 0
+                CB_CCR_PD_Change:
+                - 0.0011
+                - 0.0
+                CB_CCR_Change_With_OCI:
+                - 0
+                - 0
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/FrameworkValidationError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /analytics/v2/data/creditbreakdown:
+    post:
+      tags:
+      - analytics
+      summary: Credit Breakdown
+      description: Credit quality snapshot broken down by a facet column — sector, country, industry, or any facetable field.
+      operationId: creditBreakdown
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditBreakdownRequest'
+            example:
+              metric: CCR
+              rating_scale: CB21
+              effective_date: 20250930
+              lookback_period: 24
+              lookback_unit: months
+              scope:
+                filters:
+                - key: CB_Sector
+                  operator: "=="
+                  values: Banks
+              facet_column: CB_Country
+      responses:
+        '200':
+          description: Credit breakdown retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditBreakdownResponse'
+              example:
+                CB_Country:
+                - United States
+                - United Kingdom
+                AGG_EntityCount:
+                - 14
+                - 9
+                AGG_CCR:
+                - bbb
+                - bbb-
+                AGG_CCRPD:
+                - 0.00264
+                - 0.00314
+                AGG_Upgrades:
+                - 1
+                - 0
+                AGG_Downgrades:
+                - 0
+                - 2
+                AGG_NetUpMinusDown:
+                - 1
+                - -2
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/FrameworkValidationError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /analytics/v2/data/ratingdistribution:
+    post:
+      tags:
+      - analytics
+      summary: Rating Distribution
+      description: Share of entities in each rating bucket over time for a scoped universe.
+      operationId: ratingDistribution
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RatingDistributionRequest'
+            example:
+              metric: CCR
+              rating_scale: CB21
+              effective_date: 20250930
+              lookback_period: 12
+              lookback_unit: months
+              scope:
+                filters:
+                - key: CB_Country
+                  operator: "=="
+                  values: United States
+              facet_column: CB_Sector
+      responses:
+        '200':
+          description: Rating distribution retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RatingDistributionResponse'
+              example:
+                CB_Sector:
+                - Banks
+                - Financial Services
+                CB_Effective_Date_ID:
+                - 20250831
+                - 20250731
+                AGG_EntityCount:
+                - 14
+                - 9
+                a:
+                - 0.18
+                - 0.16
+                a-:
+                - 0.27
+                - 0.29
+                bbb+:
+                - 0.23
+                - 0.22
+                bbb:
+                - 0.19
+                - 0.2
+                bbb-:
+                - 0.13
+                - 0.13
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/FrameworkValidationError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /analytics/v2/metadata/columns:
+    get:
+      tags:
+      - metadata
+      summary: Available Data Columns
+      description: Returns a flat catalog of public input columns with metadata such as type, scopeable, facetable, and entitlement. This endpoint describes request-side input columns only; it does not describe route response fields or result_filter fields.
+      operationId: metadata_columns_v2_metadata_columns_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataColumnsResponse'
+              example:
+                CB_ID:
+                  type: String
+                  scopeable: false
+                  facetable: false
+                  entitlement: null
+                CB_Country:
+                  type: String
+                  scopeable: true
+                  facetable: true
+                  entitlement: null
+                CB_CCR_100_PDMid:
+                  type: Float64
+                  scopeable: true
+                  facetable: false
+                  entitlement: null
+                SP_ForeignCurrencyLongTerm:
+                  type: String
+                  scopeable: true
+                  facetable: true
+                  entitlement: SP
+                Client_Rating_Client_Scale:
+                  type: String
+                  scopeable: true
+                  facetable: true
+                  entitlement: CLIENT_DATA
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /analytics/v2/metadata/rating-scales:
+    get:
+      tags:
+      - metadata
+      summary: Rating Scales
+      description: Returns CB rating scale metadata, including CB21 and CB7 ordering and band mappings.
+      operationId: metadata_rating_scales_v2_metadata_rating_scales_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RatingScalesMetadataResponse'
+              example:
+                default_scale: CB21
+                supported_scales:
+                - CB21
+                - CB7
+                - CLIENT
+                scales:
+                  CB21:
+                    ratings:
+                    - CB_CCR_21_Notch: 1
+                      CB_CCR: aaa
+                      CB_PD_Lower_Bound: 0.0
+                      CB_PD_Mid_Point: 0.000079057
+                      CB_PD_Upper_Bound: 0.000125
+                      CB_IG_HY: IG
+                    - CB_CCR_21_Notch: 2
+                      CB_CCR: aa+
+                      CB_PD_Lower_Bound: 0.000125001
+                      CB_PD_Mid_Point: 0.000167705
+                      CB_PD_Upper_Bound: 0.000225
+                      CB_IG_HY: IG
+                  CB7:
+                    ratings:
+                    - CB_Rating_Group_Notch: 1
+                      CB_Rating_Group: aaa
+                    - CB_Rating_Group_Notch: 2
+                      CB_Rating_Group: aa
+                  CLIENT:
+                    description: Client-specific scales are selected per entitled client request.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /analytics/v2/metadata/industry-schema:
+    get:
+      tags:
+      - metadata
+      summary: Industry Schema
+      description: Returns the CB industry hierarchy as L1 through L6 rows for scope filters, facets, and hierarchy-aware analytics.
+      operationId: metadata_industry_schema_v2_metadata_industry_schema_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndustrySchemaMetadataResponse'
+              example:
+                industry:
+                  levels:
+                    CB_Industry: L1
+                    CB_Super_Sector: L2
+                    CB_Sector: L3
+                    CB_Sub_Sector: L4
+                  tree:
+                    Financials:
+                      Banks:
+                        Banks:
+                        - Banks
+                      Financial Services:
+                        Financial Services:
+                        - Asset Managers
+                        - Consumer Finance
+                entity_types:
+                  levels:
+                    CB_Entity_Type: L1
+                    CB_Entity_Sub_Type: L2
+                  tree:
+                    Corporates:
+                    - Corporates
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /analytics/v2/metadata/geography-schema:
+    get:
+      tags:
+      - metadata
+      summary: Geography Schema
+      description: Returns the CB geography hierarchy as region group, region, and country of risk levels.
+      operationId: metadata_geography_schema_v2_metadata_geography_schema_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeographySchemaMetadataResponse'
+              example:
+                levels:
+                  CB_Region_Group: L1
+                  CB_Region: L2
+                  CB_Country: L3
+                tree:
+                  Developed Markets:
+                    North America:
+                      Canada: CA
+                      United States: US
+                    Europe:
+                      France: FR
+                      United Kingdom: GB
+                code: CB_Country_ISO
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /analytics/v2/metadata/available-dates:
+    get:
+      tags:
+      - metadata
+      summary: Available Dates
+      description: Returns latest and previous available effective dates for analytics requests.
+      operationId: metadata_available_dates_v2_metadata_available_dates_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailableDatesMetadataResponse'
+              example:
+                latest_effective_date: 20260529
+                latest_finalised_effective_date: 20260529
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    TokenResponse:
+      type: object
+      title: TokenResponse
+      required:
+      - accessToken
+      - expiresIn
+      - tokenType
+      properties:
+        accessToken:
+          type: string
+          description: Bearer access token.
+        expiresIn:
+          type: integer
+          description: Token lifetime in seconds.
+          example: 7200
+        tokenType:
+          type: string
+          description: Token type.
+          example: Bearer
+    AuthError:
+      type: object
+      title: Error
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+    ExternalMatchEntity:
+      type: object
+      additionalProperties: false
+      required:
+      - entity_name
+      properties:
+        entity_name:
+          type: string
+          minLength: 1
+          description: The company or entity name to match. Whitespace is trimmed and blank values are rejected.
+        country:
+          type: string
+          description: Optional country name or ISO 3166-1 alpha-2 country code. Blank values are treated as omitted.
+        industry:
+          type: string
+          description: Optional industry hint. Blank values are treated as omitted.
+        lei:
+          type: string
+          description: Optional LEI hint. Blank values are treated as omitted.
+    ExternalMatchBody:
+      type: object
+      additionalProperties: false
+      properties:
+        entities:
+          type: array
+          description: "Entities to match using the external route contract. Empty arrays are allowed and return `results: []`."
+          items:
+            $ref: '#/components/schemas/ExternalMatchEntity'
+          default: []
+        limit:
+          type: integer
+          default: 3
+          description: Maximum candidates to return per entity row. Valid integer values are 1 through 10. Omitted or out-of-range integers are normalized to 3; malformed non-integer values fail validation.
+    ExternalCandidate:
+      type: object
+      required:
+      - rank
+      - CBId
+      - CBEntityName
+      - confidence
+      properties:
+        rank:
+          type: integer
+          description: 1-based rank of the candidate.
+        CBId:
+          type: string
+          description: Credit Benchmark entity identifier.
+        CBEntityName:
+          type: string
+          description: Credit Benchmark entity name.
+        CBCountryOfRiskISO:
+          type: string
+          description: ISO 3166-1 alpha-2 country code when available.
+        isConsensus1M:
+          type: boolean
+          description: 1-month consensus availability flag when available.
+        confidence:
+          type: number
+          description: Matching confidence score.
+    ExternalMatchRow:
+      type: object
+      required:
+      - entity
+      - candidates
+      properties:
+        entity:
+          type: string
+          description: Original input `entity_name`.
+        candidates:
+          type: array
+          description: Ordered candidates limited by the requested `limit`.
+          items:
+            $ref: '#/components/schemas/ExternalCandidate'
+    MatchExternalResponse:
+      type: object
+      required:
+      - results
+      properties:
+        results:
+          type: array
+          description: Table-style results keyed by input entity.
+          items:
+            $ref: '#/components/schemas/ExternalMatchRow'
+    DataColumnMetadata:
+      type: object
+      additionalProperties: false
+      required:
+      - type
+      - scopeable
+      - facetable
+      - entitlement
+      properties:
+        type:
+          type: string
+          description: Column type.
+        scopeable:
+          type: boolean
+          description: Whether the column can be used in `scope.filters`.
+        facetable:
+          type: boolean
+          description: Whether the column can be used as a facet column.
+        entitlement:
+          type:
+          - string
+          - 'null'
+          enum:
+          - SP
+          - FITCH
+          - CLIENT_DATA
+          - null
+          description: Required entitlement, if any.
+    DataColumnsResponse:
+      type: object
+      description: Public input column catalog.
+      additionalProperties:
+        $ref: '#/components/schemas/DataColumnMetadata'
+    RatingScalesMetadataResponse:
+      type: object
+      description: CB rating scale metadata.
+      required:
+      - default_scale
+      - supported_scales
+      - scales
+      properties:
+        default_scale:
+          type: string
+          example: CB21
+        supported_scales:
+          type: array
+          items:
+            type: string
+          example:
+          - CB21
+          - CB7
+          - CLIENT
+        scales:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties: true
+          description: Scale definitions keyed by scale name. `CB21` and `CB7` include ordered rating rows; `CLIENT` describes client-specific scale behavior.
+    IndustrySchemaMetadataResponse:
+      type: object
+      description: Industry and entity-type hierarchy metadata.
+      required:
+      - industry
+      - entity_types
+      properties:
+        industry:
+          $ref: '#/components/schemas/HierarchyMetadata'
+        entity_types:
+          $ref: '#/components/schemas/HierarchyMetadata'
+    GeographySchemaMetadataResponse:
+      type: object
+      description: Geography hierarchy metadata.
+      required:
+      - levels
+      - tree
+      - code
+      properties:
+        levels:
+          type: object
+          additionalProperties:
+            type: string
+          description: Geography field names mapped to hierarchy levels.
+          example:
+            CB_Region_Group: L1
+            CB_Region: L2
+            CB_Country: L3
+        tree:
+          type: object
+          additionalProperties: true
+          description: Nested region group, region, and country tree.
+        code:
+          type: string
+          description: Field containing the country code.
+          example: CB_Country_ISO
+    AvailableDatesMetadataResponse:
+      type: object
+      description: Latest available effective dates for analytics requests.
+      required:
+      - latest_effective_date
+      - latest_finalised_effective_date
+      properties:
+        latest_effective_date:
+          type: integer
+          description: Latest available effective date in YYYYMMDD format.
+          example: 20260529
+        latest_finalised_effective_date:
+          type: integer
+          description: Latest finalised effective date in YYYYMMDD format.
+          example: 20260529
+    HierarchyMetadata:
+      type: object
+      description: Hierarchy metadata with level labels and a nested tree.
+      required:
+      - levels
+      - tree
+      properties:
+        levels:
+          type: object
+          additionalProperties:
+            type: string
+          description: Field names mapped to hierarchy levels.
+        tree:
+          type: object
+          additionalProperties: true
+          description: Nested hierarchy tree.
+    ScopePortfolio:
+      type: object
+      description: Explicit entity universe. `CB_ID` is required. Any extra keys are treated as custom portfolio columns.
+      required:
+      - CB_ID
+      properties:
+        CB_ID:
+          type: array
+          items:
+            type: string
+          description: List of Credit Benchmark entity identifiers.
+      additionalProperties: true
+    ScopeFilter:
+      type: object
+      additionalProperties: false
+      required:
+      - key
+      - operator
+      properties:
+        key:
+          type: string
+          description: Public input column used to build or filter the universe. Only supported scopeable columns are allowed; see `/v2/metadata/columns`.
+        operator:
+          type: string
+          enum:
+          - "=="
+          - "!="
+          - ">"
+          - "<"
+          - ">="
+          - "<="
+          - in
+          - not in
+          - is null
+          - is not null
+          description: Comparison operator.
+        values:
+          $ref: '#/components/schemas/FilterValue'
+          description: Single value or list of values for the filter. Use an empty string for `is null` or `is not null`.
+    Scope:
+      type: object
+      additionalProperties: false
+      description: Defines the input universe. Use `portfolio`, `filters`, or both.
+      properties:
+        portfolio:
+          $ref: '#/components/schemas/ScopePortfolio'
+        filters:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScopeFilter'
+          description: Universe filters. Use them alone to build the universe from public columns, or with `portfolio` to subset the supplied portfolio. Only built-in scopeable columns are allowed in `filters[].key`; custom `scope.portfolio` columns are not valid scope filters.
+        filters_join:
+          type: array
+          items:
+            type: string
+          description: "Optional logic used to join `filters`. Only `&`, `|`, and `~` are supported. Length must be `len(filters)+1`."
+    ResultFilterSort:
+      type: object
+      additionalProperties: false
+      required:
+      - field
+      properties:
+        field:
+          type: string
+          description: Supported result field name to sort by for this route. Valid values come from returned analytic fields or documented route aliases, not arbitrary source columns.
+        direction:
+          type: string
+          enum:
+          - asc
+          - desc
+          default: desc
+          description: Sort direction.
+    ResultFilterCondition:
+      type: object
+      additionalProperties: false
+      required:
+      - key
+      - operator
+      properties:
+        key:
+          type: string
+          description: Supported result field name to filter after the analytic has been computed. Valid values come from returned analytic fields or documented route aliases, not arbitrary source columns.
+        operator:
+          type: string
+          enum:
+          - "=="
+          - "!="
+          - ">"
+          - "<"
+          - ">="
+          - "<="
+          - in
+          - not in
+          - contains
+          - starts with
+          - ends with
+          - does not contain
+          - does not start with
+          - does not end with
+          - is null
+          - is not null
+          description: Comparison operator.
+        values:
+          allOf:
+          - $ref: '#/components/schemas/FilterValue'
+          description: Single value or list of values for the filter. Not used for `is null` or `is not null`.
+    ResultFilter:
+      type: object
+      additionalProperties: false
+      description: Filtering, sorting, and limiting applied after an analytic has computed its results. `filters[].key` and `sort.field` must reference supported result fields for the selected route. Some routes also accept documented alias names that map to returned fields.
+      properties:
+        limit:
+          type: integer
+          minimum: 1
+          description: Return only the first N rows after `filters` and `sort` are applied.
+        filters:
+          type: array
+          description: Filters applied to computed result rows. These do not change the analytic itself.
+          items:
+            $ref: '#/components/schemas/ResultFilterCondition'
+        filters_join:
+          type: array
+          items:
+            type: string
+          description: "Optional logic used to join `filters`. Length must be `len(filters)+1`. If omitted, conditions are AND-joined."
+        sort:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResultFilterSort'
+          description: Priority-ordered sort rules.
+    AggregateTrendRequest:
+      type: object
+      required:
+      - scope
+      properties:
+        metric:
+          type: string
+          enum:
+          - CCR
+          - MyRating
+          default: CCR
+          description: Metric to compute. Use `CCR` for consensus analytics or `MyRating` for client-specific analytics.
+        rating_scale:
+          type: string
+          enum:
+          - CB21
+          - CB7
+          - MyScale
+          default: CB21
+          description: Rating scale to map results onto. Use `CB21`, `CB7`, or `MyScale` for the requesting bank's master scale.
+        effective_date:
+          type: integer
+          description: As-of date in YYYYMMDD format. If omitted, the latest available date is used.
+        lookback_period:
+          type: integer
+          minimum: 0
+          default: 24
+          description: Number of `lookback_unit` intervals before `effective_date`.
+        lookback_unit:
+          type: string
+          enum:
+          - months
+          - quarters
+          - years
+          default: months
+        scope:
+          $ref: '#/components/schemas/Scope'
+        facet_column:
+          type: string
+          description: Optional facetable column to segment the aggregate. Built-in facetable columns and custom `scope.portfolio` columns are supported.
+        result_filter:
+          $ref: '#/components/schemas/ResultFilter'
+    EntityRatingChangeRequest:
+      type: object
+      required:
+      - scope
+      properties:
+        metric:
+          type: string
+          enum:
+          - CCR
+          - MyRating
+          default: CCR
+          description: Metric to compute. Use `CCR` for consensus analytics or `MyRating` for client-specific analytics.
+        rating_scale:
+          type: string
+          enum:
+          - CB21
+          - CB7
+          - MyScale
+          default: CB21
+          description: Rating scale to map results onto. Use `CB21`, `CB7`, or `MyScale` for the requesting bank's master scale.
+        effective_date:
+          type: integer
+          description: As-of date in YYYYMMDD format. If omitted, the latest available date is used.
+        lookback_period:
+          type: integer
+          minimum: 0
+          default: 6
+          description: Number of `lookback_unit` intervals used for the rating-change window.
+        lookback_unit:
+          type: string
+          enum:
+          - months
+          - quarters
+          - years
+          default: months
+        scope:
+          $ref: '#/components/schemas/Scope'
+        result_filter:
+          allOf:
+          - $ref: '#/components/schemas/ResultFilter'
+          description: Optional result shaping applied after rating-change rows are computed. This route accepts final response fields such as `CB_ID`, `CB_CCR_PD_Change`, and `ClientRating_Change`, and stable aliases such as `entity.*`, `metrics.*`, and `client.*` when those fields are present.
+    GetDataRequest:
+      type: object
+      required:
+      - scope
+      properties:
+        effective_date:
+          type: integer
+          description: As-of date in YYYYMMDD format. If omitted, the latest available date is used.
+        lookback_period:
+          type: integer
+          minimum: 0
+          default: 24
+          description: Number of `lookback_unit` intervals before `effective_date`.
+        lookback_unit:
+          type: string
+          enum:
+          - months
+          - quarters
+          - years
+          default: months
+        scope:
+          $ref: '#/components/schemas/Scope'
+        columns:
+          type: array
+          items:
+            type: string
+          description: Requested output columns. Some columns require S&P, Fitch, or client-data entitlements. Use `/v2/metadata/columns` to discover the public column catalog.
+          default:
+          - CB_ID
+          - CB_Legal_Name
+          - CB_Effective_Date_ID
+          - CB_CCR
+          - CB_CCR_21_Notch
+          - CB_CCR_100_PDMid
+        result_filter:
+          $ref: '#/components/schemas/ResultFilter'
+    CreditBreakdownRequest:
+      type: object
+      required:
+      - scope
+      - facet_column
+      properties:
+        metric:
+          type: string
+          enum:
+          - CCR
+          - MyRating
+          default: CCR
+          description: Metric to compute. Use `CCR` for consensus analytics or `MyRating` for client-specific analytics.
+        rating_scale:
+          type: string
+          enum:
+          - CB21
+          - CB7
+          - MyScale
+          default: CB21
+          description: Rating scale to map results onto. Use `CB21`, `CB7`, or `MyScale` for the requesting bank's master scale.
+        effective_date:
+          type: integer
+          description: As-of date in YYYYMMDD format. If omitted, the latest available date is used.
+        lookback_period:
+          type: integer
+          minimum: 0
+          default: 24
+          description: Number of `lookback_unit` intervals before `effective_date`.
+        lookback_unit:
+          type: string
+          enum:
+          - months
+          - quarters
+          - years
+          default: months
+        scope:
+          $ref: '#/components/schemas/Scope'
+        facet_column:
+          type: string
+          description: Column to summarize by. Built-in facetable columns and custom `scope.portfolio` columns are supported.
+        result_filter:
+          $ref: '#/components/schemas/ResultFilter'
+    RatingDistributionRequest:
+      type: object
+      required:
+      - scope
+      properties:
+        metric:
+          type: string
+          enum:
+          - CCR
+          - MyRating
+          default: CCR
+          description: Metric to compute. Use `CCR` for consensus analytics or `MyRating` for client-specific analytics.
+        rating_scale:
+          type: string
+          enum:
+          - CB21
+          - CB7
+          - MyScale
+          default: CB21
+          description: Rating scale used to name the distribution buckets. Use `CB21`, `CB7`, or `MyScale`.
+        effective_date:
+          type: integer
+          description: As-of date in YYYYMMDD format. If omitted, the latest available date is used.
+        lookback_period:
+          type: integer
+          minimum: 0
+          default: 0
+          description: Number of `lookback_unit` intervals before `effective_date`.
+        lookback_unit:
+          type: string
+          enum:
+          - months
+          - quarters
+          - years
+          default: months
+        scope:
+          $ref: '#/components/schemas/Scope'
+        facet_column:
+          type: string
+          description: Optional facetable column to group the distribution by. Built-in facetable columns and custom `scope.portfolio` columns are supported.
+        result_filter:
+          $ref: '#/components/schemas/ResultFilter'
+    ScalarValue:
+      anyOf:
+      - type: string
+      - type: integer
+      - type: number
+      - type: boolean
+      - type: 'null'
+    ColumnArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/ScalarValue'
+    FilterValue:
+      anyOf:
+      - $ref: '#/components/schemas/ScalarValue'
+      - $ref: '#/components/schemas/ColumnArray'
+    StringArray:
+      type: array
+      items:
+        type: string
+    IntegerArray:
+      type: array
+      items:
+        type: integer
+    NumberArray:
+      type: array
+      items:
+        type: number
+    GetDataResponse:
+      type: object
+      description: Get data results.
+      properties:
+        CB_ID:
+          $ref: '#/components/schemas/StringArray'
+        CB_Effective_Date_ID:
+          $ref: '#/components/schemas/IntegerArray'
+        CB_Legal_Name:
+          $ref: '#/components/schemas/StringArray'
+        CB_CCR:
+          $ref: '#/components/schemas/ColumnArray'
+        CB_CCR_21_Notch:
+          $ref: '#/components/schemas/NumberArray'
+        CB_CCR_100_PDMid:
+          $ref: '#/components/schemas/NumberArray'
+      additionalProperties:
+        $ref: '#/components/schemas/ColumnArray'
+    AggregateTrendResponse:
+      type: object
+      description: Aggregate trend results.
+      properties:
+        CB_Effective_Date_ID:
+          $ref: '#/components/schemas/IntegerArray'
+        AGG_EntityCount:
+          $ref: '#/components/schemas/IntegerArray'
+        AGG_CCRPD_log:
+          $ref: '#/components/schemas/NumberArray'
+        AGG_CCRPD:
+          $ref: '#/components/schemas/NumberArray'
+        AGG_CCRPD_index:
+          $ref: '#/components/schemas/NumberArray'
+        AGG_CCR:
+          $ref: '#/components/schemas/ColumnArray'
+        AGG_ClientPD_log:
+          $ref: '#/components/schemas/NumberArray'
+        AGG_ClientPD:
+          $ref: '#/components/schemas/NumberArray'
+        AGG_ClientPD_index:
+          $ref: '#/components/schemas/NumberArray'
+        AGG_ClientRating:
+          $ref: '#/components/schemas/ColumnArray'
+        AGG_ClientRatingNotch:
+          $ref: '#/components/schemas/NumberArray'
+        AGG_ExMePD_log:
+          $ref: '#/components/schemas/NumberArray'
+        AGG_ExMePD:
+          $ref: '#/components/schemas/NumberArray'
+        AGG_ExMePD_index:
+          $ref: '#/components/schemas/NumberArray'
+        AGG_ExMeRating:
+          $ref: '#/components/schemas/ColumnArray'
+        AGG_ExMeRatingNotch:
+          $ref: '#/components/schemas/NumberArray'
+      additionalProperties:
+        $ref: '#/components/schemas/ColumnArray'
+    CreditBreakdownResponse:
+      type: object
+      description: Credit breakdown results.
+      properties:
+        AGG_EntityCount:
+          $ref: '#/components/schemas/IntegerArray'
+        AGG_CCR:
+          $ref: '#/components/schemas/ColumnArray'
+        AGG_CCRPD:
+          $ref: '#/components/schemas/NumberArray'
+        AGG_Upgrades:
+          $ref: '#/components/schemas/IntegerArray'
+        AGG_Downgrades:
+          $ref: '#/components/schemas/IntegerArray'
+        AGG_NetUpMinusDown:
+          $ref: '#/components/schemas/NumberArray'
+        AGG_ClientRating:
+          $ref: '#/components/schemas/ColumnArray'
+        AGG_ClientPD:
+          $ref: '#/components/schemas/NumberArray'
+        AGG_ExMeRating:
+          $ref: '#/components/schemas/ColumnArray'
+        AGG_ExMePD:
+          $ref: '#/components/schemas/NumberArray'
+        AGG_NotchDifference:
+          $ref: '#/components/schemas/NumberArray'
+        AGG_NotchDiffAggressive:
+          $ref: '#/components/schemas/IntegerArray'
+        AGG_NotchDiffConsistent:
+          $ref: '#/components/schemas/IntegerArray'
+        AGG_NotchDiffConservative:
+          $ref: '#/components/schemas/IntegerArray'
+      additionalProperties:
+        $ref: '#/components/schemas/ColumnArray'
+    EntityRatingChangeResponse:
+      type: object
+      description: Entity rating change results.
+      properties:
+        CB_ID:
+          $ref: '#/components/schemas/StringArray'
+        CB_Legal_Name:
+          $ref: '#/components/schemas/StringArray'
+        CB_CCR:
+          $ref: '#/components/schemas/ColumnArray'
+        CB_CCR_PD:
+          $ref: '#/components/schemas/NumberArray'
+        CB_CCR_Change:
+          $ref: '#/components/schemas/NumberArray'
+        CB_CCR_PD_Change:
+          $ref: '#/components/schemas/NumberArray'
+        CB_CCR_Change_With_OCI:
+          $ref: '#/components/schemas/NumberArray'
+        ClientRating:
+          $ref: '#/components/schemas/ColumnArray'
+        ClientPD:
+          $ref: '#/components/schemas/NumberArray'
+        client_change:
+          $ref: '#/components/schemas/NumberArray'
+        client_change_w_oci:
+          $ref: '#/components/schemas/NumberArray'
+      patternProperties:
+        '^CB_CCR_\d+M$':
+          $ref: '#/components/schemas/ColumnArray'
+        '^CB_CCR_PD_\d+M$':
+          $ref: '#/components/schemas/NumberArray'
+        '^ClientRating_\d+M$':
+          $ref: '#/components/schemas/ColumnArray'
+        '^ClientPD_\d+M$':
+          $ref: '#/components/schemas/NumberArray'
+      additionalProperties:
+        $ref: '#/components/schemas/ColumnArray'
+    RatingDistributionResponse:
+      type: object
+      description: Rating distribution results.
+      properties:
+        CB_Effective_Date_ID:
+          $ref: '#/components/schemas/IntegerArray'
+        AGG_EntityCount:
+          $ref: '#/components/schemas/IntegerArray'
+      patternProperties:
+        '^(aaa|aa\+|aa|aa-|a\+|a|a-|bbb\+|bbb|bbb-|bb\+|bb|bb-|b\+|b|b-|ccc\+|ccc|ccc-|cc|c|0\.1|1\.1|1\.2|2\.1|2\.2|3\.1|3\.2|3\.3|4\.1|4\.2|4\.3|5\.1|5\.2|5\.3|6\.1|6\.2|7\.1|7\.2|8\.1|8\.2|8\.3)$':
+          $ref: '#/components/schemas/NumberArray'
+      additionalProperties:
+        $ref: '#/components/schemas/ColumnArray'
+    SimpleError:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: string
+    UnauthorizedError:
+      type: object
+      required:
+      - detail
+      properties:
+        detail:
+          type: string
+    RateLimitError:
+      type: object
+      required:
+      - error
+      - detail
+      properties:
+        error:
+          type: string
+        detail:
+          type: string
+    FastApiValidationErrorDetail:
+      type: object
+      properties:
+        loc:
+          type: array
+          items:
+            oneOf:
+            - type: string
+            - type: integer
+        msg:
+          type: string
+        type:
+          type: string
+    FastApiValidationErrorResponse:
+      type: object
+      required:
+      - detail
+      properties:
+        detail:
+          type: array
+          items:
+            $ref: '#/components/schemas/FastApiValidationErrorDetail'
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT bearer token.
+  responses:
+    AuthBadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthError'
+          example:
+            error:
+              code: BAD_REQUEST
+              message: The request payload is invalid.
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: "Invalid request parameters: scope requires at least 'portfolio' or 'filters'."
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+          example:
+            detail: Unauthorized request
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: Client-backed analytics inputs require contributor entitlement.
+    FrameworkValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FastApiValidationErrorResponse'
+          example:
+            detail:
+            - loc:
+              - body
+              - effective_date
+              msg: Input should be a valid integer
+              type: int_parsing
+    TooManyRequests:
+      description: Too many requests
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RateLimitError'
+          example:
+            error: Rate limit exceeded
+            detail: 60 per 1 minute
+    InternalServerError:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: An error occurred while processing your request. Please try again later.

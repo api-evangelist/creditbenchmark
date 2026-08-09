@@ -13,15 +13,13 @@ accessModel:
   method: derived
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/creditbenchmark.png
 name: Credit Benchmark
-description: >-
-  Credit Benchmark is a financial data company that aggregates internal credit risk assessments
-  contributed by more than 40 leading global financial institutions into anonymized, consensus
-  Credit Consensus Ratings and analytics covering roughly 120,000 public and private entities —
-  over 90% of which are unrated by the traditional credit rating agencies. Its REST API delivers
-  consensus ratings, rating distributions, aggregate credit trends, entity rating changes, and
-  portfolio analytics, along with entity-name-to-CBID resolution (matching) and contributor-data
-  analytics. Delivery is also available via a web app, an Excel Add-In, and file/SFTP feeds.
-  Access is enterprise/sales-gated; the JWT-authenticated API base is https://api.creditbenchmark.com.
+description: Credit Benchmark is a financial data company that aggregates internal credit risk assessments
+  contributed by more than 40 leading global financial institutions into anonymized, consensus Credit
+  Consensus Ratings and analytics covering roughly 120,000 public and private entities — over 90% of which
+  are unrated by the traditional credit rating agencies. Its REST API delivers consensus ratings, rating
+  distributions, aggregate credit trends, entity rating changes, and portfolio analytics, along with entity-name-to-CBID
+  resolution (matching) and contributor-data analytics. Delivery is also available via a web app, an Excel
+  Add-In, and file/SFTP feeds. Access is enterprise/sales-gated; the JWT-authenticated API base is https://api.creditbenchmark.com.
 url: https://raw.githubusercontent.com/api-evangelist/creditbenchmark/refs/heads/main/apis.yml
 x-type: company
 x-source: vc-portfolio
@@ -31,7 +29,7 @@ x-tier: profiled
 x-tier-reason: has-openapi
 specificationVersion: '0.20'
 created: '2026-07-17'
-modified: '2026-07-18'
+modified: '2026-08-08'
 tags:
 - Company
 - Credit Risk
@@ -72,8 +70,8 @@ apis:
     url: https://docs.creditbenchmark.com/api-reference/intro
 - aid: creditbenchmark:creditbenchmark-contributor-data-api
   name: Credit Benchmark Contributor Data API
-  description: >-
-    Contributor-specific analytics using client/bank internal PD data. Requires ent_CLIENT-DATA entitlement.
+  description: Contributor-specific analytics using client/bank internal PD data. Requires ent_CLIENT-DATA
+    entitlement.
   humanURL: https://docs.creditbenchmark.com/api-reference/intro
   baseURL: https://api.creditbenchmark.com
   tags:
@@ -179,8 +177,16 @@ common:
   url: security/creditbenchmark-domain-security.yml
 - type: Website
   url: http://www.creditbenchmark.com/
+- type: StatusPage
+  url: https://status.creditbenchmark.com
+- type: VulnerabilityDisclosure
+  url: security/creditbenchmark-vulnerability-disclosure.yml
+- type: Security
+  url: https://www.creditbenchmark.com/vulnerability-disclosure/
 x-enrichment:
   date: '2026-07-19'
   status: backfilled
   pass: local-v1
   note: backfilled from .gitignore signal + verified work evidence
+x-merged-from:
+- credit-benchmark
