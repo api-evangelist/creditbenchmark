@@ -1,0 +1,39 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Credit Benchmark Analytics Entity Matching API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Entity Matching",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Entity Name Matching",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.creditbenchmark.com/matching/match",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Return ranked entity matches.\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

@@ -1,0 +1,39 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Credit Benchmark analytics entity-resolution API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "entity-resolution",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Entity Resolution",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://gateway.creditbenchmark.com/matching/text/match_external",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Resolves entity names to Credit Benchmark identifiers. Returns ranked candidates with confidence scores."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

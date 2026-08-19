@@ -1,0 +1,54 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Credit Benchmark Analytics Portfolio Analytics API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Portfolio Analytics",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Portfolio Data",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.creditbenchmark.com/api/analytics/portfolio-data",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Return portfolio time-series data.\n"
+        },
+        {
+          "info": {
+            "name": "Portfolio Summary",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.creditbenchmark.com/api/analytics/portfolio-summary",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Return grouped portfolio metrics.\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

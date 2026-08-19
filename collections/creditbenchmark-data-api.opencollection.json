@@ -1,0 +1,39 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Credit Benchmark analytics data API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "data",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get Data",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://gateway.creditbenchmark.com/analytics/v2/data/getdata",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Raw entity-level data for a scoped universe across a time range. The primary endpoint for extracting point-in-time or time series data."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

@@ -1,0 +1,470 @@
+{
+  "item": [
+    {
+      "id": "d5ad7096-29db-43d0-bbf4-e2b9902e619b",
+      "name": "data",
+      "description": {
+        "content": "Raw data extraction endpoints.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "41170822-addb-4c5a-951c-b60aa1f3da47",
+          "name": "Get Data",
+          "request": {
+            "name": "Get Data",
+            "description": {
+              "content": "Raw entity-level data for a scoped universe across a time range. The primary endpoint for extracting point-in-time or time series data.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "analytics",
+                "v2",
+                "data",
+                "getdata"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scope\": {\n    \"portfolio\": {\n      \"CB_ID\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    },\n    \"filters\": [\n      {\n        \"key\": \"<string>\",\n        \"operator\": \"<string>\",\n        \"values\": {\n          \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n        }\n      },\n      {\n        \"key\": \"<string>\",\n        \"operator\": \"<string>\",\n        \"values\": {\n          \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n        }\n      }\n    ],\n    \"filters_join\": [\n      \"<string>\",\n      \"<string>\"\n    ]\n  },\n  \"effective_date\": \"<integer>\",\n  \"lookback_period\": 24,\n  \"lookback_unit\": \"months\",\n  \"columns\": [\n    \"CB_ID\",\n    \"CB_Legal_Name\",\n    \"CB_Effective_Date_ID\",\n    \"CB_CCR\",\n    \"CB_CCR_21_Notch\",\n    \"CB_CCR_100_PDMid\"\n  ],\n  \"result_filter\": {\n    \"limit\": \"<integer>\",\n    \"filters\": [\n      {\n        \"key\": \"<string>\",\n        \"operator\": \"<string>\",\n        \"values\": {\n          \"description\": \"Single value or list of values for the filter. Not used for `is null` or `is not null`.\",\n          \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n        }\n      },\n      {\n        \"key\": \"<string>\",\n        \"operator\": \"<string>\",\n        \"values\": {\n          \"description\": \"Single value or list of values for the filter. Not used for `is null` or `is not null`.\",\n          \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n        }\n      }\n    ],\n    \"filters_join\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"sort\": [\n      {\n        \"field\": \"<string>\",\n        \"direction\": \"desc\"\n      },\n      {\n        \"field\": \"<string>\",\n        \"direction\": \"desc\"\n      }\n    ]\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "144304c7-8f43-4233-aafd-d746492592ab",
+              "name": "Data retrieved successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "analytics",
+                    "v2",
+                    "data",
+                    "getdata"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"effective_date\": 20250930,\n  \"lookback_period\": 24,\n  \"lookback_unit\": \"months\",\n  \"columns\": [\n    \"CB_ID\",\n    \"CB_Legal_Name\",\n    \"CB_Effective_Date_ID\",\n    \"CB_CCR\",\n    \"CB_CCR_21_Notch\",\n    \"CB_CCR_100_PDMid\"\n  ],\n  \"scope\": {\n    \"portfolio\": {\n      \"CB_ID\": [\n        \"CB0000022706\",\n        \"CB0000022177\"\n      ]\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"CB_ID\": [\n    \"CB0000022706\",\n    \"CB0000022177\"\n  ],\n  \"CB_Effective_Date_ID\": [\n    20250831,\n    20250831\n  ],\n  \"CB_Legal_Name\": [\n    \"JPMORGAN CHASE & CO\",\n    \"GOLDMAN SACHS GROUP INC\"\n  ],\n  \"CB_CCR\": [\n    \"a-\",\n    \"bbb+\"\n  ],\n  \"CB_CCR_21_Notch\": [\n    7,\n    9\n  ],\n  \"CB_CCR_100_PDMid\": [\n    0.00119,\n    0.00237\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "33f86a0a-4564-4805-9ea8-8c407b707789",
+              "name": "Bad request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "analytics",
+                    "v2",
+                    "data",
+                    "getdata"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"effective_date\": 20250930,\n  \"lookback_period\": 24,\n  \"lookback_unit\": \"months\",\n  \"columns\": [\n    \"CB_ID\",\n    \"CB_Legal_Name\",\n    \"CB_Effective_Date_ID\",\n    \"CB_CCR\",\n    \"CB_CCR_21_Notch\",\n    \"CB_CCR_100_PDMid\"\n  ],\n  \"scope\": {\n    \"portfolio\": {\n      \"CB_ID\": [\n        \"CB0000022706\",\n        \"CB0000022177\"\n      ]\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"Invalid request parameters: scope requires at least 'portfolio' or 'filters'.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "972c399f-08d4-41b3-86ef-7690456503ee",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "analytics",
+                    "v2",
+                    "data",
+                    "getdata"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"effective_date\": 20250930,\n  \"lookback_period\": 24,\n  \"lookback_unit\": \"months\",\n  \"columns\": [\n    \"CB_ID\",\n    \"CB_Legal_Name\",\n    \"CB_Effective_Date_ID\",\n    \"CB_CCR\",\n    \"CB_CCR_21_Notch\",\n    \"CB_CCR_100_PDMid\"\n  ],\n  \"scope\": {\n    \"portfolio\": {\n      \"CB_ID\": [\n        \"CB0000022706\",\n        \"CB0000022177\"\n      ]\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"Unauthorized request\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "daf9ac35-5e02-49c7-81c5-9c2b0140548a",
+              "name": "Forbidden",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "analytics",
+                    "v2",
+                    "data",
+                    "getdata"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"effective_date\": 20250930,\n  \"lookback_period\": 24,\n  \"lookback_unit\": \"months\",\n  \"columns\": [\n    \"CB_ID\",\n    \"CB_Legal_Name\",\n    \"CB_Effective_Date_ID\",\n    \"CB_CCR\",\n    \"CB_CCR_21_Notch\",\n    \"CB_CCR_100_PDMid\"\n  ],\n  \"scope\": {\n    \"portfolio\": {\n      \"CB_ID\": [\n        \"CB0000022706\",\n        \"CB0000022177\"\n      ]\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"Client-backed analytics inputs require contributor entitlement.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "80d581be-36f9-4331-ad3f-a7bec1d361fb",
+              "name": "Validation error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "analytics",
+                    "v2",
+                    "data",
+                    "getdata"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"effective_date\": 20250930,\n  \"lookback_period\": 24,\n  \"lookback_unit\": \"months\",\n  \"columns\": [\n    \"CB_ID\",\n    \"CB_Legal_Name\",\n    \"CB_Effective_Date_ID\",\n    \"CB_CCR\",\n    \"CB_CCR_21_Notch\",\n    \"CB_CCR_100_PDMid\"\n  ],\n  \"scope\": {\n    \"portfolio\": {\n      \"CB_ID\": [\n        \"CB0000022706\",\n        \"CB0000022177\"\n      ]\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+              "code": 422,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": [\n    {\n      \"loc\": [\n        \"body\",\n        \"effective_date\"\n      ],\n      \"msg\": \"Input should be a valid integer\",\n      \"type\": \"int_parsing\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "42dda75a-4def-42dc-8b30-a6d3ca8a62b8",
+              "name": "Too many requests",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "analytics",
+                    "v2",
+                    "data",
+                    "getdata"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"effective_date\": 20250930,\n  \"lookback_period\": 24,\n  \"lookback_unit\": \"months\",\n  \"columns\": [\n    \"CB_ID\",\n    \"CB_Legal_Name\",\n    \"CB_Effective_Date_ID\",\n    \"CB_CCR\",\n    \"CB_CCR_21_Notch\",\n    \"CB_CCR_100_PDMid\"\n  ],\n  \"scope\": {\n    \"portfolio\": {\n      \"CB_ID\": [\n        \"CB0000022706\",\n        \"CB0000022177\"\n      ]\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"Rate limit exceeded\",\n  \"detail\": \"60 per 1 minute\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "10641ed8-ea9c-4cfd-8056-a02d98bbaa3c",
+              "name": "Server error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "analytics",
+                    "v2",
+                    "data",
+                    "getdata"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"effective_date\": 20250930,\n  \"lookback_period\": 24,\n  \"lookback_unit\": \"months\",\n  \"columns\": [\n    \"CB_ID\",\n    \"CB_Legal_Name\",\n    \"CB_Effective_Date_ID\",\n    \"CB_CCR\",\n    \"CB_CCR_21_Notch\",\n    \"CB_CCR_100_PDMid\"\n  ],\n  \"scope\": {\n    \"portfolio\": {\n      \"CB_ID\": [\n        \"CB0000022706\",\n        \"CB0000022177\"\n      ]\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"An error occurred while processing your request. Please try again later.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://gateway.creditbenchmark.com",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "a2eb28a2-9d3c-4818-9431-d9d0c6f34e9c",
+    "name": "Credit Benchmark analytics data API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Authentication, entity resolution, data, analytics, and metadata endpoints.\n\n\nContact Support:\n Name: Credit Benchmark API Support\n Email: api-support@creditbenchmark.com",
+      "type": "text/plain"
+    }
+  }
+}

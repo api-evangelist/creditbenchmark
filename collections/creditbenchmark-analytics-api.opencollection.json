@@ -1,0 +1,54 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Credit Benchmark Analytics API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Analytics",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Custom Aggregate",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.creditbenchmark.com/api/analytics/custom-aggregate",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Return aggregate trend metrics.\n"
+        },
+        {
+          "info": {
+            "name": "Rating Distribution",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.creditbenchmark.com/api/analytics/rating-distribution",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Return rating distribution data.\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

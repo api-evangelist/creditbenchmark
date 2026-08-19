@@ -1,0 +1,409 @@
+{
+  "item": [
+    {
+      "id": "ce414004-e0d6-4c38-8f01-65b562640784",
+      "name": "Entity Data",
+      "description": {
+        "content": "Entity-specific data and rating information",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "409e2f2f-27b3-4443-85a2-67bab053025e",
+          "name": "Entity Rating Change",
+          "request": {
+            "name": "Entity Rating Change",
+            "description": {
+              "content": "Return entity rating changes.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "analytics",
+                "entity-rating-change"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Parameters\": {\n    \"portfolio\": {\n      \"name\": \"<string>\",\n      \"entities\": {\n        \"CBId\": [\n          \"<string>\",\n          \"<string>\"\n        ],\n        \"key_0\": true,\n        \"key_1\": \"string\",\n        \"key_2\": 4475\n      }\n    },\n    \"EffectiveDateId\": \"<integer>\",\n    \"rating_change_months\": 6,\n    \"use_oci\": false,\n    \"use_client_scale\": false,\n    \"descriptor_columns\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"filters\": {\n      \"rating_change_type\": \"<string>\",\n      \"sort_by\": \"rating_change\",\n      \"sort_descending\": true,\n      \"n\": \"<integer>\"\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "c668987d-4ec2-4614-a20e-e3d867ddee69",
+              "name": "Entity rating changes retrieved successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "analytics",
+                    "entity-rating-change"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"Parameters\": {\n    \"portfolio\": {\n      \"name\": \"Example Portfolio\",\n      \"entities\": {\n        \"CBId\": [\n          \"CB000000123\",\n          \"CB000000456\"\n        ],\n        \"CustomField1\": [\n          \"Value1\",\n          \"Value2\",\n          \"Value3\"\n        ]\n      }\n    },\n    \"EffectiveDateId\": 20241201,\n    \"rating_change_months\": 6,\n    \"use_oci\": false,\n    \"use_client_scale\": false,\n    \"descriptor_columns\": [\n      \"Sector\"\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"CBId\": [\n    \"CB0000002619\",\n    \"CB0000009484\",\n    \"CB0000009810\",\n    \"CB0000010249\",\n    \"CB0000010457\"\n  ],\n  \"CBEntityName\": [\n    \"BMO CAPITAL MARKETS CORP\",\n    \"HILLTOP SECURITIES INC\",\n    \"VIRTU AMERICAS LLC\",\n    \"OPPENHEIMER & CO INC, BROKER\",\n    \"TD AMERITRADE CLEARING INC\"\n  ],\n  \"CCR\": [\n    \"a-\",\n    \"bb+\",\n    \"bb-\",\n    \"bb\",\n    \"a-\"\n  ],\n  \"CCR6M\": [\n    \"a\",\n    \"bb+\",\n    \"bb-\",\n    \"bb+\",\n    \"a-\"\n  ],\n  \"CCR100PDMid\": [\n    0.0009,\n    0.0051,\n    0.012,\n    0.0086,\n    0.0011\n  ],\n  \"CCR100PDMid6M\": [\n    0.0008,\n    0.0051,\n    0.012,\n    0.0073,\n    0.0011\n  ],\n  \"rating_change\": [\n    -1,\n    0,\n    0,\n    -1,\n    0\n  ],\n  \"pd_change\": [\n    0.0001,\n    0,\n    0,\n    0.0013,\n    0\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "2bb55922-ecd1-4121-960d-d200f3da228e",
+              "name": "Bad request - invalid parameters",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "analytics",
+                    "entity-rating-change"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"Parameters\": {\n    \"portfolio\": {\n      \"name\": \"Example Portfolio\",\n      \"entities\": {\n        \"CBId\": [\n          \"CB000000123\",\n          \"CB000000456\"\n        ],\n        \"CustomField1\": [\n          \"Value1\",\n          \"Value2\",\n          \"Value3\"\n        ]\n      }\n    },\n    \"EffectiveDateId\": 20241201,\n    \"rating_change_months\": 6,\n    \"use_oci\": false,\n    \"use_client_scale\": false,\n    \"descriptor_columns\": [\n      \"Sector\"\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Invalid request parameters\",\n    \"details\": {\n      \"invalid_columns\": [\n        \"BadColumn\"\n      ],\n      \"allowed_columns\": \"Please check documentation for valid column names\"\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "12c09883-2309-4306-9926-56894c7d4d8f",
+              "name": "Unauthorized - invalid or missing JWT token",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "analytics",
+                    "entity-rating-change"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"Parameters\": {\n    \"portfolio\": {\n      \"name\": \"Example Portfolio\",\n      \"entities\": {\n        \"CBId\": [\n          \"CB000000123\",\n          \"CB000000456\"\n        ],\n        \"CustomField1\": [\n          \"Value1\",\n          \"Value2\",\n          \"Value3\"\n        ]\n      }\n    },\n    \"EffectiveDateId\": 20241201,\n    \"rating_change_months\": 6,\n    \"use_oci\": false,\n    \"use_client_scale\": false,\n    \"descriptor_columns\": [\n      \"Sector\"\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\",\n    \"message\": \"Invalid or missing JWT token\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "795c027f-95f5-4b58-8fd4-44a5dddc08d4",
+              "name": "Forbidden - insufficient permissions or access denied",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "analytics",
+                    "entity-rating-change"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"Parameters\": {\n    \"portfolio\": {\n      \"name\": \"Example Portfolio\",\n      \"entities\": {\n        \"CBId\": [\n          \"CB000000123\",\n          \"CB000000456\"\n        ],\n        \"CustomField1\": [\n          \"Value1\",\n          \"Value2\",\n          \"Value3\"\n        ]\n      }\n    },\n    \"EffectiveDateId\": 20241201,\n    \"rating_change_months\": 6,\n    \"use_oci\": false,\n    \"use_client_scale\": false,\n    \"descriptor_columns\": [\n      \"Sector\"\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"PERMISSION_DENIED\",\n    \"message\": \"Insufficient permissions for this resource\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "04da9761-f662-4227-a8ae-eb031dae67c7",
+              "name": "Validation error - request parameters are invalid",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "analytics",
+                    "entity-rating-change"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"Parameters\": {\n    \"portfolio\": {\n      \"name\": \"Example Portfolio\",\n      \"entities\": {\n        \"CBId\": [\n          \"CB000000123\",\n          \"CB000000456\"\n        ],\n        \"CustomField1\": [\n          \"Value1\",\n          \"Value2\",\n          \"Value3\"\n        ]\n      }\n    },\n    \"EffectiveDateId\": 20241201,\n    \"rating_change_months\": 6,\n    \"use_oci\": false,\n    \"use_client_scale\": false,\n    \"descriptor_columns\": [\n      \"Sector\"\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+              "code": 422,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"VALIDATION_ERROR\",\n    \"message\": \"Request validation failed\",\n    \"details\": [\n      {\n        \"field\": \"body.Parameters.portfolio\",\n        \"message\": \"field required\",\n        \"type\": \"value_error.missing\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "68a096d3-713a-4c12-a895-b9691b348783",
+              "name": "Internal server error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "analytics",
+                    "entity-rating-change"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"Parameters\": {\n    \"portfolio\": {\n      \"name\": \"Example Portfolio\",\n      \"entities\": {\n        \"CBId\": [\n          \"CB000000123\",\n          \"CB000000456\"\n        ],\n        \"CustomField1\": [\n          \"Value1\",\n          \"Value2\",\n          \"Value3\"\n        ]\n      }\n    },\n    \"EffectiveDateId\": 20241201,\n    \"rating_change_months\": 6,\n    \"use_oci\": false,\n    \"use_client_scale\": false,\n    \"descriptor_columns\": [\n      \"Sector\"\n    ]\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"INTERNAL_SERVER_ERROR\",\n    \"message\": \"An unexpected error occurred.\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://api.creditbenchmark.com",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "d06100a9-980c-4512-9006-42a1c4dbaa36",
+    "name": "Credit Benchmark Analytics Entity Data API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Authentication, matching, and analytics.\n\n\nContact Support:\n Name: Credit Benchmark API Support\n Email: api-support@creditbenchmark.com",
+      "type": "text/plain"
+    }
+  }
+}

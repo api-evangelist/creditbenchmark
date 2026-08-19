@@ -1,0 +1,39 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Credit Benchmark Analytics Entity Data API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Entity Data",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Entity Rating Change",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.creditbenchmark.com/api/analytics/entity-rating-change",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Return entity rating changes.\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

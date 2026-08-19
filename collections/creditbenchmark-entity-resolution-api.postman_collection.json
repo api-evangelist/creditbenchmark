@@ -1,0 +1,356 @@
+{
+  "item": [
+    {
+      "id": "695175eb-bb0d-4438-af7c-415315e8e120",
+      "name": "entity-resolution",
+      "description": {
+        "content": "Entity name resolution endpoints.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "deeeb6c7-7807-46c1-8d8c-6fb48905bf98",
+          "name": "Entity Resolution",
+          "request": {
+            "name": "Entity Resolution",
+            "description": {
+              "content": "Resolves entity names to Credit Benchmark identifiers. Returns ranked candidates with confidence scores.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "matching",
+                "text",
+                "match_external"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"limit\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "f64fd04a-663b-4b95-9da6-26e2e5277966",
+              "name": "Entity name resolution results",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "matching",
+                    "text",
+                    "match_external"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"entities\": [\n    {\n      \"entity_name\": \"JPMorgan Chase & Co.\",\n      \"industry\": \"Financials\",\n      \"country\": \"United States\"\n    },\n    {\n      \"entity_name\": \"Apple Inc.\",\n      \"lei\": \"5493000X0X4X4X4X4X4X\"\n    }\n  ],\n  \"limit\": 3\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"results\": [\n    {\n      \"entity\": \"JPMorgan Chase & Co.\",\n      \"candidates\": [\n        {\n          \"rank\": 1,\n          \"CBId\": \"CB0000022706\",\n          \"CBEntityName\": \"JPMORGAN CHASE & CO\",\n          \"CBCountryOfRiskISO\": \"US\",\n          \"isConsensus1M\": true,\n          \"confidence\": 0.82\n        },\n        {\n          \"rank\": 2,\n          \"CBId\": \"CB0000118034\",\n          \"CBEntityName\": \"JPMORGAN CHASE BANK NA\",\n          \"CBCountryOfRiskISO\": \"US\",\n          \"isConsensus1M\": true,\n          \"confidence\": 0.09\n        }\n      ]\n    },\n    {\n      \"entity\": \"Apple Inc.\",\n      \"candidates\": [\n        {\n          \"rank\": 1,\n          \"CBId\": \"CB0000000456\",\n          \"CBEntityName\": \"APPLE INC\",\n          \"CBCountryOfRiskISO\": \"US\",\n          \"isConsensus1M\": true,\n          \"confidence\": 0.97\n        }\n      ]\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "5fd293e7-05fd-4c9f-a6a3-2c531c633bf7",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "matching",
+                    "text",
+                    "match_external"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"entities\": [\n    {\n      \"entity_name\": \"JPMorgan Chase & Co.\",\n      \"industry\": \"Financials\",\n      \"country\": \"United States\"\n    },\n    {\n      \"entity_name\": \"Apple Inc.\",\n      \"lei\": \"5493000X0X4X4X4X4X4X\"\n    }\n  ],\n  \"limit\": 3\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": \"Unauthorized request\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "85579f90-dc1b-4c2b-a123-29a8cf2003d2",
+              "name": "Forbidden",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "matching",
+                    "text",
+                    "match_external"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"entities\": [\n    {\n      \"entity_name\": \"JPMorgan Chase & Co.\",\n      \"industry\": \"Financials\",\n      \"country\": \"United States\"\n    },\n    {\n      \"entity_name\": \"Apple Inc.\",\n      \"lei\": \"5493000X0X4X4X4X4X4X\"\n    }\n  ],\n  \"limit\": 3\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"Client-backed analytics inputs require contributor entitlement.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b1ac27f4-485c-4de1-bbf8-a598af90fab4",
+              "name": "Validation error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "matching",
+                    "text",
+                    "match_external"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"entities\": [\n    {\n      \"entity_name\": \"JPMorgan Chase & Co.\",\n      \"industry\": \"Financials\",\n      \"country\": \"United States\"\n    },\n    {\n      \"entity_name\": \"Apple Inc.\",\n      \"lei\": \"5493000X0X4X4X4X4X4X\"\n    }\n  ],\n  \"limit\": 3\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+              "code": 422,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": [\n    {\n      \"loc\": [\n        \"body\",\n        \"effective_date\"\n      ],\n      \"msg\": \"Input should be a valid integer\",\n      \"type\": \"int_parsing\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "73d21f88-868b-4953-b725-bcd822e5661e",
+              "name": "Server error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "matching",
+                    "text",
+                    "match_external"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"entities\": [\n    {\n      \"entity_name\": \"JPMorgan Chase & Co.\",\n      \"industry\": \"Financials\",\n      \"country\": \"United States\"\n    },\n    {\n      \"entity_name\": \"Apple Inc.\",\n      \"lei\": \"5493000X0X4X4X4X4X4X\"\n    }\n  ],\n  \"limit\": 3\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"An error occurred while processing your request. Please try again later.\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://gateway.creditbenchmark.com",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "e316e2d8-49e4-4417-b7d4-9a2df613eb9c",
+    "name": "Credit Benchmark analytics entity-resolution API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Authentication, entity resolution, data, analytics, and metadata endpoints.\n\n\nContact Support:\n Name: Credit Benchmark API Support\n Email: api-support@creditbenchmark.com",
+      "type": "text/plain"
+    }
+  }
+}

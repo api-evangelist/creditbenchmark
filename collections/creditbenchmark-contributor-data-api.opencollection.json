@@ -1,0 +1,84 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Credit Benchmark Analytics Contributor Data API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Contributor Data",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Client Data Custom Aggregate",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.creditbenchmark.com/api/analytics/contributor/custom-aggregate",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Return client aggregate trend metrics.\n"
+        },
+        {
+          "info": {
+            "name": "Client Data Rating Distribution",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.creditbenchmark.com/api/analytics/contributor/rating-distribution",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Return client rating distribution data.\n"
+        },
+        {
+          "info": {
+            "name": "Client Data Portfolio Summary",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.creditbenchmark.com/api/analytics/contributor/portfolio-summary",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Return grouped client portfolio metrics.\n"
+        },
+        {
+          "info": {
+            "name": "Client Data Entity Rating Change",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.creditbenchmark.com/api/analytics/contributor/entity-rating-change",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Return client entity rating changes.\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

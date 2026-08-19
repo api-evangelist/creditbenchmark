@@ -1,0 +1,333 @@
+{
+  "item": [
+    {
+      "id": "ede135a5-5602-45e4-affd-523ce92f9ffe",
+      "name": "Authentication",
+      "description": {
+        "content": "JWT token generation and authentication",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "65472427-7ea6-494d-a9cf-3c70ed4829d8",
+          "name": "Create JWT Token",
+          "request": {
+            "name": "Create JWT Token",
+            "description": {
+              "content": "Create a JWT bearer token.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "gartan",
+                "api",
+                "token"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "disabled": false,
+                  "key": "Username",
+                  "value": "<string>",
+                  "description": "(Required) Your Credit Benchmark username"
+                },
+                {
+                  "disabled": false,
+                  "key": "Password",
+                  "value": "<password>",
+                  "description": "(Required) Your Credit Benchmark password"
+                },
+                {
+                  "disabled": false,
+                  "key": "grant_type",
+                  "value": "<string>",
+                  "description": "(Required) Grant type for authentication"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "e888db64-f742-4aa0-a31e-08e8282ac7f7",
+              "name": "JWT token generated successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "gartan",
+                    "api",
+                    "token"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "disabled": false,
+                      "description": {
+                        "content": "(Required) Your Credit Benchmark username",
+                        "type": "text/plain"
+                      },
+                      "key": "Username",
+                      "value": "your_username"
+                    },
+                    {
+                      "disabled": false,
+                      "description": {
+                        "content": "(Required) Your Credit Benchmark password",
+                        "type": "text/plain"
+                      },
+                      "key": "Password",
+                      "value": "your_password"
+                    },
+                    {
+                      "disabled": false,
+                      "description": {
+                        "content": "(Required) Grant type for authentication",
+                        "type": "text/plain"
+                      },
+                      "key": "grant_type",
+                      "value": "password"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"token_type\": \"Bearer\",\n  \"expires_in\": 86400\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "64fb56e6-421b-45c7-8f65-8f597aab7e7b",
+              "name": "Bad request - invalid parameters",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "gartan",
+                    "api",
+                    "token"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "disabled": false,
+                      "description": {
+                        "content": "(Required) Your Credit Benchmark username",
+                        "type": "text/plain"
+                      },
+                      "key": "Username",
+                      "value": "your_username"
+                    },
+                    {
+                      "disabled": false,
+                      "description": {
+                        "content": "(Required) Your Credit Benchmark password",
+                        "type": "text/plain"
+                      },
+                      "key": "Password",
+                      "value": "your_password"
+                    },
+                    {
+                      "disabled": false,
+                      "description": {
+                        "content": "(Required) Grant type for authentication",
+                        "type": "text/plain"
+                      },
+                      "key": "grant_type",
+                      "value": "password"
+                    }
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Invalid request parameters\",\n    \"details\": {\n      \"invalid_columns\": [\n        \"BadColumn\"\n      ],\n      \"allowed_columns\": \"Please check documentation for valid column names\"\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "cd15f0fe-80d0-4b17-ac20-72d8eb56959c",
+              "name": "Unauthorized - invalid or missing JWT token",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "gartan",
+                    "api",
+                    "token"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "disabled": false,
+                      "description": {
+                        "content": "(Required) Your Credit Benchmark username",
+                        "type": "text/plain"
+                      },
+                      "key": "Username",
+                      "value": "your_username"
+                    },
+                    {
+                      "disabled": false,
+                      "description": {
+                        "content": "(Required) Your Credit Benchmark password",
+                        "type": "text/plain"
+                      },
+                      "key": "Password",
+                      "value": "your_password"
+                    },
+                    {
+                      "disabled": false,
+                      "description": {
+                        "content": "(Required) Grant type for authentication",
+                        "type": "text/plain"
+                      },
+                      "key": "grant_type",
+                      "value": "password"
+                    }
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\",\n    \"message\": \"Invalid or missing JWT token\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://api.creditbenchmark.com",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "1417711c-c6af-472a-8900-c8e16da3a8f0",
+    "name": "Credit Benchmark Analytics Authentication API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Authentication, matching, and analytics.\n\n\nContact Support:\n Name: Credit Benchmark API Support\n Email: api-support@creditbenchmark.com",
+      "type": "text/plain"
+    }
+  }
+}

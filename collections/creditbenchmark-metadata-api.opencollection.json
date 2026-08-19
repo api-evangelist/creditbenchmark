@@ -1,0 +1,79 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Credit Benchmark analytics metadata API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "metadata",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Available Data Columns",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://gateway.creditbenchmark.com/analytics/v2/metadata/columns"
+          },
+          "docs": "Returns a flat catalog of public input columns with metadata such as type, scopeable, facetable, and entitlement. This endpoint describes request-side input columns only; it does not describe route response fields or result_filter fields."
+        },
+        {
+          "info": {
+            "name": "Rating Scales",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://gateway.creditbenchmark.com/analytics/v2/metadata/rating-scales"
+          },
+          "docs": "Returns CB rating scale metadata, including CB21 and CB7 ordering and band mappings."
+        },
+        {
+          "info": {
+            "name": "Industry Schema",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://gateway.creditbenchmark.com/analytics/v2/metadata/industry-schema"
+          },
+          "docs": "Returns the CB industry hierarchy as L1 through L6 rows for scope filters, facets, and hierarchy-aware analytics."
+        },
+        {
+          "info": {
+            "name": "Geography Schema",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://gateway.creditbenchmark.com/analytics/v2/metadata/geography-schema"
+          },
+          "docs": "Returns the CB geography hierarchy as region group, region, and country of risk levels."
+        },
+        {
+          "info": {
+            "name": "Available Dates",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://gateway.creditbenchmark.com/analytics/v2/metadata/available-dates"
+          },
+          "docs": "Returns latest and previous available effective dates for analytics requests."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
