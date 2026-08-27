@@ -70,8 +70,8 @@ apis:
     url: https://docs.creditbenchmark.com/api-reference/intro
 - aid: creditbenchmark:creditbenchmark-contributor-data-api
   name: Credit Benchmark Contributor Data API
-  description: Contributor-specific analytics using client/bank internal PD data. Requires ent_CLIENT-DATA
-    entitlement.
+  description: >-
+    Contributor-specific analytics using client/bank internal PD data. Requires ent_CLIENT-DATA entitlement.
   humanURL: https://docs.creditbenchmark.com/api-reference/intro
   baseURL: https://api.creditbenchmark.com
   tags:
@@ -125,6 +125,36 @@ apis:
     url: https://docs.creditbenchmark.com/
   - type: APIReference
     url: https://docs.creditbenchmark.com/api-reference/intro
+- aid: creditbenchmark:creditbenchmark-data-api
+  name: Credit Benchmark Data API
+  description: Raw data extraction endpoints.
+  humanURL: https://docs.creditbenchmark.com/api-reference/intro
+  baseURL: https://api.creditbenchmark.com
+  tags:
+  - data
+  properties:
+  - type: OpenAPI
+    url: openapi/creditbenchmark-data-api-openapi.yml
+- aid: creditbenchmark:creditbenchmark-entity-resolution-api
+  name: Credit Benchmark Entity Resolution API
+  description: Entity name resolution endpoints.
+  humanURL: https://docs.creditbenchmark.com/api-reference/intro
+  baseURL: https://api.creditbenchmark.com
+  tags:
+  - entity-resolution
+  properties:
+  - type: OpenAPI
+    url: openapi/creditbenchmark-entity-resolution-api-openapi.yml
+- aid: creditbenchmark:creditbenchmark-metadata-api
+  name: Credit Benchmark Metadata API
+  description: Metadata discovery endpoints.
+  humanURL: https://docs.creditbenchmark.com/api-reference/intro
+  baseURL: https://api.creditbenchmark.com
+  tags:
+  - metadata
+  properties:
+  - type: OpenAPI
+    url: openapi/creditbenchmark-metadata-api-openapi.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
