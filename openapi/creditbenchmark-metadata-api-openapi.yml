@@ -1,6 +1,6 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Credit Benchmark analytics metadata API
+  title: Credit Benchmark Metadata API
   description: 'Authentication, entity resolution, data, analytics, and metadata endpoints.
 
     '
@@ -237,6 +237,14 @@ components:
             $ref: '#/components/schemas/SimpleError'
           example:
             error: Client-backed analytics inputs require contributor entitlement.
+    InternalServerError:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: An error occurred while processing your request. Please try again later.
     TooManyRequests:
       description: Too many requests
       content:
@@ -254,55 +262,7 @@ components:
             $ref: '#/components/schemas/UnauthorizedError'
           example:
             detail: Unauthorized request
-    InternalServerError:
-      description: Server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SimpleError'
-          example:
-            error: An error occurred while processing your request. Please try again later.
   schemas:
-    AvailableDatesMetadataResponse:
-      type: object
-      description: Latest available effective dates for analytics requests.
-      required:
-      - latest_effective_date
-      - latest_finalised_effective_date
-      properties:
-        latest_effective_date:
-          type: integer
-          description: Latest available effective date in YYYYMMDD format.
-          example: 20260529
-        latest_finalised_effective_date:
-          type: integer
-          description: Latest finalised effective date in YYYYMMDD format.
-          example: 20260529
-    GeographySchemaMetadataResponse:
-      type: object
-      description: Geography hierarchy metadata.
-      required:
-      - levels
-      - tree
-      - code
-      properties:
-        levels:
-          type: object
-          additionalProperties:
-            type: string
-          description: Geography field names mapped to hierarchy levels.
-          example:
-            CB_Region_Group: L1
-            CB_Region: L2
-            CB_Country: L3
-        tree:
-          type: object
-          additionalProperties: true
-          description: Nested region group, region, and country tree.
-        code:
-          type: string
-          description: Field containing the country code.
-          example: CB_Country_ISO
     DataColumnMetadata:
       type: object
       additionalProperties: false
@@ -331,48 +291,6 @@ components:
           - CLIENT_DATA
           - null
           description: Required entitlement, if any.
-    HierarchyMetadata:
-      type: object
-      description: Hierarchy metadata with level labels and a nested tree.
-      required:
-      - levels
-      - tree
-      properties:
-        levels:
-          type: object
-          additionalProperties:
-            type: string
-          description: Field names mapped to hierarchy levels.
-        tree:
-          type: object
-          additionalProperties: true
-          description: Nested hierarchy tree.
-    DataColumnsResponse:
-      type: object
-      description: Public input column catalog.
-      additionalProperties:
-        $ref: '#/components/schemas/DataColumnMetadata'
-    RateLimitError:
-      type: object
-      required:
-      - error
-      - detail
-      properties:
-        error:
-          type: string
-        detail:
-          type: string
-    IndustrySchemaMetadataResponse:
-      type: object
-      description: Industry and entity-type hierarchy metadata.
-      required:
-      - industry
-      - entity_types
-      properties:
-        industry:
-          $ref: '#/components/schemas/HierarchyMetadata'
-        entity_types:
-          $ref: '#/components/schemas/HierarchyMetadata'
     SimpleError:
       type: object
       required:
@@ -380,6 +298,28 @@ components:
       properties:
         error:
           type: string
+    UnauthorizedError:
+      type: object
+      required:
+      - detail
+      properties:
+        detail:
+          type: string
+    AvailableDatesMetadataResponse:
+      type: object
+      description: Latest available effective dates for analytics requests.
+      required:
+      - latest_effective_date
+      - latest_finalised_effective_date
+      properties:
+        latest_effective_date:
+          type: integer
+          description: Latest available effective date in YYYYMMDD format.
+          example: 20260529
+        latest_finalised_effective_date:
+          type: integer
+          description: Latest finalised effective date in YYYYMMDD format.
+          example: 20260529
     RatingScalesMetadataResponse:
       type: object
       description: CB rating scale metadata.
@@ -405,13 +345,73 @@ components:
             type: object
             additionalProperties: true
           description: Scale definitions keyed by scale name. `CB21` and `CB7` include ordered rating rows; `CLIENT` describes client-specific scale behavior.
-    UnauthorizedError:
+    RateLimitError:
       type: object
       required:
+      - error
       - detail
       properties:
+        error:
+          type: string
         detail:
           type: string
+    GeographySchemaMetadataResponse:
+      type: object
+      description: Geography hierarchy metadata.
+      required:
+      - levels
+      - tree
+      - code
+      properties:
+        levels:
+          type: object
+          additionalProperties:
+            type: string
+          description: Geography field names mapped to hierarchy levels.
+          example:
+            CB_Region_Group: L1
+            CB_Region: L2
+            CB_Country: L3
+        tree:
+          type: object
+          additionalProperties: true
+          description: Nested region group, region, and country tree.
+        code:
+          type: string
+          description: Field containing the country code.
+          example: CB_Country_ISO
+    IndustrySchemaMetadataResponse:
+      type: object
+      description: Industry and entity-type hierarchy metadata.
+      required:
+      - industry
+      - entity_types
+      properties:
+        industry:
+          $ref: '#/components/schemas/HierarchyMetadata'
+        entity_types:
+          $ref: '#/components/schemas/HierarchyMetadata'
+    DataColumnsResponse:
+      type: object
+      description: Public input column catalog.
+      additionalProperties:
+        $ref: '#/components/schemas/DataColumnMetadata'
+    HierarchyMetadata:
+      type: object
+      description: Hierarchy metadata with level labels and a nested tree.
+      required:
+      - levels
+      - tree
+      properties:
+        levels:
+          type: object
+          additionalProperties:
+            type: string
+          description: Field names mapped to hierarchy levels.
+        tree:
+          type: object
+          additionalProperties: true
+          description: Nested hierarchy tree.
   securitySchemes:
     BearerAuth:
       type: http

@@ -1,6 +1,6 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Credit Benchmark Analytics Entity Matching API
+  title: Credit Benchmark Entity Matching API
   description: 'Authentication, matching, and analytics.
 
     '
@@ -85,64 +85,66 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 components:
+  responses:
+    Forbidden:
+      description: Forbidden - insufficient permissions or access denied
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: PERMISSION_DENIED
+              message: Insufficient permissions for this resource
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: INTERNAL_SERVER_ERROR
+              message: An unexpected error occurred.
+    BadRequest:
+      description: Bad request - invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: BAD_REQUEST
+              message: Invalid request parameters
+              details:
+                invalid_columns:
+                - BadColumn
+                allowed_columns: Please check documentation for valid column names
+    Unauthorized:
+      description: Unauthorized - invalid or missing JWT token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: UNAUTHORIZED
+              message: Invalid or missing JWT token
+    ValidationError:
+      description: Validation error - request parameters are invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: VALIDATION_ERROR
+              message: Request validation failed
+              details:
+              - field: body.Parameters.portfolio
+                message: field required
+                type: value_error.missing
   schemas:
-    MatchExternalResponse:
-      type: object
-      description: Response containing entity matching results
-      required:
-      - results
-      properties:
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/ExternalMatchRow'
-          description: Table-style results keyed by input entity
-          default: []
-    ExternalMatchRow:
-      type: object
-      description: Matching results for a single entity query
-      required:
-      - entity
-      - candidates
-      properties:
-        entity:
-          type: string
-          description: Original query text
-          example: JPMorgan Chase & Co.
-        candidates:
-          type: array
-          items:
-            $ref: '#/components/schemas/ExternalCandidate'
-          description: Ordered list of candidate matches, sorted by rank
-          default: []
-    Error:
-      type: object
-      description: Standard error envelope used by the API
-      required:
-      - error
-      properties:
-        error:
-          type: object
-          required:
-          - code
-          - message
-          properties:
-            code:
-              type: string
-              description: Machine-readable error code
-              example: BAD_REQUEST
-            message:
-              type: string
-              description: Human-readable error message
-              example: Invalid request parameters
-            details:
-              description: Optional structured details about the error
-              oneOf:
-              - type: array
-                items:
-                  $ref: '#/components/schemas/ValidationErrorDetail'
-              - type: object
-              - type: string
     Query:
       type: object
       description: A single entity name query for matching
@@ -202,6 +204,35 @@ components:
           minimum: 0
           maximum: 1
           example: 0.98
+    MatchExternalResponse:
+      type: object
+      description: Response containing entity matching results
+      required:
+      - results
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExternalMatchRow'
+          description: Table-style results keyed by input entity
+          default: []
+    ExternalMatchRow:
+      type: object
+      description: Matching results for a single entity query
+      required:
+      - entity
+      - candidates
+      properties:
+        entity:
+          type: string
+          description: Original query text
+          example: JPMorgan Chase & Co.
+        candidates:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExternalCandidate'
+          description: Ordered list of candidate matches, sorted by rank
+          default: []
     MatchBody:
       type: object
       description: Request body for entity name matching
@@ -230,65 +261,34 @@ components:
           type: string
           description: Machine-readable error type
           example: value_error.missing
-  responses:
-    ValidationError:
-      description: Validation error - request parameters are invalid
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: VALIDATION_ERROR
-              message: Request validation failed
-              details:
-              - field: body.Parameters.portfolio
-                message: field required
-                type: value_error.missing
-    Unauthorized:
-      description: Unauthorized - invalid or missing JWT token
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: UNAUTHORIZED
-              message: Invalid or missing JWT token
-    BadRequest:
-      description: Bad request - invalid parameters
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: BAD_REQUEST
-              message: Invalid request parameters
-              details:
-                invalid_columns:
-                - BadColumn
-                allowed_columns: Please check documentation for valid column names
-    Forbidden:
-      description: Forbidden - insufficient permissions or access denied
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: PERMISSION_DENIED
-              message: Insufficient permissions for this resource
-    InternalServerError:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: INTERNAL_SERVER_ERROR
-              message: An unexpected error occurred.
+    Error:
+      type: object
+      description: Standard error envelope used by the API
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+              description: Machine-readable error code
+              example: BAD_REQUEST
+            message:
+              type: string
+              description: Human-readable error message
+              example: Invalid request parameters
+            details:
+              description: Optional structured details about the error
+              oneOf:
+              - type: array
+                items:
+                  $ref: '#/components/schemas/ValidationErrorDetail'
+              - type: object
+              - type: string
   securitySchemes:
     BearerAuth:
       type: http

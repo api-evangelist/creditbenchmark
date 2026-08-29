@@ -1,16 +1,15 @@
 {
   "provider": "creditbenchmark",
   "sources": [
-    "creditbenchmark-analytics-api-openapi.yml",
-    "creditbenchmark-authentication-api-openapi.yml",
-    "creditbenchmark-contributor-data-api-openapi.yml",
-    "creditbenchmark-entity-data-api-openapi.yml",
-    "creditbenchmark-entity-matching-api-openapi.yml",
-    "creditbenchmark-portfolio-analytics-api-openapi.yml"
+    "_original/creditbenchmark-consensus-data-openapi.yml",
+    "_original/creditbenchmark-openapi-original.yml"
   ],
   "outputs": [
     "creditbenchmark-analytics-api-openapi.yml",
     "creditbenchmark-authentication-api-openapi.yml",
+    "creditbenchmark-data-api-openapi.yml",
+    "creditbenchmark-entity-resolution-api-openapi.yml",
+    "creditbenchmark-metadata-api-openapi.yml",
     "creditbenchmark-contributor-data-api-openapi.yml",
     "creditbenchmark-entity-data-api-openapi.yml",
     "creditbenchmark-entity-matching-api-openapi.yml",
@@ -19,6 +18,22 @@
   "archived": [],
   "errors": [],
   "warnings": [],
-  "notes": [],
-  "skipped": []
+  "notes": [
+    "sourced from openapi/_original/ (2 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "creditbenchmark-consensus-data-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "creditbenchmark-openapi-original.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "tag 'analytics' spans 2 source specs (creditbenchmark-consensus-data-openapi.yml, creditbenchmark-openapi-original.yml): per-path servers applied",
+    "tag 'authentication' spans 2 source specs (creditbenchmark-consensus-data-openapi.yml, creditbenchmark-openapi-original.yml): per-path servers applied"
+  ],
+  "skipped": [
+    "creditbenchmark-analytics-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "creditbenchmark-authentication-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "creditbenchmark-contributor-data-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "creditbenchmark-data-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "creditbenchmark-entity-data-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "creditbenchmark-entity-matching-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "creditbenchmark-entity-resolution-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "creditbenchmark-metadata-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "creditbenchmark-portfolio-analytics-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }

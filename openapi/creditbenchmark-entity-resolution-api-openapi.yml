@@ -1,6 +1,6 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Credit Benchmark analytics entity-resolution API
+  title: Credit Benchmark Entity Resolution API
   description: 'Authentication, entity resolution, data, analytics, and metadata endpoints.
 
     '
@@ -97,14 +97,14 @@ components:
             $ref: '#/components/schemas/SimpleError'
           example:
             error: Client-backed analytics inputs require contributor entitlement.
-    Unauthorized:
-      description: Unauthorized
+    InternalServerError:
+      description: Server error
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/UnauthorizedError'
+            $ref: '#/components/schemas/SimpleError'
           example:
-            detail: Unauthorized request
+            error: An error occurred while processing your request. Please try again later.
     FrameworkValidationError:
       description: Validation error
       content:
@@ -118,25 +118,15 @@ components:
               - effective_date
               msg: Input should be a valid integer
               type: int_parsing
-    InternalServerError:
-      description: Server error
+    Unauthorized:
+      description: Unauthorized
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/SimpleError'
+            $ref: '#/components/schemas/UnauthorizedError'
           example:
-            error: An error occurred while processing your request. Please try again later.
+            detail: Unauthorized request
   schemas:
-    MatchExternalResponse:
-      type: object
-      required:
-      - results
-      properties:
-        results:
-          type: array
-          description: Table-style results keyed by input entity.
-          items:
-            $ref: '#/components/schemas/ExternalMatchRow'
     FastApiValidationErrorResponse:
       type: object
       required:
@@ -172,33 +162,30 @@ components:
         confidence:
           type: number
           description: Matching confidence score.
-    FastApiValidationErrorDetail:
-      type: object
-      properties:
-        loc:
-          type: array
-          items:
-            oneOf:
-            - type: string
-            - type: integer
-        msg:
-          type: string
-        type:
-          type: string
-    ExternalMatchRow:
+    SimpleError:
       type: object
       required:
-      - entity
-      - candidates
+      - error
       properties:
-        entity:
+        error:
           type: string
-          description: Original input `entity_name`.
-        candidates:
+    MatchExternalResponse:
+      type: object
+      required:
+      - results
+      properties:
+        results:
           type: array
-          description: Ordered candidates limited by the requested `limit`.
+          description: Table-style results keyed by input entity.
           items:
-            $ref: '#/components/schemas/ExternalCandidate'
+            $ref: '#/components/schemas/ExternalMatchRow'
+    UnauthorizedError:
+      type: object
+      required:
+      - detail
+      properties:
+        detail:
+          type: string
     ExternalMatchBody:
       type: object
       additionalProperties: false
@@ -213,20 +200,20 @@ components:
           type: integer
           default: 3
           description: Maximum candidates to return per entity row. Valid integer values are 1 through 10. Omitted or out-of-range integers are normalized to 3; malformed non-integer values fail validation.
-    SimpleError:
+    ExternalMatchRow:
       type: object
       required:
-      - error
+      - entity
+      - candidates
       properties:
-        error:
+        entity:
           type: string
-    UnauthorizedError:
-      type: object
-      required:
-      - detail
-      properties:
-        detail:
-          type: string
+          description: Original input `entity_name`.
+        candidates:
+          type: array
+          description: Ordered candidates limited by the requested `limit`.
+          items:
+            $ref: '#/components/schemas/ExternalCandidate'
     ExternalMatchEntity:
       type: object
       additionalProperties: false
@@ -246,6 +233,19 @@ components:
         lei:
           type: string
           description: Optional LEI hint. Blank values are treated as omitted.
+    FastApiValidationErrorDetail:
+      type: object
+      properties:
+        loc:
+          type: array
+          items:
+            oneOf:
+            - type: string
+            - type: integer
+        msg:
+          type: string
+        type:
+          type: string
   securitySchemes:
     BearerAuth:
       type: http
