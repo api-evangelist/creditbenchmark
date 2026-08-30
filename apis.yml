@@ -143,6 +143,8 @@ apis:
   humanURL: https://docs.creditbenchmark.com/api-reference/intro
   baseURL: https://api.creditbenchmark.com
   tags:
+  - Data
+  tags_raw:
   - data
   properties:
   - type: OpenAPI
@@ -153,6 +155,8 @@ apis:
   humanURL: https://docs.creditbenchmark.com/api-reference/intro
   baseURL: https://api.creditbenchmark.com
   tags:
+  - Entity Resolution
+  tags_raw:
   - entity-resolution
   properties:
   - type: OpenAPI
@@ -163,6 +167,8 @@ apis:
   humanURL: https://docs.creditbenchmark.com/api-reference/intro
   baseURL: https://api.creditbenchmark.com
   tags:
+  - Metadata
+  tags_raw:
   - metadata
   properties:
   - type: OpenAPI
