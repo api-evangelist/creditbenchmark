@@ -1,20 +1,74 @@
-generated: '2026-07-18'
+generated: '2026-09-16'
 method: generated
-source: openapi/creditbenchmark-openapi-original.yml
+source: openapi/creditbenchmark-analytics-api-openapi.yml, openapi/creditbenchmark-authentication-api-openapi.yml,
+  openapi/creditbenchmark-contributor-data-api-openapi.yml, openapi/creditbenchmark-data-api-openapi.yml,
+  openapi/creditbenchmark-entity-data-api-openapi.yml, openapi/creditbenchmark-entity-matching-api-openapi.yml,
+  openapi/creditbenchmark-entity-resolution-api-openapi.yml, openapi/creditbenchmark-metadata-api-openapi.yml,
+  openapi/creditbenchmark-portfolio-analytics-api-openapi.yml
 description: Recommended x-agentic-access execution contracts, classified heuristically from
   the OpenAPI. A governance starting point for exposing this API to AI agents — review and bind
   audience per deployment. See research/curity/agentic-governance/.
 summary:
-  operations: 11
+  operations: 23
   by_action_class:
-    acting: 11
+    acting: 18
+    connected: 5
   by_consequence:
-    write: 11
+    write: 18
+    read: 5
   human_in_the_loop_required: 0
 operations:
-- path: /gartan/api/token
+- path: /analytics/v2/data/aggregatetrend
   method: post
-  operationId: getToken
+  operationId: aggregateTrend
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /analytics/v2/data/entityratingchange
+  method: post
+  operationId: entityRatingChange
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /analytics/v2/data/creditbreakdown
+  method: post
+  operationId: creditBreakdown
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /analytics/v2/data/ratingdistribution
+  method: post
+  operationId: ratingDistribution
   x-agentic-access:
     action-class: acting
     consequence: write
@@ -44,57 +98,41 @@ operations:
       - abnormal
       - high-value
     audit: required
-- path: /api/analytics/entity-rating-change
-  method: post
-  operationId: entityRatingChange
-  x-agentic-access:
-    action-class: acting
-    consequence: write
-    subject: required
-    audience: null
-    token:
-      max-ttl: 900
-    escalation:
-      human-in-the-loop: conditional
-      triggers:
-      - abnormal
-      - high-value
-    audit: required
-- path: /api/analytics/portfolio-data
-  method: post
-  operationId: portfolioData
-  x-agentic-access:
-    action-class: acting
-    consequence: write
-    subject: required
-    audience: null
-    token:
-      max-ttl: 900
-    escalation:
-      human-in-the-loop: conditional
-      triggers:
-      - abnormal
-      - high-value
-    audit: required
-- path: /api/analytics/portfolio-summary
-  method: post
-  operationId: portfolioSummary
-  x-agentic-access:
-    action-class: acting
-    consequence: write
-    subject: required
-    audience: null
-    token:
-      max-ttl: 900
-    escalation:
-      human-in-the-loop: conditional
-      triggers:
-      - abnormal
-      - high-value
-    audit: required
 - path: /api/analytics/rating-distribution
   method: post
   operationId: ratingDistribution
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /api/security/token
+  method: post
+  operationId: getToken
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /gartan/api/token
+  method: post
+  operationId: getToken
   x-agentic-access:
     action-class: acting
     consequence: write
@@ -172,9 +210,139 @@ operations:
       - abnormal
       - high-value
     audit: required
+- path: /analytics/v2/data/getdata
+  method: post
+  operationId: getData
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /api/analytics/entity-rating-change
+  method: post
+  operationId: entityRatingChange
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
 - path: /matching/match
   method: post
   operationId: matchEntities
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /matching/text/match_external
+  method: post
+  operationId: matchExternalEntities
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /analytics/v2/metadata/columns
+  method: get
+  operationId: metadata_columns_v2_metadata_columns_get
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /analytics/v2/metadata/rating-scales
+  method: get
+  operationId: metadata_rating_scales_v2_metadata_rating_scales_get
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /analytics/v2/metadata/industry-schema
+  method: get
+  operationId: metadata_industry_schema_v2_metadata_industry_schema_get
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /analytics/v2/metadata/geography-schema
+  method: get
+  operationId: metadata_geography_schema_v2_metadata_geography_schema_get
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /analytics/v2/metadata/available-dates
+  method: get
+  operationId: metadata_available_dates_v2_metadata_available_dates_get
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /api/analytics/portfolio-data
+  method: post
+  operationId: portfolioData
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /api/analytics/portfolio-summary
+  method: post
+  operationId: portfolioSummary
   x-agentic-access:
     action-class: acting
     consequence: write
