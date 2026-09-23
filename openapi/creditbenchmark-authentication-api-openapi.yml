@@ -18,14 +18,14 @@ servers:
 security:
 - BearerAuth: []
 tags:
-- name: authentication
+- name: Authentication
   description: Token generation endpoints.
   x-group: Authentication
 paths:
   /api/security/token:
     post:
       tags:
-      - authentication
+      - Authentication
       summary: Create JWT Token
       description: Create a JWT bearer token.
       operationId: getToken
@@ -78,11 +78,9 @@ paths:
   /gartan/api/token:
     post:
       tags:
-      - authentication
+      - Authentication
       summary: Create JWT Token
-      description: 'Create a JWT bearer token.
-
-        '
+      description: Create a JWT bearer token.
       operationId: getToken
       security: []
       requestBody:
@@ -150,65 +148,7 @@ paths:
     - url: https://api.creditbenchmark.com
       description: Production server
 components:
-  responses:
-    InternalServerError:
-      description: Server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SimpleError'
-          example:
-            error: An error occurred while processing your request. Please try again later.
-    AuthBadRequest:
-      description: Bad request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AuthError'
-          example:
-            error:
-              code: BAD_REQUEST
-              message: The request payload is invalid.
-    Unauthorized:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UnauthorizedError'
-          example:
-            detail: Unauthorized request
-    BadRequest:
-      description: Bad request - invalid parameters
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: BAD_REQUEST
-              message: Invalid request parameters
-              details:
-                invalid_columns:
-                - BadColumn
-                allowed_columns: Please check documentation for valid column names
-    Unauthorized_2:
-      description: Unauthorized - invalid or missing JWT token
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: UNAUTHORIZED
-              message: Invalid or missing JWT token
   schemas:
-    SimpleError:
-      type: object
-      required:
-      - error
-      properties:
-        error:
-          type: string
     UnauthorizedError:
       type: object
       required:
@@ -216,22 +156,13 @@ components:
       properties:
         detail:
           type: string
-    AuthError:
+    SimpleError:
       type: object
-      title: Error
       required:
       - error
       properties:
         error:
-          type: object
-          required:
-          - code
-          - message
-          properties:
-            code:
-              type: string
-            message:
-              type: string
+          type: string
     TokenResponse:
       type: object
       title: TokenResponse
@@ -251,22 +182,22 @@ components:
           type: string
           description: Token type.
           example: Bearer
-    ValidationErrorDetail:
+    AuthError:
       type: object
-      description: Single field validation error
+      title: Error
+      required:
+      - error
       properties:
-        field:
-          type: string
-          description: Location of the validation error (e.g. body.Parameters.portfolio)
-          example: body.Parameters.portfolio
-        message:
-          type: string
-          description: Human-readable error message
-          example: field required
-        type:
-          type: string
-          description: Machine-readable error type
-          example: value_error.missing
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+            message:
+              type: string
     Error:
       type: object
       description: Standard error envelope used by the API
@@ -295,6 +226,73 @@ components:
                   $ref: '#/components/schemas/ValidationErrorDetail'
               - type: object
               - type: string
+    ValidationErrorDetail:
+      type: object
+      description: Single field validation error
+      properties:
+        field:
+          type: string
+          description: Location of the validation error (e.g. body.Parameters.portfolio)
+          example: body.Parameters.portfolio
+        message:
+          type: string
+          description: Human-readable error message
+          example: field required
+        type:
+          type: string
+          description: Machine-readable error type
+          example: value_error.missing
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+          example:
+            detail: Unauthorized request
+    AuthBadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthError'
+          example:
+            error:
+              code: BAD_REQUEST
+              message: The request payload is invalid.
+    InternalServerError:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: An error occurred while processing your request. Please try again later.
+    BadRequest:
+      description: Bad request - invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: BAD_REQUEST
+              message: Invalid request parameters
+              details:
+                invalid_columns:
+                - BadColumn
+                allowed_columns: Please check documentation for valid column names
+    Unauthorized_2:
+      description: Unauthorized - invalid or missing JWT token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: UNAUTHORIZED
+              message: Invalid or missing JWT token
   securitySchemes:
     BearerAuth:
       type: http

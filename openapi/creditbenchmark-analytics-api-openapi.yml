@@ -18,14 +18,14 @@ servers:
 security:
 - BearerAuth: []
 tags:
-- name: analytics
+- name: Analytics
   description: Analytics endpoints.
   x-group: Analytics
 paths:
   /analytics/v2/data/aggregatetrend:
     post:
       tags:
-      - analytics
+      - Analytics
       summary: Aggregate Trend
       description: Time series of aggregate credit metrics for a scoped entity universe. Use to track how consensus credit quality moves over time.
       operationId: aggregateTrend
@@ -90,7 +90,7 @@ paths:
   /analytics/v2/data/entityratingchange:
     post:
       tags:
-      - analytics
+      - Analytics
       summary: Entity Rating Change
       description: Entity-level rating changes over a lookback window. Use to identify upgrades and downgrades across a portfolio.
       operationId: entityRatingChange
@@ -169,7 +169,7 @@ paths:
   /analytics/v2/data/creditbreakdown:
     post:
       tags:
-      - analytics
+      - Analytics
       summary: Credit Breakdown
       description: Credit quality snapshot broken down by a facet column — sector, country, industry, or any facetable field.
       operationId: creditBreakdown
@@ -238,7 +238,7 @@ paths:
   /analytics/v2/data/ratingdistribution:
     post:
       tags:
-      - analytics
+      - Analytics
       summary: Rating Distribution
       description: Share of entities in each rating bucket over time for a scoped universe.
       operationId: ratingDistribution
@@ -310,11 +310,9 @@ paths:
   /api/analytics/custom-aggregate:
     post:
       tags:
-      - analytics
+      - Analytics
       summary: Custom Aggregate
-      description: 'Return aggregate trend metrics.
-
-        '
+      description: Return aggregate trend metrics.
       operationId: customAggregate
       requestBody:
         required: true
@@ -361,11 +359,9 @@ paths:
   /api/analytics/rating-distribution:
     post:
       tags:
-      - analytics
+      - Analytics
       summary: Rating Distribution
-      description: 'Return rating distribution data.
-
-        '
+      description: Return rating distribution data.
       operationId: ratingDistribution
       requestBody:
         required: true
@@ -408,127 +404,28 @@ paths:
     - url: https://api.creditbenchmark.com
       description: Production server
 components:
-  responses:
-    InternalServerError:
-      description: Server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SimpleError'
-          example:
-            error: An error occurred while processing your request. Please try again later.
-    TooManyRequests:
-      description: Too many requests
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/RateLimitError'
-          example:
-            error: Rate limit exceeded
-            detail: 60 per 1 minute
-    Unauthorized:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UnauthorizedError'
-          example:
-            detail: Unauthorized request
-    Forbidden:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SimpleError'
-          example:
-            error: Client-backed analytics inputs require contributor entitlement.
-    FrameworkValidationError:
-      description: Validation error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/FastApiValidationErrorResponse'
-          example:
-            detail:
-            - loc:
-              - body
-              - effective_date
-              msg: Input should be a valid integer
-              type: int_parsing
-    BadRequest:
-      description: Bad request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SimpleError'
-          example:
-            error: 'Invalid request parameters: scope requires at least ''portfolio'' or ''filters''.'
-    Forbidden_2:
-      description: Forbidden - insufficient permissions or access denied
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: PERMISSION_DENIED
-              message: Insufficient permissions for this resource
-    InternalServerError_2:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: INTERNAL_SERVER_ERROR
-              message: An unexpected error occurred.
-    BadRequest_2:
-      description: Bad request - invalid parameters
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: BAD_REQUEST
-              message: Invalid request parameters
-              details:
-                invalid_columns:
-                - BadColumn
-                allowed_columns: Please check documentation for valid column names
-    Unauthorized_2:
-      description: Unauthorized - invalid or missing JWT token
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: UNAUTHORIZED
-              message: Invalid or missing JWT token
-    ValidationError:
-      description: Validation error - request parameters are invalid
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: VALIDATION_ERROR
-              message: Request validation failed
-              details:
-              - field: body.Parameters.portfolio
-                message: field required
-                type: value_error.missing
   schemas:
-    UnauthorizedError:
+    RateLimitError:
       type: object
       required:
+      - error
       - detail
       properties:
+        error:
+          type: string
         detail:
           type: string
+    NumberArray:
+      type: array
+      items:
+        type: number
+    ScalarValue:
+      anyOf:
+      - type: string
+      - type: integer
+      - type: number
+      - type: boolean
+      - type: 'null'
     ResultFilterSort:
       type: object
       additionalProperties: false
@@ -545,10 +442,47 @@ components:
           - desc
           default: desc
           description: Sort direction.
-    FilterValue:
-      anyOf:
-      - $ref: '#/components/schemas/ScalarValue'
-      - $ref: '#/components/schemas/ColumnArray'
+    EntityRatingChangeResponse:
+      type: object
+      description: Entity rating change results.
+      properties:
+        CB_ID:
+          $ref: '#/components/schemas/StringArray'
+        CB_Legal_Name:
+          $ref: '#/components/schemas/StringArray'
+        CB_CCR:
+          $ref: '#/components/schemas/ColumnArray'
+        CB_CCR_PD:
+          $ref: '#/components/schemas/NumberArray'
+        CB_CCR_Change:
+          $ref: '#/components/schemas/NumberArray'
+        CB_CCR_PD_Change:
+          $ref: '#/components/schemas/NumberArray'
+        CB_CCR_Change_With_OCI:
+          $ref: '#/components/schemas/NumberArray'
+        ClientRating:
+          $ref: '#/components/schemas/ColumnArray'
+        ClientPD:
+          $ref: '#/components/schemas/NumberArray'
+        client_change:
+          $ref: '#/components/schemas/NumberArray'
+        client_change_w_oci:
+          $ref: '#/components/schemas/NumberArray'
+      patternProperties:
+        ^CB_CCR_\d+M$:
+          $ref: '#/components/schemas/ColumnArray'
+        ^CB_CCR_PD_\d+M$:
+          $ref: '#/components/schemas/NumberArray'
+        ^ClientRating_\d+M$:
+          $ref: '#/components/schemas/ColumnArray'
+        ^ClientPD_\d+M$:
+          $ref: '#/components/schemas/NumberArray'
+      additionalProperties:
+        $ref: '#/components/schemas/ColumnArray'
+    ColumnArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/ScalarValue'
     AggregateTrendResponse:
       type: object
       description: Aggregate trend results.
@@ -587,244 +521,10 @@ components:
           $ref: '#/components/schemas/NumberArray'
       additionalProperties:
         $ref: '#/components/schemas/ColumnArray'
-    AggregateTrendRequest:
-      type: object
-      required:
-      - scope
-      properties:
-        metric:
-          type: string
-          enum:
-          - CCR
-          - MyRating
-          default: CCR
-          description: Metric to compute. Use `CCR` for consensus analytics or `MyRating` for client-specific analytics.
-        rating_scale:
-          type: string
-          enum:
-          - CB21
-          - CB7
-          - MyScale
-          default: CB21
-          description: Rating scale to map results onto. Use `CB21`, `CB7`, or `MyScale` for the requesting bank's master scale.
-        effective_date:
-          type: integer
-          description: As-of date in YYYYMMDD format. If omitted, the latest available date is used.
-        lookback_period:
-          type: integer
-          minimum: 0
-          default: 24
-          description: Number of `lookback_unit` intervals before `effective_date`.
-        lookback_unit:
-          type: string
-          enum:
-          - months
-          - quarters
-          - years
-          default: months
-        scope:
-          $ref: '#/components/schemas/Scope'
-        facet_column:
-          type: string
-          description: Optional facetable column to segment the aggregate. Built-in facetable columns and custom `scope.portfolio` columns are supported.
-        result_filter:
-          $ref: '#/components/schemas/ResultFilter'
-    CreditBreakdownResponse:
-      type: object
-      description: Credit breakdown results.
-      properties:
-        AGG_EntityCount:
-          $ref: '#/components/schemas/IntegerArray'
-        AGG_CCR:
-          $ref: '#/components/schemas/ColumnArray'
-        AGG_CCRPD:
-          $ref: '#/components/schemas/NumberArray'
-        AGG_Upgrades:
-          $ref: '#/components/schemas/IntegerArray'
-        AGG_Downgrades:
-          $ref: '#/components/schemas/IntegerArray'
-        AGG_NetUpMinusDown:
-          $ref: '#/components/schemas/NumberArray'
-        AGG_ClientRating:
-          $ref: '#/components/schemas/ColumnArray'
-        AGG_ClientPD:
-          $ref: '#/components/schemas/NumberArray'
-        AGG_ExMeRating:
-          $ref: '#/components/schemas/ColumnArray'
-        AGG_ExMePD:
-          $ref: '#/components/schemas/NumberArray'
-        AGG_NotchDifference:
-          $ref: '#/components/schemas/NumberArray'
-        AGG_NotchDiffAggressive:
-          $ref: '#/components/schemas/IntegerArray'
-        AGG_NotchDiffConsistent:
-          $ref: '#/components/schemas/IntegerArray'
-        AGG_NotchDiffConservative:
-          $ref: '#/components/schemas/IntegerArray'
-      additionalProperties:
-        $ref: '#/components/schemas/ColumnArray'
-    ScopePortfolio:
-      type: object
-      description: Explicit entity universe. `CB_ID` is required. Any extra keys are treated as custom portfolio columns.
-      required:
-      - CB_ID
-      properties:
-        CB_ID:
-          type: array
-          items:
-            type: string
-          description: List of Credit Benchmark entity identifiers.
-      additionalProperties: true
-    ResultFilterCondition:
-      type: object
-      additionalProperties: false
-      required:
-      - key
-      - operator
-      properties:
-        key:
-          type: string
-          description: Supported result field name to filter after the analytic has been computed. Valid values come from returned analytic fields or documented route aliases, not arbitrary source columns.
-        operator:
-          type: string
-          enum:
-          - ==
-          - '!='
-          - '>'
-          - <
-          - '>='
-          - <=
-          - in
-          - not in
-          - contains
-          - starts with
-          - ends with
-          - does not contain
-          - does not start with
-          - does not end with
-          - is null
-          - is not null
-          description: Comparison operator.
-        values:
-          allOf:
-          - $ref: '#/components/schemas/FilterValue'
-          description: Single value or list of values for the filter. Not used for `is null` or `is not null`.
-    RatingDistributionResponse:
-      type: object
-      description: Rating distribution results.
-      properties:
-        CB_Effective_Date_ID:
-          $ref: '#/components/schemas/IntegerArray'
-        AGG_EntityCount:
-          $ref: '#/components/schemas/IntegerArray'
-      patternProperties:
-        ? ^(aaa|aa\+|aa|aa-|a\+|a|a-|bbb\+|bbb|bbb-|bb\+|bb|bb-|b\+|b|b-|ccc\+|ccc|ccc-|cc|c|0\.1|1\.1|1\.2|2\.1|2\.2|3\.1|3\.2|3\.3|4\.1|4\.2|4\.3|5\.1|5\.2|5\.3|6\.1|6\.2|7\.1|7\.2|8\.1|8\.2|8\.3)$
-        : $ref: '#/components/schemas/NumberArray'
-      additionalProperties:
-        $ref: '#/components/schemas/ColumnArray'
-    ColumnArray:
-      type: array
-      items:
-        $ref: '#/components/schemas/ScalarValue'
-    ScopeFilter:
-      type: object
-      additionalProperties: false
-      required:
-      - key
-      - operator
-      properties:
-        key:
-          type: string
-          description: Public input column used to build or filter the universe. Only supported scopeable columns are allowed; see `/v2/metadata/columns`.
-        operator:
-          type: string
-          enum:
-          - ==
-          - '!='
-          - '>'
-          - <
-          - '>='
-          - <=
-          - in
-          - not in
-          - is null
-          - is not null
-          description: Comparison operator.
-        values:
-          $ref: '#/components/schemas/FilterValue'
-          description: Single value or list of values for the filter. Use an empty string for `is null` or `is not null`.
-    EntityRatingChangeResponse:
-      type: object
-      description: Entity rating change results.
-      properties:
-        CB_ID:
-          $ref: '#/components/schemas/StringArray'
-        CB_Legal_Name:
-          $ref: '#/components/schemas/StringArray'
-        CB_CCR:
-          $ref: '#/components/schemas/ColumnArray'
-        CB_CCR_PD:
-          $ref: '#/components/schemas/NumberArray'
-        CB_CCR_Change:
-          $ref: '#/components/schemas/NumberArray'
-        CB_CCR_PD_Change:
-          $ref: '#/components/schemas/NumberArray'
-        CB_CCR_Change_With_OCI:
-          $ref: '#/components/schemas/NumberArray'
-        ClientRating:
-          $ref: '#/components/schemas/ColumnArray'
-        ClientPD:
-          $ref: '#/components/schemas/NumberArray'
-        client_change:
-          $ref: '#/components/schemas/NumberArray'
-        client_change_w_oci:
-          $ref: '#/components/schemas/NumberArray'
-      patternProperties:
-        ^CB_CCR_\d+M$:
-          $ref: '#/components/schemas/ColumnArray'
-        ^CB_CCR_PD_\d+M$:
-          $ref: '#/components/schemas/NumberArray'
-        ^ClientRating_\d+M$:
-          $ref: '#/components/schemas/ColumnArray'
-        ^ClientPD_\d+M$:
-          $ref: '#/components/schemas/NumberArray'
-      additionalProperties:
-        $ref: '#/components/schemas/ColumnArray'
-    ResultFilter:
-      type: object
-      additionalProperties: false
-      description: Filtering, sorting, and limiting applied after an analytic has computed its results. `filters[].key` and `sort.field` must reference supported result fields for the selected route. Some routes also accept documented alias names that map to returned fields.
-      properties:
-        limit:
-          type: integer
-          minimum: 1
-          description: Return only the first N rows after `filters` and `sort` are applied.
-        filters:
-          type: array
-          description: Filters applied to computed result rows. These do not change the analytic itself.
-          items:
-            $ref: '#/components/schemas/ResultFilterCondition'
-        filters_join:
-          type: array
-          items:
-            type: string
-          description: Optional logic used to join `filters`. Length must be `len(filters)+1`. If omitted, conditions are AND-joined.
-        sort:
-          type: array
-          items:
-            $ref: '#/components/schemas/ResultFilterSort'
-          description: Priority-ordered sort rules.
-    IntegerArray:
-      type: array
-      items:
-        type: integer
-    ScalarValue:
+    FilterValue:
       anyOf:
-      - type: string
-      - type: integer
-      - type: number
-      - type: boolean
-      - type: 'null'
+      - $ref: '#/components/schemas/ScalarValue'
+      - $ref: '#/components/schemas/ColumnArray'
     FastApiValidationErrorResponse:
       type: object
       required:
@@ -834,144 +534,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/FastApiValidationErrorDetail'
-    StringArray:
-      type: array
-      items:
-        type: string
-    RatingDistributionRequest:
-      type: object
-      required:
-      - scope
-      properties:
-        metric:
-          type: string
-          enum:
-          - CCR
-          - MyRating
-          default: CCR
-          description: Metric to compute. Use `CCR` for consensus analytics or `MyRating` for client-specific analytics.
-        rating_scale:
-          type: string
-          enum:
-          - CB21
-          - CB7
-          - MyScale
-          default: CB21
-          description: Rating scale used to name the distribution buckets. Use `CB21`, `CB7`, or `MyScale`.
-        effective_date:
-          type: integer
-          description: As-of date in YYYYMMDD format. If omitted, the latest available date is used.
-        lookback_period:
-          type: integer
-          minimum: 0
-          default: 0
-          description: Number of `lookback_unit` intervals before `effective_date`.
-        lookback_unit:
-          type: string
-          enum:
-          - months
-          - quarters
-          - years
-          default: months
-        scope:
-          $ref: '#/components/schemas/Scope'
-        facet_column:
-          type: string
-          description: Optional facetable column to group the distribution by. Built-in facetable columns and custom `scope.portfolio` columns are supported.
-        result_filter:
-          $ref: '#/components/schemas/ResultFilter'
-    Scope:
-      type: object
-      additionalProperties: false
-      description: Defines the input universe. Use `portfolio`, `filters`, or both.
-      properties:
-        portfolio:
-          $ref: '#/components/schemas/ScopePortfolio'
-        filters:
-          type: array
-          items:
-            $ref: '#/components/schemas/ScopeFilter'
-          description: Universe filters. Use them alone to build the universe from public columns, or with `portfolio` to subset the supplied portfolio. Only built-in scopeable columns are allowed in `filters[].key`; custom `scope.portfolio` columns are not valid scope filters.
-        filters_join:
-          type: array
-          items:
-            type: string
-          description: Optional logic used to join `filters`. Only `&`, `|`, and `~` are supported. Length must be `len(filters)+1`.
-    NumberArray:
-      type: array
-      items:
-        type: number
-    EntityRatingChangeRequest:
-      type: object
-      required:
-      - scope
-      properties:
-        metric:
-          type: string
-          enum:
-          - CCR
-          - MyRating
-          default: CCR
-          description: Metric to compute. Use `CCR` for consensus analytics or `MyRating` for client-specific analytics.
-        rating_scale:
-          type: string
-          enum:
-          - CB21
-          - CB7
-          - MyScale
-          default: CB21
-          description: Rating scale to map results onto. Use `CB21`, `CB7`, or `MyScale` for the requesting bank's master scale.
-        effective_date:
-          type: integer
-          description: As-of date in YYYYMMDD format. If omitted, the latest available date is used.
-        lookback_period:
-          type: integer
-          minimum: 0
-          default: 6
-          description: Number of `lookback_unit` intervals used for the rating-change window.
-        lookback_unit:
-          type: string
-          enum:
-          - months
-          - quarters
-          - years
-          default: months
-        scope:
-          $ref: '#/components/schemas/Scope'
-        result_filter:
-          allOf:
-          - $ref: '#/components/schemas/ResultFilter'
-          description: Optional result shaping applied after rating-change rows are computed. This route accepts final response fields such as `CB_ID`, `CB_CCR_PD_Change`, and `ClientRating_Change`, and stable aliases such as `entity.*`, `metrics.*`, and `client.*` when those fields are present.
-    SimpleError:
-      type: object
-      required:
-      - error
-      properties:
-        error:
-          type: string
-    FastApiValidationErrorDetail:
-      type: object
-      properties:
-        loc:
-          type: array
-          items:
-            oneOf:
-            - type: string
-            - type: integer
-        msg:
-          type: string
-        type:
-          type: string
-    RateLimitError:
-      type: object
-      required:
-      - error
-      - detail
-      properties:
-        error:
-          type: string
-        detail:
-          type: string
     CreditBreakdownRequest:
       type: object
       required:
@@ -1015,84 +577,343 @@ components:
           description: Column to summarize by. Built-in facetable columns and custom `scope.portfolio` columns are supported.
         result_filter:
           $ref: '#/components/schemas/ResultFilter'
-    CustomAggregateRequest:
+    StringArray:
+      type: array
+      items:
+        type: string
+    CreditBreakdownResponse:
+      type: object
+      description: Credit breakdown results.
+      properties:
+        AGG_EntityCount:
+          $ref: '#/components/schemas/IntegerArray'
+        AGG_CCR:
+          $ref: '#/components/schemas/ColumnArray'
+        AGG_CCRPD:
+          $ref: '#/components/schemas/NumberArray'
+        AGG_Upgrades:
+          $ref: '#/components/schemas/IntegerArray'
+        AGG_Downgrades:
+          $ref: '#/components/schemas/IntegerArray'
+        AGG_NetUpMinusDown:
+          $ref: '#/components/schemas/NumberArray'
+        AGG_ClientRating:
+          $ref: '#/components/schemas/ColumnArray'
+        AGG_ClientPD:
+          $ref: '#/components/schemas/NumberArray'
+        AGG_ExMeRating:
+          $ref: '#/components/schemas/ColumnArray'
+        AGG_ExMePD:
+          $ref: '#/components/schemas/NumberArray'
+        AGG_NotchDifference:
+          $ref: '#/components/schemas/NumberArray'
+        AGG_NotchDiffAggressive:
+          $ref: '#/components/schemas/IntegerArray'
+        AGG_NotchDiffConsistent:
+          $ref: '#/components/schemas/IntegerArray'
+        AGG_NotchDiffConservative:
+          $ref: '#/components/schemas/IntegerArray'
+      additionalProperties:
+        $ref: '#/components/schemas/ColumnArray'
+    ScopeFilter:
+      type: object
+      additionalProperties: false
+      required:
+      - key
+      - operator
+      properties:
+        key:
+          type: string
+          description: Public input column used to build or filter the universe. Only supported scopeable columns are allowed; see `/v2/metadata/columns`.
+        operator:
+          type: string
+          enum:
+          - ==
+          - '!='
+          - '>'
+          - <
+          - '>='
+          - <=
+          - in
+          - not in
+          - is null
+          - is not null
+          description: Comparison operator.
+        values:
+          $ref: '#/components/schemas/FilterValue'
+          description: Single value or list of values for the filter. Use an empty string for `is null` or `is not null`.
+    Scope:
+      type: object
+      additionalProperties: false
+      description: Defines the input universe. Use `portfolio`, `filters`, or both.
       properties:
         portfolio:
-          $ref: '#/components/schemas/Portfolio'
-        EffectiveDateId:
+          $ref: '#/components/schemas/ScopePortfolio'
+        filters:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScopeFilter'
+          description: Universe filters. Use them alone to build the universe from public columns, or with `portfolio` to subset the supplied portfolio. Only built-in scopeable columns are allowed in `filters[].key`; custom `scope.portfolio` columns are not valid scope filters.
+        filters_join:
+          type: array
+          items:
+            type: string
+          description: Optional logic used to join `filters`. Only `&`, `|`, and `~` are supported. Length must be `len(filters)+1`.
+    UnauthorizedError:
+      type: object
+      required:
+      - detail
+      properties:
+        detail:
+          type: string
+    AggregateTrendRequest:
+      type: object
+      required:
+      - scope
+      properties:
+        metric:
+          type: string
+          enum:
+          - CCR
+          - MyRating
+          default: CCR
+          description: Metric to compute. Use `CCR` for consensus analytics or `MyRating` for client-specific analytics.
+        rating_scale:
+          type: string
+          enum:
+          - CB21
+          - CB7
+          - MyScale
+          default: CB21
+          description: Rating scale to map results onto. Use `CB21`, `CB7`, or `MyScale` for the requesting bank's master scale.
+        effective_date:
           type: integer
-          title: Effectivedateid
-        effectivedateid_min_lag_months:
+          description: As-of date in YYYYMMDD format. If omitted, the latest available date is used.
+        lookback_period:
           type: integer
-          title: Effectivedateid Min Lag Months
+          minimum: 0
           default: 24
-        use_client_scale:
-          type: boolean
-          title: Use Client Scale
-          default: false
+          description: Number of `lookback_unit` intervals before `effective_date`.
+        lookback_unit:
+          type: string
+          enum:
+          - months
+          - quarters
+          - years
+          default: months
+        scope:
+          $ref: '#/components/schemas/Scope'
         facet_column:
           type: string
-          title: Facet Column
-          description: Optional column to group by (e.g., Sector, Industry)
+          description: Optional facetable column to segment the aggregate. Built-in facetable columns and custom `scope.portfolio` columns are supported.
+        result_filter:
+          $ref: '#/components/schemas/ResultFilter'
+    ScopePortfolio:
+      type: object
+      description: Explicit entity universe. `CB_ID` is required. Any extra keys are treated as custom portfolio columns.
+      required:
+      - CB_ID
+      properties:
+        CB_ID:
+          type: array
+          items:
+            type: string
+          description: List of Credit Benchmark entity identifiers.
+      additionalProperties: true
+    ResultFilter:
+      type: object
+      additionalProperties: false
+      description: Filtering, sorting, and limiting applied after an analytic has computed its results. `filters[].key` and `sort.field` must reference supported result fields for the selected route. Some routes also accept documented alias names that map to returned fields.
+      properties:
+        limit:
+          type: integer
+          minimum: 1
+          description: Return only the first N rows after `filters` and `sort` are applied.
+        filters:
+          type: array
+          description: Filters applied to computed result rows. These do not change the analytic itself.
+          items:
+            $ref: '#/components/schemas/ResultFilterCondition'
+        filters_join:
+          type: array
+          items:
+            type: string
+          description: Optional logic used to join `filters`. Length must be `len(filters)+1`. If omitted, conditions are AND-joined.
+        sort:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResultFilterSort'
+          description: Priority-ordered sort rules.
+    ResultFilterCondition:
+      type: object
+      additionalProperties: false
+      required:
+      - key
+      - operator
+      properties:
+        key:
+          type: string
+          description: Supported result field name to filter after the analytic has been computed. Valid values come from returned analytic fields or documented route aliases, not arbitrary source columns.
+        operator:
+          type: string
+          enum:
+          - ==
+          - '!='
+          - '>'
+          - <
+          - '>='
+          - <=
+          - in
+          - not in
+          - contains
+          - starts with
+          - ends with
+          - does not contain
+          - does not start with
+          - does not end with
+          - is null
+          - is not null
+          description: Comparison operator.
+        values:
+          allOf:
+          - $ref: '#/components/schemas/FilterValue'
+          description: Single value or list of values for the filter. Not used for `is null` or `is not null`.
+    EntityRatingChangeRequest:
       type: object
       required:
-      - portfolio
-      title: CustomAggregateRequest
-    RatingDistributionRequest_2:
+      - scope
       properties:
-        portfolio:
-          $ref: '#/components/schemas/Portfolio'
-        EffectiveDateId:
+        metric:
+          type: string
+          enum:
+          - CCR
+          - MyRating
+          default: CCR
+          description: Metric to compute. Use `CCR` for consensus analytics or `MyRating` for client-specific analytics.
+        rating_scale:
+          type: string
+          enum:
+          - CB21
+          - CB7
+          - MyScale
+          default: CB21
+          description: Rating scale to map results onto. Use `CB21`, `CB7`, or `MyScale` for the requesting bank's master scale.
+        effective_date:
           type: integer
-          title: Effectivedateid
-        effectivedateid_min:
+          description: As-of date in YYYYMMDD format. If omitted, the latest available date is used.
+        lookback_period:
           type: integer
-          title: Effectivedateid Min
-        effectivedateid_min_lag_months:
+          minimum: 0
+          default: 6
+          description: Number of `lookback_unit` intervals used for the rating-change window.
+        lookback_unit:
+          type: string
+          enum:
+          - months
+          - quarters
+          - years
+          default: months
+        scope:
+          $ref: '#/components/schemas/Scope'
+        result_filter:
+          allOf:
+          - $ref: '#/components/schemas/ResultFilter'
+          description: Optional result shaping applied after rating-change rows are computed. This route accepts final response fields such as `CB_ID`, `CB_CCR_PD_Change`, and `ClientRating_Change`, and stable aliases such as `entity.*`, `metrics.*`, and `client.*` when those fields are present.
+    RatingDistributionResponse:
+      type: object
+      description: Rating distribution results.
+      properties:
+        CB_Effective_Date_ID:
+          $ref: '#/components/schemas/IntegerArray'
+        AGG_EntityCount:
+          $ref: '#/components/schemas/IntegerArray'
+      patternProperties:
+        ? ^(aaa|aa\+|aa|aa-|a\+|a|a-|bbb\+|bbb|bbb-|bb\+|bb|bb-|b\+|b|b-|ccc\+|ccc|ccc-|cc|c|0\.1|1\.1|1\.2|2\.1|2\.2|3\.1|3\.2|3\.3|4\.1|4\.2|4\.3|5\.1|5\.2|5\.3|6\.1|6\.2|7\.1|7\.2|8\.1|8\.2|8\.3)$
+        : $ref: '#/components/schemas/NumberArray'
+      additionalProperties:
+        $ref: '#/components/schemas/ColumnArray'
+    SimpleError:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: string
+    FastApiValidationErrorDetail:
+      type: object
+      properties:
+        loc:
+          type: array
+          items:
+            oneOf:
+            - type: string
+            - type: integer
+        msg:
+          type: string
+        type:
+          type: string
+    RatingDistributionRequest:
+      type: object
+      required:
+      - scope
+      properties:
+        metric:
+          type: string
+          enum:
+          - CCR
+          - MyRating
+          default: CCR
+          description: Metric to compute. Use `CCR` for consensus analytics or `MyRating` for client-specific analytics.
+        rating_scale:
+          type: string
+          enum:
+          - CB21
+          - CB7
+          - MyScale
+          default: CB21
+          description: Rating scale used to name the distribution buckets. Use `CB21`, `CB7`, or `MyScale`.
+        effective_date:
           type: integer
-          title: Effectivedateid Min Lag Months
+          description: As-of date in YYYYMMDD format. If omitted, the latest available date is used.
+        lookback_period:
+          type: integer
+          minimum: 0
           default: 0
-        use_client_scale:
-          type: boolean
-          title: Use Client Scale
-          default: false
-        use_cb7_scale:
-          type: boolean
-          title: Use Cb7 Scale
-          default: false
+          description: Number of `lookback_unit` intervals before `effective_date`.
+        lookback_unit:
+          type: string
+          enum:
+          - months
+          - quarters
+          - years
+          default: months
+        scope:
+          $ref: '#/components/schemas/Scope'
         facet_column:
           type: string
-          title: Facet Column
-          description: Column to group by (e.g., Sector, Region, Industry)
+          description: Optional facetable column to group the distribution by. Built-in facetable columns and custom `scope.portfolio` columns are supported.
+        result_filter:
+          $ref: '#/components/schemas/ResultFilter'
+    IntegerArray:
+      type: array
+      items:
+        type: integer
+    ValidationErrorDetail:
       type: object
-      required:
-      - portfolio
-      title: RatingDistributionRequest
-    Portfolio:
+      description: Single field validation error
       properties:
-        name:
+        field:
           type: string
-          title: Name
-          example: Example Portfolio
-        entities:
-          $ref: '#/components/schemas/FlexibleCBPortfolio'
-          example:
-            CBId:
-            - CB000000123
-            - CB000000456
-      type: object
-      required:
-      - name
-      - entities
-      title: Portfolio
-    RequestEnvelope_CustomAggregateRequest:
-      properties:
-        Parameters:
-          $ref: '#/components/schemas/CustomAggregateRequest'
-      type: object
-      required:
-      - Parameters
-      title: RequestEnvelope_CustomAggregateRequest
+          description: Location of the validation error (e.g. body.Parameters.portfolio)
+          example: body.Parameters.portfolio
+        message:
+          type: string
+          description: Human-readable error message
+          example: field required
+        type:
+          type: string
+          description: Machine-readable error type
+          example: value_error.missing
     FlexibleCBPortfolio:
       properties:
         CBId:
@@ -1111,6 +932,14 @@ components:
       required:
       - Parameters
       title: RequestEnvelope_RatingDistributionRequest
+    RequestEnvelope_CustomAggregateRequest:
+      properties:
+        Parameters:
+          $ref: '#/components/schemas/CustomAggregateRequest'
+      type: object
+      required:
+      - Parameters
+      title: RequestEnvelope_CustomAggregateRequest
     CustomAggregateResponse:
       type: object
       description: Response containing facet values and aggregated metrics over time
@@ -1203,6 +1032,104 @@ components:
           - bbb-
           - bbb-
           - bbb-
+    CustomAggregateRequest:
+      properties:
+        portfolio:
+          $ref: '#/components/schemas/Portfolio'
+        EffectiveDateId:
+          type: integer
+          title: Effectivedateid
+        effectivedateid_min_lag_months:
+          type: integer
+          title: Effectivedateid Min Lag Months
+          default: 24
+        use_client_scale:
+          type: boolean
+          title: Use Client Scale
+          default: false
+        facet_column:
+          type: string
+          title: Facet Column
+          description: Optional column to group by (e.g., Sector, Industry)
+      type: object
+      required:
+      - portfolio
+      title: CustomAggregateRequest
+    RatingDistributionRequest_2:
+      properties:
+        portfolio:
+          $ref: '#/components/schemas/Portfolio'
+        EffectiveDateId:
+          type: integer
+          title: Effectivedateid
+        effectivedateid_min:
+          type: integer
+          title: Effectivedateid Min
+        effectivedateid_min_lag_months:
+          type: integer
+          title: Effectivedateid Min Lag Months
+          default: 0
+        use_client_scale:
+          type: boolean
+          title: Use Client Scale
+          default: false
+        use_cb7_scale:
+          type: boolean
+          title: Use Cb7 Scale
+          default: false
+        facet_column:
+          type: string
+          title: Facet Column
+          description: Column to group by (e.g., Sector, Region, Industry)
+      type: object
+      required:
+      - portfolio
+      title: RatingDistributionRequest
+    Error:
+      type: object
+      description: Standard error envelope used by the API
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+              description: Machine-readable error code
+              example: BAD_REQUEST
+            message:
+              type: string
+              description: Human-readable error message
+              example: Invalid request parameters
+            details:
+              description: Optional structured details about the error
+              oneOf:
+              - type: array
+                items:
+                  $ref: '#/components/schemas/ValidationErrorDetail'
+              - type: object
+              - type: string
+    Portfolio:
+      properties:
+        name:
+          type: string
+          title: Name
+          example: Example Portfolio
+        entities:
+          $ref: '#/components/schemas/FlexibleCBPortfolio'
+          example:
+            CBId:
+            - CB000000123
+            - CB000000456
+      type: object
+      required:
+      - name
+      - entities
+      title: Portfolio
     RatingDistributionResponse_2:
       type: object
       description: Response containing rating distribution with percentage of entities in each rating band
@@ -1405,50 +1332,119 @@ components:
           description: Percentage of entities rated C
           example:
           - 0
-    ValidationErrorDetail:
-      type: object
-      description: Single field validation error
-      properties:
-        field:
-          type: string
-          description: Location of the validation error (e.g. body.Parameters.portfolio)
-          example: body.Parameters.portfolio
-        message:
-          type: string
-          description: Human-readable error message
-          example: field required
-        type:
-          type: string
-          description: Machine-readable error type
-          example: value_error.missing
-    Error:
-      type: object
-      description: Standard error envelope used by the API
-      required:
-      - error
-      properties:
-        error:
-          type: object
-          required:
-          - code
-          - message
-          properties:
-            code:
-              type: string
-              description: Machine-readable error code
-              example: BAD_REQUEST
-            message:
-              type: string
-              description: Human-readable error message
-              example: Invalid request parameters
-            details:
-              description: Optional structured details about the error
-              oneOf:
-              - type: array
-                items:
-                  $ref: '#/components/schemas/ValidationErrorDetail'
-              - type: object
-              - type: string
+  responses:
+    InternalServerError:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: An error occurred while processing your request. Please try again later.
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: Client-backed analytics inputs require contributor entitlement.
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: 'Invalid request parameters: scope requires at least ''portfolio'' or ''filters''.'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+          example:
+            detail: Unauthorized request
+    TooManyRequests:
+      description: Too many requests
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RateLimitError'
+          example:
+            error: Rate limit exceeded
+            detail: 60 per 1 minute
+    FrameworkValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FastApiValidationErrorResponse'
+          example:
+            detail:
+            - loc:
+              - body
+              - effective_date
+              msg: Input should be a valid integer
+              type: int_parsing
+    ValidationError:
+      description: Validation error - request parameters are invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: VALIDATION_ERROR
+              message: Request validation failed
+              details:
+              - field: body.Parameters.portfolio
+                message: field required
+                type: value_error.missing
+    BadRequest_2:
+      description: Bad request - invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: BAD_REQUEST
+              message: Invalid request parameters
+              details:
+                invalid_columns:
+                - BadColumn
+                allowed_columns: Please check documentation for valid column names
+    Unauthorized_2:
+      description: Unauthorized - invalid or missing JWT token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: UNAUTHORIZED
+              message: Invalid or missing JWT token
+    InternalServerError_2:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: INTERNAL_SERVER_ERROR
+              message: An unexpected error occurred.
+    Forbidden_2:
+      description: Forbidden - insufficient permissions or access denied
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: PERMISSION_DENIED
+              message: Insufficient permissions for this resource
   securitySchemes:
     BearerAuth:
       type: http

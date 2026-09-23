@@ -1,9 +1,7 @@
 openapi: 3.2.0
 info:
   title: Credit Benchmark Entity Resolution API
-  description: 'Authentication, entity resolution, data, analytics, and metadata endpoints.
-
-    '
+  description: Authentication, entity resolution, data, analytics, and metadata endpoints.
   version: 1.0.0
   contact:
     name: Credit Benchmark API Support
@@ -18,14 +16,14 @@ servers:
 security:
 - BearerAuth: []
 tags:
-- name: entity-resolution
+- name: Entity Resolution
   description: Entity name resolution endpoints.
   x-group: Entity Resolution
 paths:
   /matching/text/match_external:
     post:
       tags:
-      - entity-resolution
+      - Entity Resolution
       summary: Entity Resolution
       description: Resolves entity names to Credit Benchmark identifiers. Returns ranked candidates with confidence scores.
       operationId: matchExternalEntities
@@ -88,54 +86,91 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 components:
-  responses:
-    Forbidden:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SimpleError'
-          example:
-            error: Client-backed analytics inputs require contributor entitlement.
-    InternalServerError:
-      description: Server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SimpleError'
-          example:
-            error: An error occurred while processing your request. Please try again later.
-    FrameworkValidationError:
-      description: Validation error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/FastApiValidationErrorResponse'
-          example:
-            detail:
-            - loc:
-              - body
-              - effective_date
-              msg: Input should be a valid integer
-              type: int_parsing
-    Unauthorized:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UnauthorizedError'
-          example:
-            detail: Unauthorized request
   schemas:
-    FastApiValidationErrorResponse:
+    ExternalMatchBody:
+      type: object
+      additionalProperties: false
+      properties:
+        entities:
+          type: array
+          description: 'Entities to match using the external route contract. Empty arrays are allowed and return `results: []`.'
+          items:
+            $ref: '#/components/schemas/ExternalMatchEntity'
+          default: []
+        limit:
+          type: integer
+          default: 3
+          description: Maximum candidates to return per entity row. Valid integer values are 1 through 10. Omitted or out-of-range integers are normalized to 3; malformed non-integer values fail validation.
+    ExternalMatchEntity:
+      type: object
+      additionalProperties: false
+      required:
+      - entity_name
+      properties:
+        entity_name:
+          type: string
+          minLength: 1
+          description: The company or entity name to match. Whitespace is trimmed and blank values are rejected.
+        country:
+          type: string
+          description: Optional country name or ISO 3166-1 alpha-2 country code. Blank values are treated as omitted.
+        industry:
+          type: string
+          description: Optional industry hint. Blank values are treated as omitted.
+        lei:
+          type: string
+          description: Optional LEI hint. Blank values are treated as omitted.
+    MatchExternalResponse:
+      type: object
+      required:
+      - results
+      properties:
+        results:
+          type: array
+          description: Table-style results keyed by input entity.
+          items:
+            $ref: '#/components/schemas/ExternalMatchRow'
+    SimpleError:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: string
+    FastApiValidationErrorDetail:
+      type: object
+      properties:
+        loc:
+          type: array
+          items:
+            oneOf:
+            - type: string
+            - type: integer
+        msg:
+          type: string
+        type:
+          type: string
+    UnauthorizedError:
       type: object
       required:
       - detail
       properties:
         detail:
+          type: string
+    ExternalMatchRow:
+      type: object
+      required:
+      - entity
+      - candidates
+      properties:
+        entity:
+          type: string
+          description: Original input `entity_name`.
+        candidates:
           type: array
+          description: Ordered candidates limited by the requested `limit`.
           items:
-            $ref: '#/components/schemas/FastApiValidationErrorDetail'
+            $ref: '#/components/schemas/ExternalCandidate'
     ExternalCandidate:
       type: object
       required:
@@ -162,90 +197,53 @@ components:
         confidence:
           type: number
           description: Matching confidence score.
-    SimpleError:
-      type: object
-      required:
-      - error
-      properties:
-        error:
-          type: string
-    MatchExternalResponse:
-      type: object
-      required:
-      - results
-      properties:
-        results:
-          type: array
-          description: Table-style results keyed by input entity.
-          items:
-            $ref: '#/components/schemas/ExternalMatchRow'
-    UnauthorizedError:
+    FastApiValidationErrorResponse:
       type: object
       required:
       - detail
       properties:
         detail:
-          type: string
-    ExternalMatchBody:
-      type: object
-      additionalProperties: false
-      properties:
-        entities:
-          type: array
-          description: 'Entities to match using the external route contract. Empty arrays are allowed and return `results: []`.'
-          items:
-            $ref: '#/components/schemas/ExternalMatchEntity'
-          default: []
-        limit:
-          type: integer
-          default: 3
-          description: Maximum candidates to return per entity row. Valid integer values are 1 through 10. Omitted or out-of-range integers are normalized to 3; malformed non-integer values fail validation.
-    ExternalMatchRow:
-      type: object
-      required:
-      - entity
-      - candidates
-      properties:
-        entity:
-          type: string
-          description: Original input `entity_name`.
-        candidates:
-          type: array
-          description: Ordered candidates limited by the requested `limit`.
-          items:
-            $ref: '#/components/schemas/ExternalCandidate'
-    ExternalMatchEntity:
-      type: object
-      additionalProperties: false
-      required:
-      - entity_name
-      properties:
-        entity_name:
-          type: string
-          minLength: 1
-          description: The company or entity name to match. Whitespace is trimmed and blank values are rejected.
-        country:
-          type: string
-          description: Optional country name or ISO 3166-1 alpha-2 country code. Blank values are treated as omitted.
-        industry:
-          type: string
-          description: Optional industry hint. Blank values are treated as omitted.
-        lei:
-          type: string
-          description: Optional LEI hint. Blank values are treated as omitted.
-    FastApiValidationErrorDetail:
-      type: object
-      properties:
-        loc:
           type: array
           items:
-            oneOf:
-            - type: string
-            - type: integer
-        msg:
-          type: string
-        type:
-          type: string
+            $ref: '#/components/schemas/FastApiValidationErrorDetail'
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+          example:
+            detail: Unauthorized request
+    InternalServerError:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: An error occurred while processing your request. Please try again later.
+    FrameworkValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FastApiValidationErrorResponse'
+          example:
+            detail:
+            - loc:
+              - body
+              - effective_date
+              msg: Input should be a valid integer
+              type: int_parsing
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: Client-backed analytics inputs require contributor entitlement.
   securitySchemes:
     BearerAuth:
       type: http

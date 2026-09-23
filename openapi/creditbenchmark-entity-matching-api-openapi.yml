@@ -1,9 +1,7 @@
 openapi: 3.2.0
 info:
   title: Credit Benchmark Entity Matching API
-  description: 'Authentication, matching, and analytics.
-
-    '
+  description: Authentication, matching, and analytics.
   version: 1.0.0
   contact:
     name: Credit Benchmark API Support
@@ -26,9 +24,7 @@ paths:
       tags:
       - Entity Matching
       summary: Entity Name Matching
-      description: 'Return ranked entity matches.
-
-        '
+      description: Return ranked entity matches.
       operationId: matchEntities
       requestBody:
         required: true
@@ -86,26 +82,20 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 components:
   responses:
-    Forbidden:
-      description: Forbidden - insufficient permissions or access denied
+    ValidationError:
+      description: Validation error - request parameters are invalid
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
           example:
             error:
-              code: PERMISSION_DENIED
-              message: Insufficient permissions for this resource
-    InternalServerError:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: INTERNAL_SERVER_ERROR
-              message: An unexpected error occurred.
+              code: VALIDATION_ERROR
+              message: Request validation failed
+              details:
+              - field: body.Parameters.portfolio
+                message: field required
+                type: value_error.missing
     BadRequest:
       description: Bad request - invalid parameters
       content:
@@ -130,43 +120,84 @@ components:
             error:
               code: UNAUTHORIZED
               message: Invalid or missing JWT token
-    ValidationError:
-      description: Validation error - request parameters are invalid
+    InternalServerError:
+      description: Internal server error
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
           example:
             error:
-              code: VALIDATION_ERROR
-              message: Request validation failed
-              details:
-              - field: body.Parameters.portfolio
-                message: field required
-                type: value_error.missing
+              code: INTERNAL_SERVER_ERROR
+              message: An unexpected error occurred.
+    Forbidden:
+      description: Forbidden - insufficient permissions or access denied
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: PERMISSION_DENIED
+              message: Insufficient permissions for this resource
   schemas:
-    Query:
+    ValidationErrorDetail:
       type: object
-      description: A single entity name query for matching
-      required:
-      - text
+      description: Single field validation error
       properties:
-        text:
+        field:
           type: string
-          description: The company name to match
+          description: Location of the validation error (e.g. body.Parameters.portfolio)
+          example: body.Parameters.portfolio
+        message:
+          type: string
+          description: Human-readable error message
+          example: field required
+        type:
+          type: string
+          description: Machine-readable error type
+          example: value_error.missing
+    MatchExternalResponse:
+      type: object
+      description: Response containing entity matching results
+      required:
+      - results
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExternalMatchRow'
+          description: Table-style results keyed by input entity
+          default: []
+    MatchBody:
+      type: object
+      description: Request body for entity name matching
+      required:
+      - queries
+      properties:
+        queries:
+          type: array
+          items:
+            $ref: '#/components/schemas/Query'
+          description: List of company names to match
+          minItems: 1
+    ExternalMatchRow:
+      type: object
+      description: Matching results for a single entity query
+      required:
+      - entity
+      - candidates
+      properties:
+        entity:
+          type: string
+          description: Original query text
           example: JPMorgan Chase & Co.
-        industry:
-          type: string
-          description: Optional industry filter to improve matching accuracy
-          example: Financials
-        lei:
-          type: string
-          description: Optional Legal Entity Identifier (LEI) for exact matching
-          example: 5493000X0X4X4X4X4X4X
-        country_name:
-          type: string
-          description: Optional country name or code to filter matches
-          example: United States
+        candidates:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExternalCandidate'
+          description: Ordered list of candidate matches, sorted by rank
+          default: []
     ExternalCandidate:
       type: object
       description: A ranked candidate match for an entity query
@@ -204,63 +235,28 @@ components:
           minimum: 0
           maximum: 1
           example: 0.98
-    MatchExternalResponse:
+    Query:
       type: object
-      description: Response containing entity matching results
+      description: A single entity name query for matching
       required:
-      - results
+      - text
       properties:
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/ExternalMatchRow'
-          description: Table-style results keyed by input entity
-          default: []
-    ExternalMatchRow:
-      type: object
-      description: Matching results for a single entity query
-      required:
-      - entity
-      - candidates
-      properties:
-        entity:
+        text:
           type: string
-          description: Original query text
+          description: The company name to match
           example: JPMorgan Chase & Co.
-        candidates:
-          type: array
-          items:
-            $ref: '#/components/schemas/ExternalCandidate'
-          description: Ordered list of candidate matches, sorted by rank
-          default: []
-    MatchBody:
-      type: object
-      description: Request body for entity name matching
-      required:
-      - queries
-      properties:
-        queries:
-          type: array
-          items:
-            $ref: '#/components/schemas/Query'
-          description: List of company names to match
-          minItems: 1
-    ValidationErrorDetail:
-      type: object
-      description: Single field validation error
-      properties:
-        field:
+        industry:
           type: string
-          description: Location of the validation error (e.g. body.Parameters.portfolio)
-          example: body.Parameters.portfolio
-        message:
+          description: Optional industry filter to improve matching accuracy
+          example: Financials
+        lei:
           type: string
-          description: Human-readable error message
-          example: field required
-        type:
+          description: Optional Legal Entity Identifier (LEI) for exact matching
+          example: 5493000X0X4X4X4X4X4X
+        country_name:
           type: string
-          description: Machine-readable error type
-          example: value_error.missing
+          description: Optional country name or code to filter matches
+          example: United States
     Error:
       type: object
       description: Standard error envelope used by the API

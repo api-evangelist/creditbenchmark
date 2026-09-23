@@ -1,9 +1,7 @@
 openapi: 3.2.0
 info:
   title: Credit Benchmark Metadata API
-  description: 'Authentication, entity resolution, data, analytics, and metadata endpoints.
-
-    '
+  description: Authentication, entity resolution, data, analytics, and metadata endpoints.
   version: 1.0.0
   contact:
     name: Credit Benchmark API Support
@@ -18,14 +16,14 @@ servers:
 security:
 - BearerAuth: []
 tags:
-- name: metadata
+- name: Metadata
   description: Metadata discovery endpoints.
   x-group: Metadata
 paths:
   /analytics/v2/metadata/columns:
     get:
       tags:
-      - metadata
+      - Metadata
       summary: Available Data Columns
       description: Returns a flat catalog of public input columns with metadata such as type, scopeable, facetable, and entitlement. This endpoint describes request-side input columns only; it does not describe route response fields or result_filter fields.
       operationId: metadata_columns_v2_metadata_columns_get
@@ -73,7 +71,7 @@ paths:
   /analytics/v2/metadata/rating-scales:
     get:
       tags:
-      - metadata
+      - Metadata
       summary: Rating Scales
       description: Returns CB rating scale metadata, including CB21 and CB7 ordering and band mappings.
       operationId: metadata_rating_scales_v2_metadata_rating_scales_get
@@ -124,7 +122,7 @@ paths:
   /analytics/v2/metadata/industry-schema:
     get:
       tags:
-      - metadata
+      - Metadata
       summary: Industry Schema
       description: Returns the CB industry hierarchy as L1 through L6 rows for scope filters, facets, and hierarchy-aware analytics.
       operationId: metadata_industry_schema_v2_metadata_industry_schema_get
@@ -169,7 +167,7 @@ paths:
   /analytics/v2/metadata/geography-schema:
     get:
       tags:
-      - metadata
+      - Metadata
       summary: Geography Schema
       description: Returns the CB geography hierarchy as region group, region, and country of risk levels.
       operationId: metadata_geography_schema_v2_metadata_geography_schema_get
@@ -205,7 +203,7 @@ paths:
   /analytics/v2/metadata/available-dates:
     get:
       tags:
-      - metadata
+      - Metadata
       summary: Available Dates
       description: Returns latest and previous available effective dates for analytics requests.
       operationId: metadata_available_dates_v2_metadata_available_dates_get
@@ -228,76 +226,33 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 components:
-  responses:
-    Forbidden:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SimpleError'
-          example:
-            error: Client-backed analytics inputs require contributor entitlement.
-    InternalServerError:
-      description: Server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SimpleError'
-          example:
-            error: An error occurred while processing your request. Please try again later.
-    TooManyRequests:
-      description: Too many requests
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/RateLimitError'
-          example:
-            error: Rate limit exceeded
-            detail: 60 per 1 minute
-    Unauthorized:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UnauthorizedError'
-          example:
-            detail: Unauthorized request
   schemas:
-    DataColumnMetadata:
-      type: object
-      additionalProperties: false
-      required:
-      - type
-      - scopeable
-      - facetable
-      - entitlement
-      properties:
-        type:
-          type: string
-          description: Column type.
-        scopeable:
-          type: boolean
-          description: Whether the column can be used in `scope.filters`.
-        facetable:
-          type: boolean
-          description: Whether the column can be used as a facet column.
-        entitlement:
-          type:
-          - string
-          - 'null'
-          enum:
-          - SP
-          - FITCH
-          - CLIENT_DATA
-          - null
-          description: Required entitlement, if any.
-    SimpleError:
+    RateLimitError:
       type: object
       required:
       - error
+      - detail
       properties:
         error:
           type: string
+        detail:
+          type: string
+    HierarchyMetadata:
+      type: object
+      description: Hierarchy metadata with level labels and a nested tree.
+      required:
+      - levels
+      - tree
+      properties:
+        levels:
+          type: object
+          additionalProperties:
+            type: string
+          description: Field names mapped to hierarchy levels.
+        tree:
+          type: object
+          additionalProperties: true
+          description: Nested hierarchy tree.
     UnauthorizedError:
       type: object
       required:
@@ -305,21 +260,13 @@ components:
       properties:
         detail:
           type: string
-    AvailableDatesMetadataResponse:
+    SimpleError:
       type: object
-      description: Latest available effective dates for analytics requests.
       required:
-      - latest_effective_date
-      - latest_finalised_effective_date
+      - error
       properties:
-        latest_effective_date:
-          type: integer
-          description: Latest available effective date in YYYYMMDD format.
-          example: 20260529
-        latest_finalised_effective_date:
-          type: integer
-          description: Latest finalised effective date in YYYYMMDD format.
-          example: 20260529
+        error:
+          type: string
     RatingScalesMetadataResponse:
       type: object
       description: CB rating scale metadata.
@@ -345,16 +292,26 @@ components:
             type: object
             additionalProperties: true
           description: Scale definitions keyed by scale name. `CB21` and `CB7` include ordered rating rows; `CLIENT` describes client-specific scale behavior.
-    RateLimitError:
+    AvailableDatesMetadataResponse:
       type: object
+      description: Latest available effective dates for analytics requests.
       required:
-      - error
-      - detail
+      - latest_effective_date
+      - latest_finalised_effective_date
       properties:
-        error:
-          type: string
-        detail:
-          type: string
+        latest_effective_date:
+          type: integer
+          description: Latest available effective date in YYYYMMDD format.
+          example: 20260529
+        latest_finalised_effective_date:
+          type: integer
+          description: Latest finalised effective date in YYYYMMDD format.
+          example: 20260529
+    DataColumnsResponse:
+      type: object
+      description: Public input column catalog.
+      additionalProperties:
+        $ref: '#/components/schemas/DataColumnMetadata'
     GeographySchemaMetadataResponse:
       type: object
       description: Geography hierarchy metadata.
@@ -391,27 +348,68 @@ components:
           $ref: '#/components/schemas/HierarchyMetadata'
         entity_types:
           $ref: '#/components/schemas/HierarchyMetadata'
-    DataColumnsResponse:
+    DataColumnMetadata:
       type: object
-      description: Public input column catalog.
-      additionalProperties:
-        $ref: '#/components/schemas/DataColumnMetadata'
-    HierarchyMetadata:
-      type: object
-      description: Hierarchy metadata with level labels and a nested tree.
+      additionalProperties: false
       required:
-      - levels
-      - tree
+      - type
+      - scopeable
+      - facetable
+      - entitlement
       properties:
-        levels:
-          type: object
-          additionalProperties:
-            type: string
-          description: Field names mapped to hierarchy levels.
-        tree:
-          type: object
-          additionalProperties: true
-          description: Nested hierarchy tree.
+        type:
+          type: string
+          description: Column type.
+        scopeable:
+          type: boolean
+          description: Whether the column can be used in `scope.filters`.
+        facetable:
+          type: boolean
+          description: Whether the column can be used as a facet column.
+        entitlement:
+          type:
+          - string
+          - 'null'
+          enum:
+          - SP
+          - FITCH
+          - CLIENT_DATA
+          - null
+          description: Required entitlement, if any.
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+          example:
+            detail: Unauthorized request
+    TooManyRequests:
+      description: Too many requests
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RateLimitError'
+          example:
+            error: Rate limit exceeded
+            detail: 60 per 1 minute
+    InternalServerError:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: An error occurred while processing your request. Please try again later.
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: Client-backed analytics inputs require contributor entitlement.
   securitySchemes:
     BearerAuth:
       type: http
