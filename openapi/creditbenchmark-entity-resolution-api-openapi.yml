@@ -87,20 +87,20 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 components:
   schemas:
-    ExternalMatchBody:
+    ExternalMatchRow:
       type: object
-      additionalProperties: false
+      required:
+      - entity
+      - candidates
       properties:
-        entities:
+        entity:
+          type: string
+          description: Original input `entity_name`.
+        candidates:
           type: array
-          description: 'Entities to match using the external route contract. Empty arrays are allowed and return `results: []`.'
+          description: Ordered candidates limited by the requested `limit`.
           items:
-            $ref: '#/components/schemas/ExternalMatchEntity'
-          default: []
-        limit:
-          type: integer
-          default: 3
-          description: Maximum candidates to return per entity row. Valid integer values are 1 through 10. Omitted or out-of-range integers are normalized to 3; malformed non-integer values fail validation.
+            $ref: '#/components/schemas/ExternalCandidate'
     ExternalMatchEntity:
       type: object
       additionalProperties: false
@@ -120,23 +120,6 @@ components:
         lei:
           type: string
           description: Optional LEI hint. Blank values are treated as omitted.
-    MatchExternalResponse:
-      type: object
-      required:
-      - results
-      properties:
-        results:
-          type: array
-          description: Table-style results keyed by input entity.
-          items:
-            $ref: '#/components/schemas/ExternalMatchRow'
-    SimpleError:
-      type: object
-      required:
-      - error
-      properties:
-        error:
-          type: string
     FastApiValidationErrorDetail:
       type: object
       properties:
@@ -150,27 +133,29 @@ components:
           type: string
         type:
           type: string
-    UnauthorizedError:
+    FastApiValidationErrorResponse:
       type: object
       required:
       - detail
       properties:
         detail:
-          type: string
-    ExternalMatchRow:
-      type: object
-      required:
-      - entity
-      - candidates
-      properties:
-        entity:
-          type: string
-          description: Original input `entity_name`.
-        candidates:
           type: array
-          description: Ordered candidates limited by the requested `limit`.
           items:
-            $ref: '#/components/schemas/ExternalCandidate'
+            $ref: '#/components/schemas/FastApiValidationErrorDetail'
+    ExternalMatchBody:
+      type: object
+      additionalProperties: false
+      properties:
+        entities:
+          type: array
+          description: 'Entities to match using the external route contract. Empty arrays are allowed and return `results: []`.'
+          items:
+            $ref: '#/components/schemas/ExternalMatchEntity'
+          default: []
+        limit:
+          type: integer
+          default: 3
+          description: Maximum candidates to return per entity row. Valid integer values are 1 through 10. Omitted or out-of-range integers are normalized to 3; malformed non-integer values fail validation.
     ExternalCandidate:
       type: object
       required:
@@ -197,32 +182,39 @@ components:
         confidence:
           type: number
           description: Matching confidence score.
-    FastApiValidationErrorResponse:
+    UnauthorizedError:
       type: object
       required:
       - detail
       properties:
         detail:
+          type: string
+    SimpleError:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: string
+    MatchExternalResponse:
+      type: object
+      required:
+      - results
+      properties:
+        results:
           type: array
+          description: Table-style results keyed by input entity.
           items:
-            $ref: '#/components/schemas/FastApiValidationErrorDetail'
+            $ref: '#/components/schemas/ExternalMatchRow'
   responses:
-    Unauthorized:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UnauthorizedError'
-          example:
-            detail: Unauthorized request
-    InternalServerError:
-      description: Server error
+    Forbidden:
+      description: Forbidden
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/SimpleError'
           example:
-            error: An error occurred while processing your request. Please try again later.
+            error: Client-backed analytics inputs require contributor entitlement.
     FrameworkValidationError:
       description: Validation error
       content:
@@ -236,14 +228,22 @@ components:
               - effective_date
               msg: Input should be a valid integer
               type: int_parsing
-    Forbidden:
-      description: Forbidden
+    InternalServerError:
+      description: Server error
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/SimpleError'
           example:
-            error: Client-backed analytics inputs require contributor entitlement.
+            error: An error occurred while processing your request. Please try again later.
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+          example:
+            detail: Unauthorized request
   securitySchemes:
     BearerAuth:
       type: http

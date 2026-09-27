@@ -43,6 +43,10 @@ x-tier-reason: has-openapi
 specificationVersion: '0.23'
 created: '2026-07-17'
 modified: '2026-08-08'
+x-docs-platform: mintlify
+x-docs-platform-confidence: medium
+x-docs-platform-checked: 2026-09-24
+x-docs-hosting: vercel
 tags:
 - Company
 - Credit Risk

@@ -68,65 +68,6 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 components:
-  responses:
-    ValidationError:
-      description: Validation error - request parameters are invalid
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: VALIDATION_ERROR
-              message: Request validation failed
-              details:
-              - field: body.Parameters.portfolio
-                message: field required
-                type: value_error.missing
-    BadRequest:
-      description: Bad request - invalid parameters
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: BAD_REQUEST
-              message: Invalid request parameters
-              details:
-                invalid_columns:
-                - BadColumn
-                allowed_columns: Please check documentation for valid column names
-    Unauthorized:
-      description: Unauthorized - invalid or missing JWT token
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: UNAUTHORIZED
-              message: Invalid or missing JWT token
-    InternalServerError:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: INTERNAL_SERVER_ERROR
-              message: An unexpected error occurred.
-    Forbidden:
-      description: Forbidden - insufficient permissions or access denied
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: PERMISSION_DENIED
-              message: Insufficient permissions for this resource
   schemas:
     RequestEnvelope_EntityRatingChangeRequest:
       properties:
@@ -136,6 +77,16 @@ components:
       required:
       - Parameters
       title: RequestEnvelope_EntityRatingChangeRequest
+    FlexibleCBPortfolio:
+      properties:
+        CBId:
+          items:
+            type: string
+          type: array
+          title: Cbid
+      additionalProperties: true
+      type: object
+      title: FlexibleCBPortfolio
     ValidationErrorDetail:
       type: object
       description: Single field validation error
@@ -152,22 +103,6 @@ components:
           type: string
           description: Machine-readable error type
           example: value_error.missing
-    RatingChangeType:
-      type: string
-      enum:
-      - upgrades
-      - downgrades
-      title: RatingChangeType
-    FlexibleCBPortfolio:
-      properties:
-        CBId:
-          items:
-            type: string
-          type: array
-          title: Cbid
-      additionalProperties: true
-      type: object
-      title: FlexibleCBPortfolio
     EntityRatingChangeResponse:
       type: object
       description: Response containing entity rating change data
@@ -272,6 +207,36 @@ components:
           - 0
           - 0.0013
           - 0
+    EntityRatingChangeRequest:
+      properties:
+        portfolio:
+          $ref: '#/components/schemas/Portfolio'
+        EffectiveDateId:
+          type: integer
+          title: Effectivedateid
+        rating_change_months:
+          type: integer
+          title: Rating Change Months
+          default: 6
+        use_oci:
+          type: boolean
+          title: Use Oci
+          default: false
+        use_client_scale:
+          type: boolean
+          title: Use Client Scale
+          default: false
+        descriptor_columns:
+          items:
+            type: string
+          type: array
+          title: Descriptor Columns
+        filters:
+          $ref: '#/components/schemas/RatingChangeFilters'
+      type: object
+      required:
+      - portfolio
+      title: EntityRatingChangeRequest
     Portfolio:
       properties:
         name:
@@ -289,6 +254,12 @@ components:
       - name
       - entities
       title: Portfolio
+    RatingChangeType:
+      type: string
+      enum:
+      - upgrades
+      - downgrades
+      title: RatingChangeType
     Error:
       type: object
       description: Standard error envelope used by the API
@@ -334,36 +305,65 @@ components:
           title: N
       type: object
       title: RatingChangeFilters
-    EntityRatingChangeRequest:
-      properties:
-        portfolio:
-          $ref: '#/components/schemas/Portfolio'
-        EffectiveDateId:
-          type: integer
-          title: Effectivedateid
-        rating_change_months:
-          type: integer
-          title: Rating Change Months
-          default: 6
-        use_oci:
-          type: boolean
-          title: Use Oci
-          default: false
-        use_client_scale:
-          type: boolean
-          title: Use Client Scale
-          default: false
-        descriptor_columns:
-          items:
-            type: string
-          type: array
-          title: Descriptor Columns
-        filters:
-          $ref: '#/components/schemas/RatingChangeFilters'
-      type: object
-      required:
-      - portfolio
-      title: EntityRatingChangeRequest
+  responses:
+    Forbidden:
+      description: Forbidden - insufficient permissions or access denied
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: PERMISSION_DENIED
+              message: Insufficient permissions for this resource
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: INTERNAL_SERVER_ERROR
+              message: An unexpected error occurred.
+    ValidationError:
+      description: Validation error - request parameters are invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: VALIDATION_ERROR
+              message: Request validation failed
+              details:
+              - field: body.Parameters.portfolio
+                message: field required
+                type: value_error.missing
+    Unauthorized:
+      description: Unauthorized - invalid or missing JWT token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: UNAUTHORIZED
+              message: Invalid or missing JWT token
+    BadRequest:
+      description: Bad request - invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: BAD_REQUEST
+              message: Invalid request parameters
+              details:
+                invalid_columns:
+                - BadColumn
+                allowed_columns: Please check documentation for valid column names
   securitySchemes:
     BearerAuth:
       type: http
