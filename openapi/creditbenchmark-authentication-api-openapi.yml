@@ -151,36 +151,6 @@ paths:
       description: Production server
 components:
   schemas:
-    AuthError:
-      type: object
-      title: Error
-      required:
-      - error
-      properties:
-        error:
-          type: object
-          required:
-          - code
-          - message
-          properties:
-            code:
-              type: string
-            message:
-              type: string
-    UnauthorizedError:
-      type: object
-      required:
-      - detail
-      properties:
-        detail:
-          type: string
-    SimpleError:
-      type: object
-      required:
-      - error
-      properties:
-        error:
-          type: string
     TokenResponse:
       type: object
       title: TokenResponse
@@ -200,6 +170,36 @@ components:
           type: string
           description: Token type.
           example: Bearer
+    UnauthorizedError:
+      type: object
+      required:
+      - detail
+      properties:
+        detail:
+          type: string
+    SimpleError:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: string
+    AuthError:
+      type: object
+      title: Error
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+            message:
+              type: string
     ValidationErrorDetail:
       type: object
       description: Single field validation error
@@ -245,14 +245,6 @@ components:
               - type: object
               - type: string
   responses:
-    Unauthorized:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UnauthorizedError'
-          example:
-            detail: Unauthorized request
     InternalServerError:
       description: Server error
       content:
@@ -261,6 +253,14 @@ components:
             $ref: '#/components/schemas/SimpleError'
           example:
             error: An error occurred while processing your request. Please try again later.
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+          example:
+            detail: Unauthorized request
     AuthBadRequest:
       description: Bad request
       content:

@@ -226,41 +226,54 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 components:
-  responses:
-    Forbidden:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SimpleError'
-          example:
-            error: Client-backed analytics inputs require contributor entitlement.
-    InternalServerError:
-      description: Server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SimpleError'
-          example:
-            error: An error occurred while processing your request. Please try again later.
-    Unauthorized:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UnauthorizedError'
-          example:
-            detail: Unauthorized request
-    TooManyRequests:
-      description: Too many requests
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/RateLimitError'
-          example:
-            error: Rate limit exceeded
-            detail: 60 per 1 minute
   schemas:
+    AvailableDatesMetadataResponse:
+      type: object
+      description: Latest available effective dates for analytics requests.
+      required:
+      - latest_effective_date
+      - latest_finalised_effective_date
+      properties:
+        latest_effective_date:
+          type: integer
+          description: Latest available effective date in YYYYMMDD format.
+          example: 20260529
+        latest_finalised_effective_date:
+          type: integer
+          description: Latest finalised effective date in YYYYMMDD format.
+          example: 20260529
+    RatingScalesMetadataResponse:
+      type: object
+      description: CB rating scale metadata.
+      required:
+      - default_scale
+      - supported_scales
+      - scales
+      properties:
+        default_scale:
+          type: string
+          example: CB21
+        supported_scales:
+          type: array
+          items:
+            type: string
+          example:
+          - CB21
+          - CB7
+          - CLIENT
+        scales:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties: true
+          description: Scale definitions keyed by scale name. `CB21` and `CB7` include ordered rating rows; `CLIENT` describes client-specific scale behavior.
+    UnauthorizedError:
+      type: object
+      required:
+      - detail
+      properties:
+        detail:
+          type: string
     DataColumnMetadata:
       type: object
       additionalProperties: false
@@ -289,11 +302,6 @@ components:
           - CLIENT_DATA
           - null
           description: Required entitlement, if any.
-    DataColumnsResponse:
-      type: object
-      description: Public input column catalog.
-      additionalProperties:
-        $ref: '#/components/schemas/DataColumnMetadata'
     GeographySchemaMetadataResponse:
       type: object
       description: Geography hierarchy metadata.
@@ -319,41 +327,13 @@ components:
           type: string
           description: Field containing the country code.
           example: CB_Country_ISO
-    RateLimitError:
+    SimpleError:
       type: object
       required:
       - error
-      - detail
       properties:
         error:
           type: string
-        detail:
-          type: string
-    RatingScalesMetadataResponse:
-      type: object
-      description: CB rating scale metadata.
-      required:
-      - default_scale
-      - supported_scales
-      - scales
-      properties:
-        default_scale:
-          type: string
-          example: CB21
-        supported_scales:
-          type: array
-          items:
-            type: string
-          example:
-          - CB21
-          - CB7
-          - CLIENT
-        scales:
-          type: object
-          additionalProperties:
-            type: object
-            additionalProperties: true
-          description: Scale definitions keyed by scale name. `CB21` and `CB7` include ordered rating rows; `CLIENT` describes client-specific scale behavior.
     HierarchyMetadata:
       type: object
       description: Hierarchy metadata with level labels and a nested tree.
@@ -370,28 +350,21 @@ components:
           type: object
           additionalProperties: true
           description: Nested hierarchy tree.
-    AvailableDatesMetadataResponse:
-      type: object
-      description: Latest available effective dates for analytics requests.
-      required:
-      - latest_effective_date
-      - latest_finalised_effective_date
-      properties:
-        latest_effective_date:
-          type: integer
-          description: Latest available effective date in YYYYMMDD format.
-          example: 20260529
-        latest_finalised_effective_date:
-          type: integer
-          description: Latest finalised effective date in YYYYMMDD format.
-          example: 20260529
-    UnauthorizedError:
+    RateLimitError:
       type: object
       required:
+      - error
       - detail
       properties:
+        error:
+          type: string
         detail:
           type: string
+    DataColumnsResponse:
+      type: object
+      description: Public input column catalog.
+      additionalProperties:
+        $ref: '#/components/schemas/DataColumnMetadata'
     IndustrySchemaMetadataResponse:
       type: object
       description: Industry and entity-type hierarchy metadata.
@@ -403,13 +376,40 @@ components:
           $ref: '#/components/schemas/HierarchyMetadata'
         entity_types:
           $ref: '#/components/schemas/HierarchyMetadata'
-    SimpleError:
-      type: object
-      required:
-      - error
-      properties:
-        error:
-          type: string
+  responses:
+    InternalServerError:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: An error occurred while processing your request. Please try again later.
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: Client-backed analytics inputs require contributor entitlement.
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+          example:
+            detail: Unauthorized request
+    TooManyRequests:
+      description: Too many requests
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RateLimitError'
+          example:
+            error: Rate limit exceeded
+            detail: 60 per 1 minute
   securitySchemes:
     BearerAuth:
       type: http

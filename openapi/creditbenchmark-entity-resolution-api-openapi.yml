@@ -87,61 +87,6 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 components:
   schemas:
-    ExternalMatchRow:
-      type: object
-      required:
-      - entity
-      - candidates
-      properties:
-        entity:
-          type: string
-          description: Original input `entity_name`.
-        candidates:
-          type: array
-          description: Ordered candidates limited by the requested `limit`.
-          items:
-            $ref: '#/components/schemas/ExternalCandidate'
-    ExternalMatchEntity:
-      type: object
-      additionalProperties: false
-      required:
-      - entity_name
-      properties:
-        entity_name:
-          type: string
-          minLength: 1
-          description: The company or entity name to match. Whitespace is trimmed and blank values are rejected.
-        country:
-          type: string
-          description: Optional country name or ISO 3166-1 alpha-2 country code. Blank values are treated as omitted.
-        industry:
-          type: string
-          description: Optional industry hint. Blank values are treated as omitted.
-        lei:
-          type: string
-          description: Optional LEI hint. Blank values are treated as omitted.
-    FastApiValidationErrorDetail:
-      type: object
-      properties:
-        loc:
-          type: array
-          items:
-            oneOf:
-            - type: string
-            - type: integer
-        msg:
-          type: string
-        type:
-          type: string
-    FastApiValidationErrorResponse:
-      type: object
-      required:
-      - detail
-      properties:
-        detail:
-          type: array
-          items:
-            $ref: '#/components/schemas/FastApiValidationErrorDetail'
     ExternalMatchBody:
       type: object
       additionalProperties: false
@@ -156,6 +101,26 @@ components:
           type: integer
           default: 3
           description: Maximum candidates to return per entity row. Valid integer values are 1 through 10. Omitted or out-of-range integers are normalized to 3; malformed non-integer values fail validation.
+    FastApiValidationErrorDetail:
+      type: object
+      properties:
+        loc:
+          type: array
+          items:
+            oneOf:
+            - type: string
+            - type: integer
+        msg:
+          type: string
+        type:
+          type: string
+    UnauthorizedError:
+      type: object
+      required:
+      - detail
+      properties:
+        detail:
+          type: string
     ExternalCandidate:
       type: object
       required:
@@ -182,13 +147,25 @@ components:
         confidence:
           type: number
           description: Matching confidence score.
-    UnauthorizedError:
+    ExternalMatchEntity:
       type: object
+      additionalProperties: false
       required:
-      - detail
+      - entity_name
       properties:
-        detail:
+        entity_name:
           type: string
+          minLength: 1
+          description: The company or entity name to match. Whitespace is trimmed and blank values are rejected.
+        country:
+          type: string
+          description: Optional country name or ISO 3166-1 alpha-2 country code. Blank values are treated as omitted.
+        industry:
+          type: string
+          description: Optional industry hint. Blank values are treated as omitted.
+        lei:
+          type: string
+          description: Optional LEI hint. Blank values are treated as omitted.
     SimpleError:
       type: object
       required:
@@ -196,6 +173,29 @@ components:
       properties:
         error:
           type: string
+    ExternalMatchRow:
+      type: object
+      required:
+      - entity
+      - candidates
+      properties:
+        entity:
+          type: string
+          description: Original input `entity_name`.
+        candidates:
+          type: array
+          description: Ordered candidates limited by the requested `limit`.
+          items:
+            $ref: '#/components/schemas/ExternalCandidate'
+    FastApiValidationErrorResponse:
+      type: object
+      required:
+      - detail
+      properties:
+        detail:
+          type: array
+          items:
+            $ref: '#/components/schemas/FastApiValidationErrorDetail'
     MatchExternalResponse:
       type: object
       required:
@@ -207,6 +207,14 @@ components:
           items:
             $ref: '#/components/schemas/ExternalMatchRow'
   responses:
+    InternalServerError:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: An error occurred while processing your request. Please try again later.
     Forbidden:
       description: Forbidden
       content:
@@ -215,6 +223,14 @@ components:
             $ref: '#/components/schemas/SimpleError'
           example:
             error: Client-backed analytics inputs require contributor entitlement.
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+          example:
+            detail: Unauthorized request
     FrameworkValidationError:
       description: Validation error
       content:
@@ -228,22 +244,6 @@ components:
               - effective_date
               msg: Input should be a valid integer
               type: int_parsing
-    InternalServerError:
-      description: Server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SimpleError'
-          example:
-            error: An error occurred while processing your request. Please try again later.
-    Unauthorized:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UnauthorizedError'
-          example:
-            detail: Unauthorized request
   securitySchemes:
     BearerAuth:
       type: http
