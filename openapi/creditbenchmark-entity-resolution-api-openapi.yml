@@ -87,33 +87,37 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 components:
   schemas:
-    ExternalMatchBody:
+    ExternalMatchRow:
       type: object
-      additionalProperties: false
+      required:
+      - entity
+      - candidates
       properties:
-        entities:
+        entity:
+          type: string
+          description: Original input `entity_name`.
+        candidates:
           type: array
-          description: 'Entities to match using the external route contract. Empty arrays are allowed and return `results: []`.'
+          description: Ordered candidates limited by the requested `limit`.
           items:
-            $ref: '#/components/schemas/ExternalMatchEntity'
-          default: []
-        limit:
-          type: integer
-          default: 3
-          description: Maximum candidates to return per entity row. Valid integer values are 1 through 10. Omitted or out-of-range integers are normalized to 3; malformed non-integer values fail validation.
-    FastApiValidationErrorDetail:
+            $ref: '#/components/schemas/ExternalCandidate'
+    SimpleError:
       type: object
+      required:
+      - error
       properties:
-        loc:
+        error:
+          type: string
+    MatchExternalResponse:
+      type: object
+      required:
+      - results
+      properties:
+        results:
           type: array
+          description: Table-style results keyed by input entity.
           items:
-            oneOf:
-            - type: string
-            - type: integer
-        msg:
-          type: string
-        type:
-          type: string
+            $ref: '#/components/schemas/ExternalMatchRow'
     UnauthorizedError:
       type: object
       required:
@@ -147,6 +151,42 @@ components:
         confidence:
           type: number
           description: Matching confidence score.
+    ExternalMatchBody:
+      type: object
+      additionalProperties: false
+      properties:
+        entities:
+          type: array
+          description: 'Entities to match using the external route contract. Empty arrays are allowed and return `results: []`.'
+          items:
+            $ref: '#/components/schemas/ExternalMatchEntity'
+          default: []
+        limit:
+          type: integer
+          default: 3
+          description: Maximum candidates to return per entity row. Valid integer values are 1 through 10. Omitted or out-of-range integers are normalized to 3; malformed non-integer values fail validation.
+    FastApiValidationErrorResponse:
+      type: object
+      required:
+      - detail
+      properties:
+        detail:
+          type: array
+          items:
+            $ref: '#/components/schemas/FastApiValidationErrorDetail'
+    FastApiValidationErrorDetail:
+      type: object
+      properties:
+        loc:
+          type: array
+          items:
+            oneOf:
+            - type: string
+            - type: integer
+        msg:
+          type: string
+        type:
+          type: string
     ExternalMatchEntity:
       type: object
       additionalProperties: false
@@ -166,46 +206,6 @@ components:
         lei:
           type: string
           description: Optional LEI hint. Blank values are treated as omitted.
-    SimpleError:
-      type: object
-      required:
-      - error
-      properties:
-        error:
-          type: string
-    ExternalMatchRow:
-      type: object
-      required:
-      - entity
-      - candidates
-      properties:
-        entity:
-          type: string
-          description: Original input `entity_name`.
-        candidates:
-          type: array
-          description: Ordered candidates limited by the requested `limit`.
-          items:
-            $ref: '#/components/schemas/ExternalCandidate'
-    FastApiValidationErrorResponse:
-      type: object
-      required:
-      - detail
-      properties:
-        detail:
-          type: array
-          items:
-            $ref: '#/components/schemas/FastApiValidationErrorDetail'
-    MatchExternalResponse:
-      type: object
-      required:
-      - results
-      properties:
-        results:
-          type: array
-          description: Table-style results keyed by input entity.
-          items:
-            $ref: '#/components/schemas/ExternalMatchRow'
   responses:
     InternalServerError:
       description: Server error

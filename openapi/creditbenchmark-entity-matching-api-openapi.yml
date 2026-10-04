@@ -81,103 +81,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 components:
-  responses:
-    InternalServerError:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: INTERNAL_SERVER_ERROR
-              message: An unexpected error occurred.
-    Forbidden:
-      description: Forbidden - insufficient permissions or access denied
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: PERMISSION_DENIED
-              message: Insufficient permissions for this resource
-    Unauthorized:
-      description: Unauthorized - invalid or missing JWT token
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: UNAUTHORIZED
-              message: Invalid or missing JWT token
-    BadRequest:
-      description: Bad request - invalid parameters
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: BAD_REQUEST
-              message: Invalid request parameters
-              details:
-                invalid_columns:
-                - BadColumn
-                allowed_columns: Please check documentation for valid column names
-    ValidationError:
-      description: Validation error - request parameters are invalid
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: VALIDATION_ERROR
-              message: Request validation failed
-              details:
-              - field: body.Parameters.portfolio
-                message: field required
-                type: value_error.missing
   schemas:
-    ExternalCandidate:
-      type: object
-      description: A ranked candidate match for an entity query
-      required:
-      - rank
-      - CBId
-      - CBEntityName
-      - confidence
-      properties:
-        rank:
-          type: integer
-          description: 1-based rank of the candidate (1 = best match)
-          minimum: 1
-          example: 1
-        CBId:
-          type: string
-          description: Credit Benchmark entity identifier
-          example: CB0000000121
-        CBEntityName:
-          type: string
-          description: Credit Benchmark entity name
-          example: JPMorgan Chase & Co.
-        CBCountryOfRiskISO:
-          type: string
-          description: ISO 3166-1 alpha-2 country code
-          example: US
-        isConsensus1M:
-          type: boolean
-          description: Whether the entity has a 1-month consensus rating
-          example: true
-        confidence:
-          type: number
-          format: float
-          description: Confidence score for the match (0.0 to 1.0)
-          minimum: 0
-          maximum: 1
-          example: 0.98
     MatchBody:
       type: object
       description: Request body for entity name matching
@@ -207,22 +111,18 @@ components:
             $ref: '#/components/schemas/ExternalCandidate'
           description: Ordered list of candidate matches, sorted by rank
           default: []
-    ValidationErrorDetail:
+    MatchExternalResponse:
       type: object
-      description: Single field validation error
+      description: Response containing entity matching results
+      required:
+      - results
       properties:
-        field:
-          type: string
-          description: Location of the validation error (e.g. body.Parameters.portfolio)
-          example: body.Parameters.portfolio
-        message:
-          type: string
-          description: Human-readable error message
-          example: field required
-        type:
-          type: string
-          description: Machine-readable error type
-          example: value_error.missing
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExternalMatchRow'
+          description: Table-style results keyed by input entity
+          default: []
     Query:
       type: object
       description: A single entity name query for matching
@@ -273,18 +173,118 @@ components:
                   $ref: '#/components/schemas/ValidationErrorDetail'
               - type: object
               - type: string
-    MatchExternalResponse:
+    ExternalCandidate:
       type: object
-      description: Response containing entity matching results
+      description: A ranked candidate match for an entity query
       required:
-      - results
+      - rank
+      - CBId
+      - CBEntityName
+      - confidence
       properties:
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/ExternalMatchRow'
-          description: Table-style results keyed by input entity
-          default: []
+        rank:
+          type: integer
+          description: 1-based rank of the candidate (1 = best match)
+          minimum: 1
+          example: 1
+        CBId:
+          type: string
+          description: Credit Benchmark entity identifier
+          example: CB0000000121
+        CBEntityName:
+          type: string
+          description: Credit Benchmark entity name
+          example: JPMorgan Chase & Co.
+        CBCountryOfRiskISO:
+          type: string
+          description: ISO 3166-1 alpha-2 country code
+          example: US
+        isConsensus1M:
+          type: boolean
+          description: Whether the entity has a 1-month consensus rating
+          example: true
+        confidence:
+          type: number
+          format: float
+          description: Confidence score for the match (0.0 to 1.0)
+          minimum: 0
+          maximum: 1
+          example: 0.98
+    ValidationErrorDetail:
+      type: object
+      description: Single field validation error
+      properties:
+        field:
+          type: string
+          description: Location of the validation error (e.g. body.Parameters.portfolio)
+          example: body.Parameters.portfolio
+        message:
+          type: string
+          description: Human-readable error message
+          example: field required
+        type:
+          type: string
+          description: Machine-readable error type
+          example: value_error.missing
+  responses:
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: INTERNAL_SERVER_ERROR
+              message: An unexpected error occurred.
+    ValidationError:
+      description: Validation error - request parameters are invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: VALIDATION_ERROR
+              message: Request validation failed
+              details:
+              - field: body.Parameters.portfolio
+                message: field required
+                type: value_error.missing
+    Forbidden:
+      description: Forbidden - insufficient permissions or access denied
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: PERMISSION_DENIED
+              message: Insufficient permissions for this resource
+    BadRequest:
+      description: Bad request - invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: BAD_REQUEST
+              message: Invalid request parameters
+              details:
+                invalid_columns:
+                - BadColumn
+                allowed_columns: Please check documentation for valid column names
+    Unauthorized:
+      description: Unauthorized - invalid or missing JWT token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: UNAUTHORIZED
+              message: Invalid or missing JWT token
   securitySchemes:
     BearerAuth:
       type: http

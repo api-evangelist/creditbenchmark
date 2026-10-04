@@ -208,16 +208,6 @@ components:
             error:
               code: INTERNAL_SERVER_ERROR
               message: An unexpected error occurred.
-    Forbidden:
-      description: Forbidden - insufficient permissions or access denied
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: PERMISSION_DENIED
-              message: Insufficient permissions for this resource
     Unauthorized:
       description: Unauthorized - invalid or missing JWT token
       content:
@@ -228,6 +218,16 @@ components:
             error:
               code: UNAUTHORIZED
               message: Invalid or missing JWT token
+    Forbidden:
+      description: Forbidden - insufficient permissions or access denied
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: PERMISSION_DENIED
+              message: Insufficient permissions for this resource
     BadRequest:
       description: Bad request - invalid parameters
       content:
@@ -257,159 +257,29 @@ components:
                 message: field required
                 type: value_error.missing
   schemas:
-    Portfolio:
+    ClientDataAggregateRequest:
       properties:
-        name:
-          type: string
-          title: Name
-          example: Example Portfolio
-        entities:
-          $ref: '#/components/schemas/FlexibleCBPortfolio'
-          example:
-            CBId:
-            - CB000000123
-            - CB000000456
-      type: object
-      required:
-      - name
-      - entities
-      title: Portfolio
-    ValidationErrorDetail:
-      type: object
-      description: Single field validation error
-      properties:
-        field:
-          type: string
-          description: Location of the validation error (e.g. body.Parameters.portfolio)
-          example: body.Parameters.portfolio
-        message:
-          type: string
-          description: Human-readable error message
-          example: field required
-        type:
-          type: string
-          description: Machine-readable error type
-          example: value_error.missing
-    ClientDataSummaryResponse:
-      type: object
-      description: Response containing client data portfolio summary comparing client vs benchmark ratings
-      required:
-      - CBSector
-      - entity_count
-      - benchmark_entity_count
-      - ClientRating
-      - ExMeRating
-      - notch_difference
-      - ClientPD
-      - ExMePD
-      - notch_diff_aggressive
-      - notch_diff_consistent
-      - notch_diff_conservative
-      properties:
-        CBSector:
-          type: array
-          items:
-            type: string
-          description: Values of the grouping column (matches facet_column parameter)
-          example:
-          - Financial Services
-        entity_count:
-          type: array
-          items:
-            type: integer
-          description: Total number of entities in each group
-          example:
-          - 10
-        benchmark_entity_count:
-          type: array
-          items:
-            type: integer
-          description: Number of entities with benchmark ratings
-          example:
-          - 4
-        ClientRating:
-          type: array
-          items:
-            type: string
-          description: Client's internal aggregate rating
-          example:
-          - bbb-
-        ExMeRating:
-          type: array
-          items:
-            type: string
-          description: Benchmark rating (excluding client)
-          example:
-          - bb+
-        notch_difference:
-          type: array
-          items:
-            type: integer
-          description: Notch difference between client and benchmark (positive = client more conservative)
-          example:
-          - 1
-        ClientPD:
-          type: array
-          items:
-            type: number
-            format: float
-          description: Client's aggregate probability of default
-          example:
-          - 0.0047
-        ExMePD:
-          type: array
-          items:
-            type: number
-            format: float
-          description: Benchmark aggregate probability of default (excluding client)
-          example:
-          - 0.0049
-        notch_diff_aggressive:
-          type: array
-          items:
-            type: integer
-          description: Notch difference using aggressive methodology
-          example:
-          - 1
-        notch_diff_consistent:
-          type: array
-          items:
-            type: integer
-          description: Notch difference using consistent methodology
-          example:
-          - 3
-        notch_diff_conservative:
-          type: array
-          items:
-            type: integer
-          description: Notch difference using conservative methodology
-          example:
-          - 0
-    RatingChangeFilters:
-      properties:
-        rating_change_type:
-          $ref: '#/components/schemas/RatingChangeType'
-        sort_by:
-          type: string
-          title: Sort By
-          default: rating_change
-        sort_descending:
-          type: boolean
-          title: Sort Descending
-          default: true
-        n:
+        portfolio:
+          $ref: '#/components/schemas/Portfolio'
+        EffectiveDateId:
           type: integer
-          title: N
-      type: object
-      title: RatingChangeFilters
-    RequestEnvelope_ClientDataDistributionRequest:
-      properties:
-        Parameters:
-          $ref: '#/components/schemas/ClientDataDistributionRequest'
+          title: Effectivedateid
+        effectivedateid_min_lag_months:
+          type: integer
+          title: Effectivedateid Min Lag Months
+          default: 24
+        use_client_scale:
+          type: boolean
+          title: Use Client Scale
+          default: false
+        facet_column:
+          type: string
+          title: Facet Column
+          description: Optional column to group by (e.g., Sector, Industry)
       type: object
       required:
-      - Parameters
-      title: RequestEnvelope_ClientDataDistributionRequest
+      - portfolio
+      title: ClientDataAggregateRequest
     ClientDataEntityRatingChangeResponse:
       type: object
       description: Response containing entity rating changes for both CCR and client ratings
@@ -564,14 +434,31 @@ components:
           - -2
           - 0
           - 0
-    RequestEnvelope_ClientDataEntityRatingChangeRequest:
+    RatingChangeFilters:
+      properties:
+        rating_change_type:
+          $ref: '#/components/schemas/RatingChangeType'
+        sort_by:
+          type: string
+          title: Sort By
+          default: rating_change
+        sort_descending:
+          type: boolean
+          title: Sort Descending
+          default: true
+        n:
+          type: integer
+          title: N
+      type: object
+      title: RatingChangeFilters
+    RequestEnvelope_ClientDataAggregateRequest:
       properties:
         Parameters:
-          $ref: '#/components/schemas/ClientDataEntityRatingChangeRequest'
+          $ref: '#/components/schemas/ClientDataAggregateRequest'
       type: object
       required:
       - Parameters
-      title: RequestEnvelope_ClientDataEntityRatingChangeRequest
+      title: RequestEnvelope_ClientDataAggregateRequest
     ClientDataEntityRatingChangeRequest:
       properties:
         portfolio:
@@ -602,16 +489,60 @@ components:
       required:
       - portfolio
       title: ClientDataEntityRatingChangeRequest
-    FlexibleCBPortfolio:
+    RequestEnvelope_ClientDataEntityRatingChangeRequest:
       properties:
-        CBId:
-          items:
-            type: string
-          type: array
-          title: Cbid
-      additionalProperties: true
+        Parameters:
+          $ref: '#/components/schemas/ClientDataEntityRatingChangeRequest'
       type: object
-      title: FlexibleCBPortfolio
+      required:
+      - Parameters
+      title: RequestEnvelope_ClientDataEntityRatingChangeRequest
+    ClientDataDistributionRequest:
+      properties:
+        portfolio:
+          $ref: '#/components/schemas/Portfolio'
+        EffectiveDateId:
+          type: integer
+          title: Effectivedateid
+        effectivedateid_min:
+          type: integer
+          title: Effectivedateid Min
+        effectivedateid_min_lag_months:
+          type: integer
+          title: Effectivedateid Min Lag Months
+          default: 0
+        use_client_scale:
+          type: boolean
+          title: Use Client Scale
+          default: false
+        use_cb7_scale:
+          type: boolean
+          title: Use Cb7 Scale
+          default: false
+        facet_column:
+          type: string
+          title: Facet Column
+          description: Column to group by (e.g., Sector, Region, Industry)
+      type: object
+      required:
+      - portfolio
+      title: ClientDataDistributionRequest
+    RequestEnvelope_ClientDataDistributionRequest:
+      properties:
+        Parameters:
+          $ref: '#/components/schemas/ClientDataDistributionRequest'
+      type: object
+      required:
+      - Parameters
+      title: RequestEnvelope_ClientDataDistributionRequest
+    RequestEnvelope_ClientDataSummaryRequest:
+      properties:
+        Parameters:
+          $ref: '#/components/schemas/ClientDataSummaryRequest'
+      type: object
+      required:
+      - Parameters
+      title: RequestEnvelope_ClientDataSummaryRequest
     Error:
       type: object
       description: Standard error envelope used by the API
@@ -640,28 +571,6 @@ components:
                   $ref: '#/components/schemas/ValidationErrorDetail'
               - type: object
               - type: string
-    RatingChangeType:
-      type: string
-      enum:
-      - upgrades
-      - downgrades
-      title: RatingChangeType
-    RequestEnvelope_ClientDataAggregateRequest:
-      properties:
-        Parameters:
-          $ref: '#/components/schemas/ClientDataAggregateRequest'
-      type: object
-      required:
-      - Parameters
-      title: RequestEnvelope_ClientDataAggregateRequest
-    RequestEnvelope_ClientDataSummaryRequest:
-      properties:
-        Parameters:
-          $ref: '#/components/schemas/ClientDataSummaryRequest'
-      type: object
-      required:
-      - Parameters
-      title: RequestEnvelope_ClientDataSummaryRequest
     ClientDataSummaryRequest:
       properties:
         portfolio:
@@ -893,36 +802,12 @@ components:
           description: Percentage of entities rated C
           example:
           - 0
-    ClientDataDistributionRequest:
-      properties:
-        portfolio:
-          $ref: '#/components/schemas/Portfolio'
-        EffectiveDateId:
-          type: integer
-          title: Effectivedateid
-        effectivedateid_min:
-          type: integer
-          title: Effectivedateid Min
-        effectivedateid_min_lag_months:
-          type: integer
-          title: Effectivedateid Min Lag Months
-          default: 0
-        use_client_scale:
-          type: boolean
-          title: Use Client Scale
-          default: false
-        use_cb7_scale:
-          type: boolean
-          title: Use Cb7 Scale
-          default: false
-        facet_column:
-          type: string
-          title: Facet Column
-          description: Column to group by (e.g., Sector, Region, Industry)
-      type: object
-      required:
-      - portfolio
-      title: ClientDataDistributionRequest
+    RatingChangeType:
+      type: string
+      enum:
+      - upgrades
+      - downgrades
+      title: RatingChangeType
     ClientDataAggregateResponse:
       type: object
       description: Response containing client data aggregate trend lines
@@ -1078,29 +963,144 @@ components:
           - 8
           - 8
           - 8
-    ClientDataAggregateRequest:
+    Portfolio:
       properties:
-        portfolio:
-          $ref: '#/components/schemas/Portfolio'
-        EffectiveDateId:
-          type: integer
-          title: Effectivedateid
-        effectivedateid_min_lag_months:
-          type: integer
-          title: Effectivedateid Min Lag Months
-          default: 24
-        use_client_scale:
-          type: boolean
-          title: Use Client Scale
-          default: false
-        facet_column:
+        name:
           type: string
-          title: Facet Column
-          description: Optional column to group by (e.g., Sector, Industry)
+          title: Name
+          example: Example Portfolio
+        entities:
+          $ref: '#/components/schemas/FlexibleCBPortfolio'
+          example:
+            CBId:
+            - CB000000123
+            - CB000000456
       type: object
       required:
-      - portfolio
-      title: ClientDataAggregateRequest
+      - name
+      - entities
+      title: Portfolio
+    FlexibleCBPortfolio:
+      properties:
+        CBId:
+          items:
+            type: string
+          type: array
+          title: Cbid
+      additionalProperties: true
+      type: object
+      title: FlexibleCBPortfolio
+    ValidationErrorDetail:
+      type: object
+      description: Single field validation error
+      properties:
+        field:
+          type: string
+          description: Location of the validation error (e.g. body.Parameters.portfolio)
+          example: body.Parameters.portfolio
+        message:
+          type: string
+          description: Human-readable error message
+          example: field required
+        type:
+          type: string
+          description: Machine-readable error type
+          example: value_error.missing
+    ClientDataSummaryResponse:
+      type: object
+      description: Response containing client data portfolio summary comparing client vs benchmark ratings
+      required:
+      - CBSector
+      - entity_count
+      - benchmark_entity_count
+      - ClientRating
+      - ExMeRating
+      - notch_difference
+      - ClientPD
+      - ExMePD
+      - notch_diff_aggressive
+      - notch_diff_consistent
+      - notch_diff_conservative
+      properties:
+        CBSector:
+          type: array
+          items:
+            type: string
+          description: Values of the grouping column (matches facet_column parameter)
+          example:
+          - Financial Services
+        entity_count:
+          type: array
+          items:
+            type: integer
+          description: Total number of entities in each group
+          example:
+          - 10
+        benchmark_entity_count:
+          type: array
+          items:
+            type: integer
+          description: Number of entities with benchmark ratings
+          example:
+          - 4
+        ClientRating:
+          type: array
+          items:
+            type: string
+          description: Client's internal aggregate rating
+          example:
+          - bbb-
+        ExMeRating:
+          type: array
+          items:
+            type: string
+          description: Benchmark rating (excluding client)
+          example:
+          - bb+
+        notch_difference:
+          type: array
+          items:
+            type: integer
+          description: Notch difference between client and benchmark (positive = client more conservative)
+          example:
+          - 1
+        ClientPD:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Client's aggregate probability of default
+          example:
+          - 0.0047
+        ExMePD:
+          type: array
+          items:
+            type: number
+            format: float
+          description: Benchmark aggregate probability of default (excluding client)
+          example:
+          - 0.0049
+        notch_diff_aggressive:
+          type: array
+          items:
+            type: integer
+          description: Notch difference using aggressive methodology
+          example:
+          - 1
+        notch_diff_consistent:
+          type: array
+          items:
+            type: integer
+          description: Notch difference using consistent methodology
+          example:
+          - 3
+        notch_diff_conservative:
+          type: array
+          items:
+            type: integer
+          description: Notch difference using conservative methodology
+          example:
+          - 0
   securitySchemes:
     BearerAuth:
       type: http

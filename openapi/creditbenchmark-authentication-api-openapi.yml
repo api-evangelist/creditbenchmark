@@ -150,7 +150,65 @@ paths:
     - url: https://api.creditbenchmark.com
       description: Production server
 components:
+  responses:
+    AuthBadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthError'
+          example:
+            error:
+              code: BAD_REQUEST
+              message: The request payload is invalid.
+    InternalServerError:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: An error occurred while processing your request. Please try again later.
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+          example:
+            detail: Unauthorized request
+    Unauthorized_2:
+      description: Unauthorized - invalid or missing JWT token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: UNAUTHORIZED
+              message: Invalid or missing JWT token
+    BadRequest:
+      description: Bad request - invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: BAD_REQUEST
+              message: Invalid request parameters
+              details:
+                invalid_columns:
+                - BadColumn
+                allowed_columns: Please check documentation for valid column names
   schemas:
+    SimpleError:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: string
     TokenResponse:
       type: object
       title: TokenResponse
@@ -170,20 +228,6 @@ components:
           type: string
           description: Token type.
           example: Bearer
-    UnauthorizedError:
-      type: object
-      required:
-      - detail
-      properties:
-        detail:
-          type: string
-    SimpleError:
-      type: object
-      required:
-      - error
-      properties:
-        error:
-          type: string
     AuthError:
       type: object
       title: Error
@@ -200,6 +244,13 @@ components:
               type: string
             message:
               type: string
+    UnauthorizedError:
+      type: object
+      required:
+      - detail
+      properties:
+        detail:
+          type: string
     ValidationErrorDetail:
       type: object
       description: Single field validation error
@@ -244,57 +295,6 @@ components:
                   $ref: '#/components/schemas/ValidationErrorDetail'
               - type: object
               - type: string
-  responses:
-    InternalServerError:
-      description: Server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SimpleError'
-          example:
-            error: An error occurred while processing your request. Please try again later.
-    Unauthorized:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UnauthorizedError'
-          example:
-            detail: Unauthorized request
-    AuthBadRequest:
-      description: Bad request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AuthError'
-          example:
-            error:
-              code: BAD_REQUEST
-              message: The request payload is invalid.
-    Unauthorized_2:
-      description: Unauthorized - invalid or missing JWT token
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: UNAUTHORIZED
-              message: Invalid or missing JWT token
-    BadRequest:
-      description: Bad request - invalid parameters
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: BAD_REQUEST
-              message: Invalid request parameters
-              details:
-                invalid_columns:
-                - BadColumn
-                allowed_columns: Please check documentation for valid column names
   securitySchemes:
     BearerAuth:
       type: http

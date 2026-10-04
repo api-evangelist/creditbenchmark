@@ -69,6 +69,23 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 components:
   schemas:
+    RatingChangeFilters:
+      properties:
+        rating_change_type:
+          $ref: '#/components/schemas/RatingChangeType'
+        sort_by:
+          type: string
+          title: Sort By
+          default: rating_change
+        sort_descending:
+          type: boolean
+          title: Sort Descending
+          default: true
+        n:
+          type: integer
+          title: N
+      type: object
+      title: RatingChangeFilters
     RequestEnvelope_EntityRatingChangeRequest:
       properties:
         Parameters:
@@ -77,63 +94,12 @@ components:
       required:
       - Parameters
       title: RequestEnvelope_EntityRatingChangeRequest
-    EntityRatingChangeRequest:
-      properties:
-        portfolio:
-          $ref: '#/components/schemas/Portfolio'
-        EffectiveDateId:
-          type: integer
-          title: Effectivedateid
-        rating_change_months:
-          type: integer
-          title: Rating Change Months
-          default: 6
-        use_oci:
-          type: boolean
-          title: Use Oci
-          default: false
-        use_client_scale:
-          type: boolean
-          title: Use Client Scale
-          default: false
-        descriptor_columns:
-          items:
-            type: string
-          type: array
-          title: Descriptor Columns
-        filters:
-          $ref: '#/components/schemas/RatingChangeFilters'
-      type: object
-      required:
-      - portfolio
-      title: EntityRatingChangeRequest
-    Portfolio:
-      properties:
-        name:
-          type: string
-          title: Name
-          example: Example Portfolio
-        entities:
-          $ref: '#/components/schemas/FlexibleCBPortfolio'
-          example:
-            CBId:
-            - CB000000123
-            - CB000000456
-      type: object
-      required:
-      - name
-      - entities
-      title: Portfolio
-    FlexibleCBPortfolio:
-      properties:
-        CBId:
-          items:
-            type: string
-          type: array
-          title: Cbid
-      additionalProperties: true
-      type: object
-      title: FlexibleCBPortfolio
+    RatingChangeType:
+      type: string
+      enum:
+      - upgrades
+      - downgrades
+      title: RatingChangeType
     EntityRatingChangeResponse:
       type: object
       description: Response containing entity rating change data
@@ -238,39 +204,33 @@ components:
           - 0
           - 0.0013
           - 0
-    ValidationErrorDetail:
-      type: object
-      description: Single field validation error
+    Portfolio:
       properties:
-        field:
+        name:
           type: string
-          description: Location of the validation error (e.g. body.Parameters.portfolio)
-          example: body.Parameters.portfolio
-        message:
-          type: string
-          description: Human-readable error message
-          example: field required
-        type:
-          type: string
-          description: Machine-readable error type
-          example: value_error.missing
-    RatingChangeFilters:
-      properties:
-        rating_change_type:
-          $ref: '#/components/schemas/RatingChangeType'
-        sort_by:
-          type: string
-          title: Sort By
-          default: rating_change
-        sort_descending:
-          type: boolean
-          title: Sort Descending
-          default: true
-        n:
-          type: integer
-          title: N
+          title: Name
+          example: Example Portfolio
+        entities:
+          $ref: '#/components/schemas/FlexibleCBPortfolio'
+          example:
+            CBId:
+            - CB000000123
+            - CB000000456
       type: object
-      title: RatingChangeFilters
+      required:
+      - name
+      - entities
+      title: Portfolio
+    FlexibleCBPortfolio:
+      properties:
+        CBId:
+          items:
+            type: string
+          type: array
+          title: Cbid
+      additionalProperties: true
+      type: object
+      title: FlexibleCBPortfolio
     Error:
       type: object
       description: Standard error envelope used by the API
@@ -299,12 +259,52 @@ components:
                   $ref: '#/components/schemas/ValidationErrorDetail'
               - type: object
               - type: string
-    RatingChangeType:
-      type: string
-      enum:
-      - upgrades
-      - downgrades
-      title: RatingChangeType
+    ValidationErrorDetail:
+      type: object
+      description: Single field validation error
+      properties:
+        field:
+          type: string
+          description: Location of the validation error (e.g. body.Parameters.portfolio)
+          example: body.Parameters.portfolio
+        message:
+          type: string
+          description: Human-readable error message
+          example: field required
+        type:
+          type: string
+          description: Machine-readable error type
+          example: value_error.missing
+    EntityRatingChangeRequest:
+      properties:
+        portfolio:
+          $ref: '#/components/schemas/Portfolio'
+        EffectiveDateId:
+          type: integer
+          title: Effectivedateid
+        rating_change_months:
+          type: integer
+          title: Rating Change Months
+          default: 6
+        use_oci:
+          type: boolean
+          title: Use Oci
+          default: false
+        use_client_scale:
+          type: boolean
+          title: Use Client Scale
+          default: false
+        descriptor_columns:
+          items:
+            type: string
+          type: array
+          title: Descriptor Columns
+        filters:
+          $ref: '#/components/schemas/RatingChangeFilters'
+      type: object
+      required:
+      - portfolio
+      title: EntityRatingChangeRequest
   responses:
     InternalServerError:
       description: Internal server error
@@ -326,30 +326,6 @@ components:
             error:
               code: PERMISSION_DENIED
               message: Insufficient permissions for this resource
-    Unauthorized:
-      description: Unauthorized - invalid or missing JWT token
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: UNAUTHORIZED
-              message: Invalid or missing JWT token
-    BadRequest:
-      description: Bad request - invalid parameters
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: BAD_REQUEST
-              message: Invalid request parameters
-              details:
-                invalid_columns:
-                - BadColumn
-                allowed_columns: Please check documentation for valid column names
     ValidationError:
       description: Validation error - request parameters are invalid
       content:
@@ -364,6 +340,30 @@ components:
               - field: body.Parameters.portfolio
                 message: field required
                 type: value_error.missing
+    BadRequest:
+      description: Bad request - invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: BAD_REQUEST
+              message: Invalid request parameters
+              details:
+                invalid_columns:
+                - BadColumn
+                allowed_columns: Please check documentation for valid column names
+    Unauthorized:
+      description: Unauthorized - invalid or missing JWT token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: UNAUTHORIZED
+              message: Invalid or missing JWT token
   securitySchemes:
     BearerAuth:
       type: http
