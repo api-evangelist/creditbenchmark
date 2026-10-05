@@ -1,0 +1,12 @@
+{
+ "url": "https://docs.creditbenchmark.com/openapi.yaml",
+ "requested_url": "https://docs.creditbenchmark.com/openapi.yaml",
+ "status": 200,
+ "content_type": "text/yaml",
+ "bytes": 67662,
+ "sha256": "b357bbdb41e66822cb1f95bbff30674c5f668fd206327bbbd40c383d034aaedc",
+ "fetched_at": "2026-10-04",
+ "fetched_by": "APIEvangelist-Harvest/1.0 (+https://apievangelist.com)",
+ "match": "equivalent",
+ "note": "Re-fetched from the provider by verify-openapi-sources.py; the provider's current document describes the same operations (Jaccard 1.0), but the bytes differ, so the archive is an earlier or reformatted copy."
+}
