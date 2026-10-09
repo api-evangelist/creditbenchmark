@@ -2,7 +2,7 @@
 name: Track consensus rating moves across a universe
 description: Authenticate, then identify entity-level upgrades and downgrades and a custom aggregate trend across a scoped entity universe.
 api: openapi/creditbenchmark-openapi-original.yml
-operations: [getToken, entityRatingChange, customAggregate]
+operations: [postGartanApiToken, entityRatingChange, customAggregate]
 ---
 
 # Track consensus rating moves across a universe

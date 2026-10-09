@@ -1,4 +1,4 @@
-generated: '2026-09-16'
+generated: '2026-09-23'
 method: generated
 source: openapi/creditbenchmark-analytics-api-openapi.yml, openapi/creditbenchmark-authentication-api-openapi.yml,
   openapi/creditbenchmark-contributor-data-api-openapi.yml, openapi/creditbenchmark-data-api-openapi.yml,
@@ -11,11 +11,11 @@ description: Recommended x-agentic-access execution contracts, classified heuris
 summary:
   operations: 23
   by_action_class:
-    acting: 18
-    connected: 5
+    acting: 17
+    connected: 6
   by_consequence:
-    write: 18
-    read: 5
+    write: 17
+    read: 6
   human_in_the_loop_required: 0
 operations:
 - path: /analytics/v2/data/aggregatetrend
@@ -214,18 +214,12 @@ operations:
   method: post
   operationId: getData
   x-agentic-access:
-    action-class: acting
-    consequence: write
-    subject: required
-    audience: null
+    action-class: connected
+    consequence: read
+    subject: optional
     token:
-      max-ttl: 900
-    escalation:
-      human-in-the-loop: conditional
-      triggers:
-      - abnormal
-      - high-value
-    audit: required
+      max-ttl: 3600
+    audit: none
 - path: /api/analytics/entity-rating-change
   method: post
   operationId: entityRatingChange

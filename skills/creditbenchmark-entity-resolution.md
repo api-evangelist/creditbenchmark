@@ -2,7 +2,7 @@
 name: Resolve company names to Credit Benchmark CB_IDs
 description: Map free-text company names to Credit Benchmark entity identifiers (CB_IDs) with ranked, scored candidates.
 api: openapi/credit-benchmark-consensus-data-openapi.yml
-operations: [getToken, matchExternalEntities]
+operations: [postGartanApiToken, matchExternalEntities]
 ---
 
 # Resolve company names to Credit Benchmark CB_IDs

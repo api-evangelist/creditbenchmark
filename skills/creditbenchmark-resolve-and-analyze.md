@@ -2,7 +2,7 @@
 name: Resolve entities and pull consensus credit analytics
 description: Authenticate, resolve company names to Credit Benchmark CBIDs, then pull consensus rating distribution and a portfolio summary for the resolved universe.
 api: openapi/creditbenchmark-openapi-original.yml
-operations: [getToken, matchEntities, ratingDistribution, portfolioSummary]
+operations: [postGartanApiToken, matchEntities, postApiAnalyticsRatingDistribution, portfolioSummary]
 ---
 
 # Resolve entities and pull consensus credit analytics

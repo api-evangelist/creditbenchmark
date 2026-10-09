@@ -2,7 +2,7 @@
 name: Run Credit Benchmark portfolio analytics
 description: Compute aggregate credit trends, breakdowns, rating changes, and rating distributions for a scoped universe of entities.
 api: openapi/credit-benchmark-consensus-data-openapi.yml
-operations: [getToken, metadata_available_dates_v2_metadata_available_dates_get, aggregateTrend, creditBreakdown, entityRatingChange, ratingDistribution]
+operations: [postGartanApiToken, metadata_available_dates_v2_metadata_available_dates_get, aggregateTrend, creditBreakdown, entityRatingChange, postApiAnalyticsRatingDistribution]
 ---
 
 # Run Credit Benchmark portfolio analytics

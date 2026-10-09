@@ -2,7 +2,7 @@
 name: Authenticate and extract Credit Benchmark data
 description: Get a JWT token, resolve entity names to CB_IDs if needed, then extract raw consensus credit data for a scoped universe.
 api: openapi/credit-benchmark-consensus-data-openapi.yml
-operations: [getToken, matchExternalEntities, metadata_columns_v2_metadata_columns_get, getData]
+operations: [postGartanApiToken, matchExternalEntities, metadata_columns_v2_metadata_columns_get, getData]
 ---
 
 # Authenticate and extract Credit Benchmark data
