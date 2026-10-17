@@ -94,23 +94,6 @@ components:
             $ref: '#/components/schemas/Query'
           description: List of company names to match
           minItems: 1
-    ExternalMatchRow:
-      type: object
-      description: Matching results for a single entity query
-      required:
-      - entity
-      - candidates
-      properties:
-        entity:
-          type: string
-          description: Original query text
-          example: JPMorgan Chase & Co.
-        candidates:
-          type: array
-          items:
-            $ref: '#/components/schemas/ExternalCandidate'
-          description: Ordered list of candidate matches, sorted by rank
-          default: []
     MatchExternalResponse:
       type: object
       description: Response containing entity matching results
@@ -145,34 +128,23 @@ components:
           type: string
           description: Optional country name or code to filter matches
           example: United States
-    Error:
+    ExternalMatchRow:
       type: object
-      description: Standard error envelope used by the API
+      description: Matching results for a single entity query
       required:
-      - error
+      - entity
+      - candidates
       properties:
-        error:
-          type: object
-          required:
-          - code
-          - message
-          properties:
-            code:
-              type: string
-              description: Machine-readable error code
-              example: BAD_REQUEST
-            message:
-              type: string
-              description: Human-readable error message
-              example: Invalid request parameters
-            details:
-              description: Optional structured details about the error
-              oneOf:
-              - type: array
-                items:
-                  $ref: '#/components/schemas/ValidationErrorDetail'
-              - type: object
-              - type: string
+        entity:
+          type: string
+          description: Original query text
+          example: JPMorgan Chase & Co.
+        candidates:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExternalCandidate'
+          description: Ordered list of candidate matches, sorted by rank
+          default: []
     ExternalCandidate:
       type: object
       description: A ranked candidate match for an entity query
@@ -210,6 +182,34 @@ components:
           minimum: 0
           maximum: 1
           example: 0.98
+    Error:
+      type: object
+      description: Standard error envelope used by the API
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+              description: Machine-readable error code
+              example: BAD_REQUEST
+            message:
+              type: string
+              description: Human-readable error message
+              example: Invalid request parameters
+            details:
+              description: Optional structured details about the error
+              oneOf:
+              - type: array
+                items:
+                  $ref: '#/components/schemas/ValidationErrorDetail'
+              - type: object
+              - type: string
     ValidationErrorDetail:
       type: object
       description: Single field validation error
@@ -227,6 +227,16 @@ components:
           description: Machine-readable error type
           example: value_error.missing
   responses:
+    Unauthorized:
+      description: Unauthorized - invalid or missing JWT token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: UNAUTHORIZED
+              message: Invalid or missing JWT token
     InternalServerError:
       description: Internal server error
       content:
@@ -237,30 +247,6 @@ components:
             error:
               code: INTERNAL_SERVER_ERROR
               message: An unexpected error occurred.
-    ValidationError:
-      description: Validation error - request parameters are invalid
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: VALIDATION_ERROR
-              message: Request validation failed
-              details:
-              - field: body.Parameters.portfolio
-                message: field required
-                type: value_error.missing
-    Forbidden:
-      description: Forbidden - insufficient permissions or access denied
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: PERMISSION_DENIED
-              message: Insufficient permissions for this resource
     BadRequest:
       description: Bad request - invalid parameters
       content:
@@ -275,16 +261,30 @@ components:
                 invalid_columns:
                 - BadColumn
                 allowed_columns: Please check documentation for valid column names
-    Unauthorized:
-      description: Unauthorized - invalid or missing JWT token
+    Forbidden:
+      description: Forbidden - insufficient permissions or access denied
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
           example:
             error:
-              code: UNAUTHORIZED
-              message: Invalid or missing JWT token
+              code: PERMISSION_DENIED
+              message: Insufficient permissions for this resource
+    ValidationError:
+      description: Validation error - request parameters are invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: VALIDATION_ERROR
+              message: Request validation failed
+              details:
+              - field: body.Parameters.portfolio
+                message: field required
+                type: value_error.missing
   securitySchemes:
     BearerAuth:
       type: http

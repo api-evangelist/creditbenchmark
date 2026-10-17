@@ -87,6 +87,37 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 components:
   schemas:
+    MatchExternalResponse:
+      type: object
+      required:
+      - results
+      properties:
+        results:
+          type: array
+          description: Table-style results keyed by input entity.
+          items:
+            $ref: '#/components/schemas/ExternalMatchRow'
+    ExternalMatchBody:
+      type: object
+      additionalProperties: false
+      properties:
+        entities:
+          type: array
+          description: 'Entities to match using the external route contract. Empty arrays are allowed and return `results: []`.'
+          items:
+            $ref: '#/components/schemas/ExternalMatchEntity'
+          default: []
+        limit:
+          type: integer
+          default: 3
+          description: Maximum candidates to return per entity row. Valid integer values are 1 through 10. Omitted or out-of-range integers are normalized to 3; malformed non-integer values fail validation.
+    SimpleError:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: string
     ExternalMatchRow:
       type: object
       required:
@@ -101,30 +132,15 @@ components:
           description: Ordered candidates limited by the requested `limit`.
           items:
             $ref: '#/components/schemas/ExternalCandidate'
-    SimpleError:
-      type: object
-      required:
-      - error
-      properties:
-        error:
-          type: string
-    MatchExternalResponse:
-      type: object
-      required:
-      - results
-      properties:
-        results:
-          type: array
-          description: Table-style results keyed by input entity.
-          items:
-            $ref: '#/components/schemas/ExternalMatchRow'
-    UnauthorizedError:
+    FastApiValidationErrorResponse:
       type: object
       required:
       - detail
       properties:
         detail:
-          type: string
+          type: array
+          items:
+            $ref: '#/components/schemas/FastApiValidationErrorDetail'
     ExternalCandidate:
       type: object
       required:
@@ -151,29 +167,13 @@ components:
         confidence:
           type: number
           description: Matching confidence score.
-    ExternalMatchBody:
-      type: object
-      additionalProperties: false
-      properties:
-        entities:
-          type: array
-          description: 'Entities to match using the external route contract. Empty arrays are allowed and return `results: []`.'
-          items:
-            $ref: '#/components/schemas/ExternalMatchEntity'
-          default: []
-        limit:
-          type: integer
-          default: 3
-          description: Maximum candidates to return per entity row. Valid integer values are 1 through 10. Omitted or out-of-range integers are normalized to 3; malformed non-integer values fail validation.
-    FastApiValidationErrorResponse:
+    UnauthorizedError:
       type: object
       required:
       - detail
       properties:
         detail:
-          type: array
-          items:
-            $ref: '#/components/schemas/FastApiValidationErrorDetail'
+          type: string
     FastApiValidationErrorDetail:
       type: object
       properties:
@@ -207,6 +207,14 @@ components:
           type: string
           description: Optional LEI hint. Blank values are treated as omitted.
   responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+          example:
+            detail: Unauthorized request
     InternalServerError:
       description: Server error
       content:
@@ -223,14 +231,6 @@ components:
             $ref: '#/components/schemas/SimpleError'
           example:
             error: Client-backed analytics inputs require contributor entitlement.
-    Unauthorized:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UnauthorizedError'
-          example:
-            detail: Unauthorized request
     FrameworkValidationError:
       description: Validation error
       content:

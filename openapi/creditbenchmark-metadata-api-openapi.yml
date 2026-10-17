@@ -227,105 +227,6 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 components:
   schemas:
-    DataColumnsResponse:
-      type: object
-      description: Public input column catalog.
-      additionalProperties:
-        $ref: '#/components/schemas/DataColumnMetadata'
-    RateLimitError:
-      type: object
-      required:
-      - error
-      - detail
-      properties:
-        error:
-          type: string
-        detail:
-          type: string
-    SimpleError:
-      type: object
-      required:
-      - error
-      properties:
-        error:
-          type: string
-    DataColumnMetadata:
-      type: object
-      additionalProperties: false
-      required:
-      - type
-      - scopeable
-      - facetable
-      - entitlement
-      properties:
-        type:
-          type: string
-          description: Column type.
-        scopeable:
-          type: boolean
-          description: Whether the column can be used in `scope.filters`.
-        facetable:
-          type: boolean
-          description: Whether the column can be used as a facet column.
-        entitlement:
-          type:
-          - string
-          - 'null'
-          enum:
-          - SP
-          - FITCH
-          - CLIENT_DATA
-          - null
-          description: Required entitlement, if any.
-    AvailableDatesMetadataResponse:
-      type: object
-      description: Latest available effective dates for analytics requests.
-      required:
-      - latest_effective_date
-      - latest_finalised_effective_date
-      properties:
-        latest_effective_date:
-          type: integer
-          description: Latest available effective date in YYYYMMDD format.
-          example: 20260529
-        latest_finalised_effective_date:
-          type: integer
-          description: Latest finalised effective date in YYYYMMDD format.
-          example: 20260529
-    IndustrySchemaMetadataResponse:
-      type: object
-      description: Industry and entity-type hierarchy metadata.
-      required:
-      - industry
-      - entity_types
-      properties:
-        industry:
-          $ref: '#/components/schemas/HierarchyMetadata'
-        entity_types:
-          $ref: '#/components/schemas/HierarchyMetadata'
-    UnauthorizedError:
-      type: object
-      required:
-      - detail
-      properties:
-        detail:
-          type: string
-    HierarchyMetadata:
-      type: object
-      description: Hierarchy metadata with level labels and a nested tree.
-      required:
-      - levels
-      - tree
-      properties:
-        levels:
-          type: object
-          additionalProperties:
-            type: string
-          description: Field names mapped to hierarchy levels.
-        tree:
-          type: object
-          additionalProperties: true
-          description: Nested hierarchy tree.
     GeographySchemaMetadataResponse:
       type: object
       description: Geography hierarchy metadata.
@@ -376,23 +277,106 @@ components:
             type: object
             additionalProperties: true
           description: Scale definitions keyed by scale name. `CB21` and `CB7` include ordered rating rows; `CLIENT` describes client-specific scale behavior.
+    AvailableDatesMetadataResponse:
+      type: object
+      description: Latest available effective dates for analytics requests.
+      required:
+      - latest_effective_date
+      - latest_finalised_effective_date
+      properties:
+        latest_effective_date:
+          type: integer
+          description: Latest available effective date in YYYYMMDD format.
+          example: 20260529
+        latest_finalised_effective_date:
+          type: integer
+          description: Latest finalised effective date in YYYYMMDD format.
+          example: 20260529
+    SimpleError:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: string
+    DataColumnsResponse:
+      type: object
+      description: Public input column catalog.
+      additionalProperties:
+        $ref: '#/components/schemas/DataColumnMetadata'
+    UnauthorizedError:
+      type: object
+      required:
+      - detail
+      properties:
+        detail:
+          type: string
+    HierarchyMetadata:
+      type: object
+      description: Hierarchy metadata with level labels and a nested tree.
+      required:
+      - levels
+      - tree
+      properties:
+        levels:
+          type: object
+          additionalProperties:
+            type: string
+          description: Field names mapped to hierarchy levels.
+        tree:
+          type: object
+          additionalProperties: true
+          description: Nested hierarchy tree.
+    DataColumnMetadata:
+      type: object
+      additionalProperties: false
+      required:
+      - type
+      - scopeable
+      - facetable
+      - entitlement
+      properties:
+        type:
+          type: string
+          description: Column type.
+        scopeable:
+          type: boolean
+          description: Whether the column can be used in `scope.filters`.
+        facetable:
+          type: boolean
+          description: Whether the column can be used as a facet column.
+        entitlement:
+          type:
+          - string
+          - 'null'
+          enum:
+          - SP
+          - FITCH
+          - CLIENT_DATA
+          - null
+          description: Required entitlement, if any.
+    RateLimitError:
+      type: object
+      required:
+      - error
+      - detail
+      properties:
+        error:
+          type: string
+        detail:
+          type: string
+    IndustrySchemaMetadataResponse:
+      type: object
+      description: Industry and entity-type hierarchy metadata.
+      required:
+      - industry
+      - entity_types
+      properties:
+        industry:
+          $ref: '#/components/schemas/HierarchyMetadata'
+        entity_types:
+          $ref: '#/components/schemas/HierarchyMetadata'
   responses:
-    InternalServerError:
-      description: Server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SimpleError'
-          example:
-            error: An error occurred while processing your request. Please try again later.
-    Forbidden:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SimpleError'
-          example:
-            error: Client-backed analytics inputs require contributor entitlement.
     TooManyRequests:
       description: Too many requests
       content:
@@ -410,6 +394,22 @@ components:
             $ref: '#/components/schemas/UnauthorizedError'
           example:
             detail: Unauthorized request
+    InternalServerError:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: An error occurred while processing your request. Please try again later.
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: Client-backed analytics inputs require contributor entitlement.
   securitySchemes:
     BearerAuth:
       type: http

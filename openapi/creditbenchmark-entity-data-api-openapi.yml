@@ -69,23 +69,36 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 components:
   schemas:
-    RatingChangeFilters:
+    EntityRatingChangeRequest:
       properties:
-        rating_change_type:
-          $ref: '#/components/schemas/RatingChangeType'
-        sort_by:
-          type: string
-          title: Sort By
-          default: rating_change
-        sort_descending:
-          type: boolean
-          title: Sort Descending
-          default: true
-        n:
+        portfolio:
+          $ref: '#/components/schemas/Portfolio'
+        EffectiveDateId:
           type: integer
-          title: N
+          title: Effectivedateid
+        rating_change_months:
+          type: integer
+          title: Rating Change Months
+          default: 6
+        use_oci:
+          type: boolean
+          title: Use Oci
+          default: false
+        use_client_scale:
+          type: boolean
+          title: Use Client Scale
+          default: false
+        descriptor_columns:
+          items:
+            type: string
+          type: array
+          title: Descriptor Columns
+        filters:
+          $ref: '#/components/schemas/RatingChangeFilters'
       type: object
-      title: RatingChangeFilters
+      required:
+      - portfolio
+      title: EntityRatingChangeRequest
     RequestEnvelope_EntityRatingChangeRequest:
       properties:
         Parameters:
@@ -94,12 +107,6 @@ components:
       required:
       - Parameters
       title: RequestEnvelope_EntityRatingChangeRequest
-    RatingChangeType:
-      type: string
-      enum:
-      - upgrades
-      - downgrades
-      title: RatingChangeType
     EntityRatingChangeResponse:
       type: object
       description: Response containing entity rating change data
@@ -204,6 +211,29 @@ components:
           - 0
           - 0.0013
           - 0
+    RatingChangeFilters:
+      properties:
+        rating_change_type:
+          $ref: '#/components/schemas/RatingChangeType'
+        sort_by:
+          type: string
+          title: Sort By
+          default: rating_change
+        sort_descending:
+          type: boolean
+          title: Sort Descending
+          default: true
+        n:
+          type: integer
+          title: N
+      type: object
+      title: RatingChangeFilters
+    RatingChangeType:
+      type: string
+      enum:
+      - upgrades
+      - downgrades
+      title: RatingChangeType
     Portfolio:
       properties:
         name:
@@ -275,37 +305,17 @@ components:
           type: string
           description: Machine-readable error type
           example: value_error.missing
-    EntityRatingChangeRequest:
-      properties:
-        portfolio:
-          $ref: '#/components/schemas/Portfolio'
-        EffectiveDateId:
-          type: integer
-          title: Effectivedateid
-        rating_change_months:
-          type: integer
-          title: Rating Change Months
-          default: 6
-        use_oci:
-          type: boolean
-          title: Use Oci
-          default: false
-        use_client_scale:
-          type: boolean
-          title: Use Client Scale
-          default: false
-        descriptor_columns:
-          items:
-            type: string
-          type: array
-          title: Descriptor Columns
-        filters:
-          $ref: '#/components/schemas/RatingChangeFilters'
-      type: object
-      required:
-      - portfolio
-      title: EntityRatingChangeRequest
   responses:
+    Unauthorized:
+      description: Unauthorized - invalid or missing JWT token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: UNAUTHORIZED
+              message: Invalid or missing JWT token
     InternalServerError:
       description: Internal server error
       content:
@@ -316,6 +326,20 @@ components:
             error:
               code: INTERNAL_SERVER_ERROR
               message: An unexpected error occurred.
+    BadRequest:
+      description: Bad request - invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: BAD_REQUEST
+              message: Invalid request parameters
+              details:
+                invalid_columns:
+                - BadColumn
+                allowed_columns: Please check documentation for valid column names
     Forbidden:
       description: Forbidden - insufficient permissions or access denied
       content:
@@ -340,30 +364,6 @@ components:
               - field: body.Parameters.portfolio
                 message: field required
                 type: value_error.missing
-    BadRequest:
-      description: Bad request - invalid parameters
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: BAD_REQUEST
-              message: Invalid request parameters
-              details:
-                invalid_columns:
-                - BadColumn
-                allowed_columns: Please check documentation for valid column names
-    Unauthorized:
-      description: Unauthorized - invalid or missing JWT token
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error:
-              code: UNAUTHORIZED
-              message: Invalid or missing JWT token
   securitySchemes:
     BearerAuth:
       type: http

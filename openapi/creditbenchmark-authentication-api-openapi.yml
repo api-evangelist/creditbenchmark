@@ -161,14 +161,6 @@ components:
             error:
               code: BAD_REQUEST
               message: The request payload is invalid.
-    InternalServerError:
-      description: Server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SimpleError'
-          example:
-            error: An error occurred while processing your request. Please try again later.
     Unauthorized:
       description: Unauthorized
       content:
@@ -177,6 +169,14 @@ components:
             $ref: '#/components/schemas/UnauthorizedError'
           example:
             detail: Unauthorized request
+    InternalServerError:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SimpleError'
+          example:
+            error: An error occurred while processing your request. Please try again later.
     Unauthorized_2:
       description: Unauthorized - invalid or missing JWT token
       content:
@@ -209,6 +209,29 @@ components:
       properties:
         error:
           type: string
+    UnauthorizedError:
+      type: object
+      required:
+      - detail
+      properties:
+        detail:
+          type: string
+    AuthError:
+      type: object
+      title: Error
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+            message:
+              type: string
     TokenResponse:
       type: object
       title: TokenResponse
@@ -228,29 +251,6 @@ components:
           type: string
           description: Token type.
           example: Bearer
-    AuthError:
-      type: object
-      title: Error
-      required:
-      - error
-      properties:
-        error:
-          type: object
-          required:
-          - code
-          - message
-          properties:
-            code:
-              type: string
-            message:
-              type: string
-    UnauthorizedError:
-      type: object
-      required:
-      - detail
-      properties:
-        detail:
-          type: string
     ValidationErrorDetail:
       type: object
       description: Single field validation error
